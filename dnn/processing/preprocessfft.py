@@ -21,6 +21,7 @@ into a huge compressed data structure
 Data will be stored as npz compressed file
 
 matrix will be H x W x F x T (height x width x frequency band x time window),
+T x H x W x F 
 where height and width define a grid where power is projected.
 
 It will depend on the number of parcellated regions, so for 84, it will be a 
