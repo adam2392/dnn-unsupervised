@@ -1,10 +1,12 @@
 # dnn-unsupervised
 By: Adam Li
-### Languages/Libs: Python, Ipython, Keras, Tensorflow
+### Languages/Libs: Python, Ipython, Keras, Tensorflow, Pandas, SciPy
 ### Concepts: CNN, RNN, LSTM, CNN-LSTM, Mixing Networks, GPU Training
 
 # Background
 IEEG data is sparse within the community relative to the big data of commercial sectors that power deep learning models. This project builds deep learning models that learn off of simulated data from nonlinear computational models of the brain.
+
+Visualizations will be performed with matplotlib and seaborn.
 
 # Setup
 
