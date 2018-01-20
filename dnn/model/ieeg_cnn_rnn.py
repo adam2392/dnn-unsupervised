@@ -42,6 +42,7 @@ from keras.layers.embeddings import Embedding
 # from utils import augment_EEG, cart2sph, pol2cart
 # from keras import backend as K
 
+
 class IEEGdnn():
     def __init__(self, imsize: int =32, n_colors: int =3, num_classes: int = 2):
         '''
@@ -197,7 +198,7 @@ class IEEGdnn():
         model.add(LSTM(units=size_mem, 
                             activation='relu', 
                             return_sequences=True))
-        model = self._build_output(model, size_fc)
+        model = self._build_output(model.output, size_fc)
         return model
 
     def build_cnn_lstm_mix(self, num_timewins: int, size_mem: int = 128, size_fc: int = 1024, DROPOUT: bool = False):
@@ -277,6 +278,37 @@ class IEEGdnn():
         if DROPOUT:
             output = Dropout(0.5)(output)
         return output
+
+    def _build_seq_output(self, finalmodel, size_fc: int =1024, DROPOUT: bool = False):
+        '''
+        Creates the final output layers of the sequential model: a fully connected layer
+        followed by a final classification layer.
+
+        Parameters:
+        size_fc             (int) the size of the fully connected dense layer
+        DROPOUT             (bool) True, of False on whether to use dropout or not
+
+        Returns:
+        model               the sequential model object with all layers added in LSTM style,
+                            or the actual tensor
+        '''
+        # finalmodel = Sequential()
+        # finalmodel.add(InputLayer(input_shape=model.output_shape))
+        # if DROPOUT:
+        #     finalmodel.add(Dropout(0.5))
+        # finalmodel.add(Dense(size_fc, activation='relu'))
+        # if DROPOUT:
+        #     finalmodel.add(Dropout(0.5))
+        # # final classification layer -> softmax for multiclass, 
+        # finalmodel.add(Dense(num_classes, activation='softmax'))
+
+        if DROPOUT:
+            finalmodel.add(Dropout(0.5))
+        finalmodel.add(Dense(size_fc, activation='relu'))
+        if DROPOUT:
+            finalmodel.add(Dropout(0.5))
+        finalmodel.add(Dense(self.num_classes, activation='softmax'))
+        return finalmodel
 
     def init_callbacks(self):
         callbacks = [LearningRateScheduler(poly_decay)]
