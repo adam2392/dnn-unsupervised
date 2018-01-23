@@ -19,15 +19,18 @@ from keras.utils.training_utils import multi_gpu_model
 import tensorflow as tf
 import keras
 
+from keras import Model
+
 # import high level optimizers, models and layers
 from keras.optimizers import SGD
-from keras.models import Sequential
+from keras.models import Sequential, Model
 from keras.layers import InputLayer
 
 # for CNN
-from keras.layers import Conv1D, Conv2D, MaxPooling2D
+from keras.layers import Conv1D, Conv2D, Conv3D, MaxPooling2D, MaxPooling3D
 # for RNN
 from keras.layers import LSTM
+from keras.layers import Bidirectional
 # for general NN behavior
 from keras.layers import TimeDistributed, Dense, Dropout, Flatten
 from keras.layers import Input, Concatenate, Permute, Reshape, Merge
@@ -87,7 +90,7 @@ class IEEGdnn():
         for idx, n_layer in enumerate(n_layers):
             for ilay in range(n_layer):
                 model.add(Conv2D(n_filters_first*(2 ** idx), 
-                                 kernel_size=(3, 3),
+                                 kernel_size=filter_size,
                                  input_shape=(self.imsize, self.imsize, self.n_colors),
                                  kernel_initializer=w_init[count], 
                                  activation='relu'))
@@ -98,6 +101,49 @@ class IEEGdnn():
                 count+=1
             # create a network at the end with a max pooling
             model.add(MaxPooling2D(pool_size=poolsize))
+        return model
+
+    def _build_3dcnn(self, w_init: list = None, n_layers: tuple = (4,2,1), poolsize: tuple = (2,2,2), n_filters_first: int = 32, filter_size=(3,3,3)):    
+        '''
+        Creates a Convolutional Neural network in VGG-16 style. It requires self
+        to initialize a sequential model first.
+
+        Parameters:
+        w_init              (list) of all the weights (#layers * #nodes_in_layers)
+        n_layers            (tuple) of number of nodes in each layer
+        poolsize            (tuple) for max pooling poolsize along each dimension 
+                            (e.g. 2D is (2,2) for pooling over 2 pixels in x and y direction)
+        n_filters_first     (int) number of filters in the first layer
+        filter_size         (int/tuple/list) the kernel/filter size of the width/height of
+                            2D convolution window
+
+        Returns:
+        model               the sequential model object with all layers added in CNN style
+        '''
+        DEBUG=0
+        # check for weight initialization -> apply Glorotuniform
+        if w_init is None:
+            w_init = [keras.initializers.glorot_uniform()] * sum(n_layers)
+        # set up input layer of CNN
+        model = Sequential()
+        model.add(InputLayer(input_shape=(self.imsize, self.imsize, self.imsize, self.n_colors)))
+        # initialize counter to keep track of which weight to assign
+        count=0
+        # add the rest of the hidden layers
+        for idx, n_layer in enumerate(n_layers):
+            for ilay in range(n_layer):
+                model.add(Conv3D(n_filters_first*(2 ** idx), 
+                                 kernel_size=filter_size,
+                                 # input_shape=(self.imsize, self.imsize, self.n_colors),
+                                 kernel_initializer=w_init[count], 
+                                 activation='relu'))
+                if DEBUG:
+                    print(model.output_shape)
+                    print(idx, " and ", ilay)
+                # increment counter to the next weight initializer
+                count+=1
+            # create a network at the end with a max pooling
+            model.add(MaxPooling3D(pool_size=poolsize))
         return model
 
     def _build_lstm(self, input_dim: int, embed_vector_dim: int, input_len: int, output_dim: int, size_mem: int):
@@ -125,7 +171,7 @@ class IEEGdnn():
         self.model.add(Dense(output_dim, activation='relu'))
         return self.model
 
-    def build_same_cnn_lstm(self, num_timewins: int, size_mem: int = 128,size_fc: int =1024, DROPOUT: bool = False):
+    def build_same_cnn_lstm(self, num_timewins: int, size_mem: int = 128,size_fc: int =1024, dim: int=2, BIDIRECT: bool=True, DROPOUT: bool = False):
         '''
         Creates a CNN network with shared weights, with a LSTM layer to 
         integrate time from sequences of images 
@@ -141,25 +187,38 @@ class IEEGdnn():
         w_init = None
 
         # create a single CNN
-        convnet = self._build_2dcnn(w_init=w_init, n_layers=(4,2,1), 
-                poolsize=(2,2), n_filters_first=32, filter_size=(3,3))
+        if dim == 2:
+            convnet = self._build_2dcnn(w_init=w_init, n_layers=(4,2,1), 
+                    poolsize=(2,2), n_filters_first=32, filter_size=(3,3))
+        elif dim==3:
+            convnet = self._build_3dcnn(w_init=w_init, n_layers=(4,2,1), 
+                poolsize=(2,2,2), n_filters_first=32, filter_size=(3,3,3))
         # flatten layer from single CNN (e.g. model.output_shape == (None, 64, 32, 32) -> (None, 65536))
         convnet.add(Flatten())
         cnn_output_shape = convnet.output_shape[1]
 
         # create sequential model to get this all before the LSTM
         model = Sequential()
-        model.add(TimeDistributed(convnet, input_shape=(num_timewins, self.imsize, self.imsize, self.n_colors)))
-        model.add(LSTM(units=size_mem, 
+        if dim == 2:
+            model.add(TimeDistributed(convnet, input_shape=(num_timewins, self.imsize, self.imsize, self.n_colors)))
+        elif dim==3:
+            model.add(TimeDistributed(convnet, input_shape=(num_timewins, self.imsize, self.imsize, self.imsize, self.n_colors)))
+        if BIDIRECT:
+            model.add(Bidirectional(LSTM(units=size_mem, 
                             activation='relu', 
-                            return_sequences=True))
-        output = self._build_output(model.output, size_fc=size_fc)
+                            return_sequences=False)))
+        else:
+            model.add(LSTM(units=size_mem, 
+                            activation='relu', 
+                            return_sequences=False))
+        output = self._build_seq_output(model, size_fc=size_fc)
         
         return output
         # model.add(Input(tensor=output))
         # return model
 
-    def build_cnn_lstm(self, num_timewins: int, size_mem: int = 128, size_fc: int =1024, DROPOUT: bool = False):
+    def build_cnn_lstm(self, num_timewins: int, size_mem: int = 128, 
+        size_fc: int =1024, dim: int=2, BIDIRECT: bool=True, DROPOUT: bool = False):
         '''
         Creates a CNN network with shared weights, with a LSTM layer to 
         integrate time from sequences of images 
@@ -178,8 +237,12 @@ class IEEGdnn():
         convnets = []
         # Build 7 parallel CNNs with shared weights
         for i in range(num_timewins):
-            convnet = self._build_2dcnn(w_init=w_init, n_layers=(4,2,1), 
-                    poolsize=(2,2), n_filters_first=32, filter_size=(3,3))
+            if dim == 2:
+                convnet = self._build_2dcnn(w_init=w_init, n_layers=(4,2,1), 
+                        poolsize=(2,2), n_filters_first=32, filter_size=(3,3))
+            elif dim==3:
+                convnet = self._build_3dcnn(w_init=w_init, n_layers=(4,2,1), 
+                    poolsize=(2,2,2), n_filters_first=32, filter_size=(3,3,3))
             convnet.add(Flatten())
             # adds a flattened layer for the convnet (e.g. model.output_shape == (None, 64, 32, 32) -> (None, 65536))
             convnets.append(convnet)
@@ -194,14 +257,20 @@ class IEEGdnn():
         model.add(Reshape((num_timewins, num_cnn_features)))
         ########################## Build into LSTM now #################
         # Input to LSTM should have the shape as (batch size, seqlen/timesteps, inputdim/features)
-        # only get the last LSTM output
-        model.add(LSTM(units=size_mem, 
+        if BIDIRECT:
+            model.add(Bidirectional(LSTM(units=size_mem, 
                             activation='relu', 
-                            return_sequences=True))
-        model = self._build_output(model.output, size_fc)
+                            return_sequences=False)))
+        else:
+            # only get the last LSTM output
+            model.add(LSTM(units=size_mem, 
+                            activation='relu', 
+                            return_sequences=False))
+
+        model = self._build_seq_output(model, size_fc)
         return model
 
-    def build_cnn_lstm_mix(self, num_timewins: int, size_mem: int = 128, size_fc: int = 1024, DROPOUT: bool = False):
+    def build_cnn_lstm_mix(self, num_timewins: int, size_mem: int = 128, size_fc: int = 1024, dim: int=2, BIDIRECT: bool=True, DROPOUT: bool = False):
         '''
         - NEED TO DETERMINE HOW TO FEED SEPARATE DATA INTO EACH OF THE CNN'S...
         CAN'T BE BUILT SEQUENTIALLY?
@@ -212,8 +281,12 @@ class IEEGdnn():
         convnets = []
         # Build 7 parallel CNNs with shared weights
         for i in range(num_timewins):
-            convnet = self._build_2dcnn(w_init=w_init, n_layers=(4,2,1), 
-                    poolsize=(2,2), n_filters_first=32, filter_size=(3,3))
+            if dim == 2:
+                convnet = self._build_2dcnn(w_init=w_init, n_layers=(4,2,1), 
+                        poolsize=(2,2), n_filters_first=32, filter_size=(3,3))
+            elif dim==3:
+                convnet = self._build_3dcnn(w_init=w_init, n_layers=(4,2,1), 
+                    poolsize=(2,2,2), n_filters_first=32, filter_size=(3,3,3))
             convnet.add(Flatten())
             # adds a flattened layer for the convnet (e.g. model.output_shape == (None, 64, 32, 32) -> (None, 65536))
             convnets.append(convnet)
@@ -237,16 +310,21 @@ class IEEGdnn():
         ########################## Build into LSTM now #################
         # Input to LSTM should have the shape as (batch size, seqlen/timesteps, inputdim/features)
         # only get the last LSTM output
-        lstm = LSTM(units=size_mem, 
+        if BIDIRECT:
+            lstm = Bidirectional(LSTM(units=size_mem, 
+                        activation='relu', 
+                        return_sequences=False))(convpool)
+        else:
+            lstm = LSTM(units=size_mem, 
                         activation='relu', 
                         return_sequences=False)(convpool)
         
         # Merge 1D-Conv and LSTM outputs -> feed into the final fc / classify layers
-        model = self._build_output(lstm, size_fc)
-        # model = Sequential()
-        # model.add(keras.layers.concatenate([convout_1d, lstm]))
-        # model = self._build_output(model, 2, 1024)
-        return model
+        finalmodel = keras.layers.concatenate([lstm, convout_1d])
+        finalmodel = self._build_output(finalmodel, size_fc)
+
+        finalmodel = Model(inputs=model.input, outputs=finalmodel)
+        return finalmodel
         
     def _build_output(self, finalmodel, size_fc: int =1024, DROPOUT: bool = False):
         '''
@@ -271,6 +349,7 @@ class IEEGdnn():
         # # final classification layer -> softmax for multiclass, 
         # finalmodel.add(Dense(num_classes, activation='softmax'))
 
+        # finalmodel = Flatten()(finalmodel)
         output = Dense(size_fc, activation='relu')(finalmodel)
         if DROPOUT:
             output = Dropout(0.5)(output)
@@ -301,7 +380,8 @@ class IEEGdnn():
         #     finalmodel.add(Dropout(0.5))
         # # final classification layer -> softmax for multiclass, 
         # finalmodel.add(Dense(num_classes, activation='softmax'))
-
+        if len(finalmodel.output_shape) > 2:
+            finalmodel.add(Flatten())
         if DROPOUT:
             finalmodel.add(Dropout(0.5))
         finalmodel.add(Dense(size_fc, activation='relu'))
