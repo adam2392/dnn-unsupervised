@@ -18,6 +18,7 @@
 # on TNG Cluster
 #---------------------------------------------------------------------
 module unload git
+ml anaconda-python/3.6
 source activate dnn
 
 ml python/3.6.0
@@ -30,7 +31,7 @@ echo ${outputdatadir}
 echo ${CUDA_VISIBLE_DEVICES}
 
 # pull tensorflow image onto the marcc-hpc
-singularity pull --name tensorflow shub:$PWD
+singularity pull --name tensorflow shub://marcc-hpc/tensorflow
 
 # redefine SINGULARITY_HOME to mount current working directory to base $HOME
 export SINGULARITY_HOME=$PWD:/home/$USER
