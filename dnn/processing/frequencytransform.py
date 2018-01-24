@@ -362,7 +362,7 @@ class MultiTaperFFT(FrequencyAnalysis):
 
         # multitaper FFT using welch's method
         self.timewidth = timewidth
-        self.freqsout = freqsout # vector of frequencies to get analysis for
+        # self.freqsout = freqsout # vector of frequencies to get analysis for
         
         # possible values of method are 'eigen', 'hann', 
         if not method:

@@ -339,8 +339,14 @@ class DataHandler(object):
         # swap axes to have [samples, colors, W, H]
         return np.swapaxes(np.asarray(temp_interp), 0, 1)     
 
-    def oldgen_images(self, locs: np.ndarray, feature_tensor: np.ndarray, n_gridpoints: int=32, normalize: bool=True, 
-        augment: bool=False, pca: bool=False, std_mult: float=0.1, n_components: int=2, edgeless: bool=False):
+
+    def gen_images3d(self, locs: np.ndarray, 
+                     feature_tensor: np.ndarray, 
+                     n_gridpoints: int=32, 
+                     normalize: bool=True, 
+                     augment: bool=False, 
+                     std_mult: float=0.1, 
+                     edgeless: bool=False):
         '''
         Generates EEG images given electrode locations in 2D space and multiple feature values for each electrode
 
@@ -355,59 +361,59 @@ class DataHandler(object):
         n_gridpoints        (int) Number of pixels in the output images
         normalize           (bool) Flag for whether to normalize each band over all samples (default=True)
         augment             (bool) Flag for generating augmented images (default=False)
-        pca                 (bool) Flag for PCA based data augmentation (default=False)
         std_mult            (float) Multiplier for std of added noise
-        n_components        (int) Number of components in PCA to retain for augmentation
         edgeless            (bool) If True generates edgeless images by adding artificial channels
                             at four corners of the image with value = 0 (default=False).
-        
+
         :return:            Tensor of size [samples, colors, W, H] containing generated
                             images.
         '''
         feat_array_temp = []            # list holder for feature array
         temp_interp = []
 
-        numcontacts = locs.shape[0]     # Number of electrodes
-        numsamples = features.shape[0]    
-
-        # Test whether the feature vector length is divisible by number of electrodes
-        assert features.shape[1] % numcontacts == 0
-        # get the number of colors there are in image
-        n_colors = features.shape[1] / numcontacts 
+        numcontacts, n_colors, numsamples = feature_tensor.shape     # Number of electrodes
 
         # Interpolate the values into a grid of x/y coords
-        grid_x, grid_y = np.mgrid[
-                                 min(locs[:, 0]):max(locs[:, 0]):n_gridpoints*1j,
-                                 min(locs[:, 1]):max(locs[:, 1]):n_gridpoints*1j
-                             ]
+        grid_x, grid_y, grid_z = np.mgrid[min(locs[:, 0]):max(locs[:, 0]):n_gridpoints*1j, # x
+                                          min(locs[:, 1]):max(locs[:, 1]):n_gridpoints*1j, # y
+                                          min(locs[:, 2]):max(locs[:, 2]):n_gridpoints*1j, # z
+                                         ]
 
         # loop through each color
         for c in range(n_colors):
-            # build feature array
-            feat_array_temp.append(features[:, c * numcontacts : numcontacts * (c+1)])
+            # build feature array from [ncontacts, 1 freq band, nsamples] squeezed and swapped axes
+            feat_array_temp.append(feature_tensor[:,c,:].squeeze().swapaxes(0,1))
+
+            if c == 0:
+                print(feat_array_temp[0].shape)
+
             if augment: # add data augmentation -> either pca or not
-                feat_array_temp[c] = self.augment_EEG(feat_array_temp[c], std_mult, pca=pca, n_components=n_components)
+                feat_array_temp[c] = self.augment_EEG(feat_array_temp[c], std_mult, n_components=n_components)
 
             # build temporary interpolator matrix    
-            temp_interp.append(np.zeros([numsamples, n_gridpoints, n_gridpoints]))
+            temp_interp.append(np.zeros([numsamples, n_gridpoints, n_gridpoints, n_gridpoints]))
         # Generate edgeless images -> add 4 locations (minx,miny),...,(maxx,maxy)
         if edgeless:
-            min_x, min_y = np.min(locs, axis=0)
-            max_x, max_y = np.max(locs, axis=0)
-            locs = np.append(locs, np.array([[min_x, min_y], 
-                                             [min_x, max_y],
-                                             [max_x, min_y],
-                                             [max_x, max_y]]), axis=0)
+            min_x, min_y, min_z = np.min(locs, axis=0)
+            max_x, max_y, max_z = np.max(locs, axis=0)
+            locs = np.append(locs, np.array([[min_x, min_y, min_z], 
+                                             [min_x, max_y, min_z],
+                                             [max_x, min_y, min_z],
+                                             [max_x, max_y, min_z],
+                                             [min_x, min_y, max_z], 
+                                             [min_x, max_y, max_z],
+                                             [max_x, min_y, max_z],
+                                             [max_x, max_y, max_z]]), axis=0)
             for c in range(n_colors):
                 feat_array_temp[c] = np.append(feat_array_temp[c], np.zeros((numsamples, 4)), axis=1)
-       
+
        # Interpolating for all samples across all features
-        for i in xrange(numsamples):
+        for i in range(numsamples):
             for c in range(n_colors):
-                temp_interp[c][i, :, :] = griddata(points=locs, 
+                temp_interp[c][i, :, :, :] = griddata(points=locs, 
                                             values=feat_array_temp[c][i, :], 
-                                            xi=(grid_x, grid_y),
-                                            method='cubic', 
+                                            xi=(grid_x, grid_y, grid_z),
+                                            method='linear', 
                                             fill_value=np.nan)
             print('Interpolating {0}/{1}\r'.format(i+1, numsamples), end='\r')
 
@@ -419,4 +425,21 @@ class DataHandler(object):
             temp_interp[c] = np.nan_to_num(temp_interp[c])
 
         # swap axes to have [samples, colors, W, H]
-        return np.swapaxes(np.asarray(temp_interp), 0, 1)     
+        return np.swapaxes(np.asarray(temp_interp), 0, 1)  
+
+    def computelabels(self, seiztimes, timepoints):
+        ylabels = np.zeros((timepoints.shape[0],1))
+
+        if len(seiztimes) == 0:
+            print('no seizure times in <computelabels>!')
+            return -1
+
+        for jdx, i in enumerate(seiztimes):
+            # Determine the starting window point of the seiztimes
+            start_position = np.where(timepoints[:,1]>i[0])[0][0]
+            
+            # Determine the starting window point of the seiztimes
+            end_position = np.where(timepoints[:,1]>i[1])[0][0]
+
+            ylabels[start_position:end_position] = 1
+        return ylabels

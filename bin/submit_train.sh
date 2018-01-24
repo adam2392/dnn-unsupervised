@@ -6,11 +6,7 @@
 # cluster with nodes, CPUS, tasks, GPUs
 #
 ##############################################################
-# ml python/3.6.0
-# ml cuda/9.0
-module unload git
-ml anaconda-python/3.6
-source activate dnn
+# ml python
 # ml parallel
 
 ## activate virtualenv/condaenv to use their modules
@@ -20,8 +16,8 @@ echo "Begin analysis." # print beginning statement
 # NEED TO RUN FOR EZ=0,1,2,3 and varying PZ all once
 
 # Pause before running to check
-tempdatadir='/home-1/ali39@jhu.edu/data/dnn/_temp/'
-outputdatadir='/home-1/ali39@jhu.edu/data/dnn/_final/'
+tempdatadir='/home-1/ali39@jhu.edu/data/fragility/_temp/tvbsim/'
+outputdatadir='/home-1/ali39@jhu.edu/data/fragility/output/tvbsim/'
 printf "\nThis is the data directories: \n"
 printf "Temp datadir: $tempdatadir \n"
 printf "Output datadir: $outputdatadir \n"
@@ -40,14 +36,14 @@ else
 fi
 
 # 2. Define Slurm Parameters
-NUM_PROCSPERNODE=6  	# number of processors per node (1-24). Use 24 for GNU jobs.
+NUM_PROCSPERNODE=24  	# number of processors per node (1-24). Use 24 for GNU jobs.
 NUM_NODES=1				# number of nodes to request
 NUM_CPUPERTASK=1
 
 partition=gpu 	# debug, shared, unlimited, parallel, gpu, lrgmem, scavenger
 # partition=debug
 qos=scavenger
-numgpus=1
+numgpus=4
 
 gpu="gpu:$numgpus"
 echo $gpu
@@ -80,7 +76,7 @@ printf "Sbatch should run now\n"
 
 echo $sbatcomm $exvars ./runtvbarrayjob.sbatch 
 
-${sbatcomm} --export=$exvars ./submit_train.sbatch
+${sbatcomm} --export=$exvars ./runtvbarrayjob.sbatch
 
 read -p "Continuing in 0.5 Seconds...." -t 0.5
 echo "Continuing ...."

@@ -38,14 +38,14 @@ def get_factors(x):
 
 class PreProcess():
     def __init__(self,datafiles=[],freqbands=None):
-
         if not freqbands:
             # establish frequency bands
             freqbands = {
-                'lowfreq': [0, 16],
-                'midfreq': [16, 33],
-                'gamma': [33, 90],
-                'highgamma': [90, 501],
+                    'dalpha':[0,15],
+                    'beta':[15,30],
+                    'gamma':[30,90],
+                    'high':[90,200],
+                    'hfo':[200,500]
             }
         self.datafiles = datafiles
         self.freqbands = freqbands
@@ -60,6 +60,26 @@ class PreProcess():
             freqbandindices[band] = np.where((freqs >= lowerband) & (freqs < upperband))
             freqbandindices[band] = [freqbandindices[band][0][0], freqbandindices[band][0][-1]]
         return freqbandindices
+
+    def binFrequencyValues(self, power, freqs):
+        # List of physiological frequency ranges
+        freqbands = self.freqbands
+        
+        # Create an empty array
+        power_binned = np.zeros(shape=(power.shape[0],
+                                        len(freqbands),
+                                        power.shape[2]))
+        
+        # compute the freq indices for each band
+        freqbandindices = self._computefreqindices(freqs,freqbands)
+
+        # compress data using frequency bands
+        for idx, band in enumerate(freqbandindices):
+            indices = freqbandindices[band]
+            # average between these two indices
+            power_binned[:,idx,:] = np.mean(power[:,indices[0]:indices[1]+1,:], axis=1) #[np.newaxis,:,:]
+
+        return power_binned
 
     def compresspowermat(self,datapath):
         print(os.path.join(datapath))
