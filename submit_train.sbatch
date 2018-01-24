@@ -18,7 +18,6 @@
 # on TNG Cluster
 #---------------------------------------------------------------------
 module unload git
-3
 source activate dnn
 
 ml python/3.6.0
