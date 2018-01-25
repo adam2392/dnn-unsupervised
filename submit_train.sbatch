@@ -40,10 +40,6 @@ fi
 # set jobname
 logfilename="submit_trainpy.log"
 
-mkdir -p /scratch/users/$USER/dnn_run
-cd /scratch/users/$USER/dnn_run
-
-
 # pull tensorflow image onto the marcc-hpc
 singularity pull --name tensorflow shub://marcc-hpc/tensorflow
 
@@ -51,7 +47,7 @@ singularity pull --name tensorflow shub://marcc-hpc/tensorflow
 export SINGULARITY_HOME=$PWD:/home/$USER
 
 printf "Running training model"
-singularity exec --nv ./tensorflow python ./test.py ${outputdatadir} ${tempdatadir}
+singularity -d exec --nv ./tensorflow python ./test.py ${outputdatadir} ${tempdatadir}
 # python ./main.py ${outputdatadir} ${tempdatadir} ${CUDA_VISIBLE_DEVICES}
 
 exit
