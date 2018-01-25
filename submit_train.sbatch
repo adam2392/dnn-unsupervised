@@ -40,6 +40,10 @@ fi
 # set jobname
 logfilename="submit_trainpy.log"
 
+mkdir -p /scratch/users/$USER/dnn_run
+cd /scratch/users/$USER/dnn_run
+
+
 # pull tensorflow image onto the marcc-hpc
 singularity pull --name tensorflow shub://marcc-hpc/tensorflow
 
