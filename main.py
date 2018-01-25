@@ -122,3 +122,31 @@ if __name__ == '__main__':
 	vggcnn.save('final_weights.h5')
 
 
+	# datagen = ImageDataGenerator(
+ #        featurewise_center=True, # set input mean to 0 over the dataset
+ #        samplewise_center=False, # set each sample mean to 0
+ #        featurewise_std_normalization=True, # divide inputs by std of the dataset
+ #        samplewise_std_normalization=False, # divide each input by its std
+ #        zca_whitening=False, # apply ZCA whitening
+ #        rotation_range=20, # randomly rotate images in the range (degrees, 0 to 180)
+ #        width_shift_range=0.2, # randomly shift images horizontally (fraction of total width)
+ #        height_shift_range=0.2, # randomly shift images vertically (fraction of total height)
+ #        horizontal_flip=True, # randomly flip images
+ #        vertical_flip=False) # randomly flip images
+
+	# datagen.fit(X_sample) # let's say X_sample is a small-ish but statistically representative sample of your data
+
+	# # let's say you have an ImageNet generator that yields ~10k samples at a time.
+	# for e in range(nb_epoch):
+	#     print("epoch %d" % e)
+	#     for X_train, Y_train in ImageNet(): # these are chunks of ~10k pictures
+	#         for X_batch, Y_batch in datagen.flow(X_train, Y_train, batch_size=32): # these are chunks of 32 samples
+	#             loss = model.train(X_batch, Y_batch)
+
+	# # Alternatively, without data augmentation / normalization:
+	# for e in range(nb_epoch):
+	#     print("epoch %d" % e)
+	#     for X_train, Y_train in ImageNet(): # these are chunks of ~10k pictures
+	#         model.fit(X_batch, Y_batch, batch_size=32, nb_epoch=1)
+
+

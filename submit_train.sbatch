@@ -1,12 +1,12 @@
 #!/bin/bash
 
 #SBATCH
-#SBATCH -p gpu # or -p parallel
 #SBATCH --mail-type=end
 #SBATCH --mail-user=ali39@jhu.edu
 #SBATCH --output=_out/%A.out 
 #SBATCH --error=_out/%A.err
 
+#SBATCH -p gpu # or -p parallel
 #SBATCH --gres=gpu:1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=6
@@ -30,12 +30,6 @@ echo ${tempdatadir}
 echo ${outputdatadir}
 echo ${CUDA_VISIBLE_DEVICES}
 
-# pull tensorflow image onto the marcc-hpc
-singularity pull --name tensorflow shub://marcc-hpc/tensorflow
-
-# redefine SINGULARITY_HOME to mount current working directory to base $HOME
-export SINGULARITY_HOME=$PWD:/home/$USER
-
 # create log directory 
 logdir='_logs'
 if [ -d "$logdir" ]; then  
@@ -45,6 +39,12 @@ else
 fi
 # set jobname
 logfilename="submit_trainpy.log"
+
+# pull tensorflow image onto the marcc-hpc
+singularity pull --name tensorflow shub://marcc-hpc/tensorflow
+
+# redefine SINGULARITY_HOME to mount current working directory to base $HOME
+export SINGULARITY_HOME=$PWD:/home/$USER
 
 printf "Running training model"
 singularity exec --nv ./tensorflow python ./test.py ${outputdatadir} ${tempdatadir}
