@@ -51,7 +51,8 @@ singularity pull --name tensorflow shub://marcc-hpc/tensorflow
 export SINGULARITY_HOME=$PWD:/home/$USER
 
 printf "Running training model"
-singularity -vvv -d exec --nv ./tensorflow python ./test_v1.py ${outputdatadir} ${tempdatadir}
+# singularity -vvv -d exec --nv ./tensorflow 
+python ./test_v1.py ${outputdatadir} ${tempdatadir}
 # python ./main.py ${outputdatadir} ${tempdatadir} ${CUDA_VISIBLE_DEVICES}
 
 exit
