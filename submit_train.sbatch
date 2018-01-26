@@ -26,6 +26,8 @@ ml cuda/9.0
 ml singularity 
 
 # cd /scratch/groups/ssarma2/dnn-unsupervised/
+mkdir -p /scratch/users/$USER/dnn-unsupervised
+cd /scratch/users/$USER/dnn-unsupervised/
 
 # grep for SLURM_EXPORT_ENV
 echo ${tempdatadir}
