@@ -25,6 +25,8 @@ ml python/3.6.0
 ml cuda/9.0
 ml singularity/2.4
 
+cd /scratch/groups/dnn-unsupervised/
+
 # grep for SLURM_EXPORT_ENV
 echo ${tempdatadir}
 echo ${outputdatadir}
