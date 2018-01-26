@@ -23,9 +23,9 @@ source activate dnn
 
 ml python/3.6.0
 ml cuda/9.0
-ml singularity/2.4
+ml singularity 
 
-cd /scratch/groups/ssarma2/dnn-unsupervised/
+# cd /scratch/groups/ssarma2/dnn-unsupervised/
 
 # grep for SLURM_EXPORT_ENV
 echo ${tempdatadir}
