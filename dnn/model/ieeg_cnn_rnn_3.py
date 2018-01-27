@@ -47,7 +47,7 @@ from keras.layers.embeddings import Embedding
 
 
 class IEEGdnn():
-    def __init__(self, imsize =32, n_colors =3, num_classes = 2):
+    def __init__(self, imsize: int =32, n_colors: int =3, num_classes: int = 2):
         '''
         Parameters:
         num_classes         (int) the number of classes in prediction space
@@ -60,7 +60,7 @@ class IEEGdnn():
         # start off with a relatively simple sequential model
         self.model = Sequential()
 
-    def _build_2dcnn(self, w_init= None, n_layers = (4,2,1), poolsize = (2,2), n_filters_first = 32, filter_size=(3,3)):    
+    def _build_2dcnn(self, w_init: list = None, n_layers: tuple = (4,2,1), poolsize: tuple = (2,2), n_filters_first: int = 32, filter_size=(3,3)):    
         '''
         Creates a Convolutional Neural network in VGG-16 style. It requires self
         to initialize a sequential model first.
@@ -103,7 +103,7 @@ class IEEGdnn():
             model.add(MaxPooling2D(pool_size=poolsize))
         return model
 
-    def _build_3dcnn(self, w_init= None, n_layers = (4,2,1), poolsize = (2,2,2), n_filters_first = 32, filter_size=(3,3,3)):    
+    def _build_3dcnn(self, w_init: list = None, n_layers: tuple = (4,2,1), poolsize: tuple = (2,2,2), n_filters_first: int = 32, filter_size=(3,3,3)):    
         '''
         Creates a Convolutional Neural network in VGG-16 style. It requires self
         to initialize a sequential model first.
@@ -146,7 +146,7 @@ class IEEGdnn():
             model.add(MaxPooling3D(pool_size=poolsize))
         return model
 
-    def _build_lstm(self, input_dim, embed_vector_dim, input_len, output_dim, size_mem):
+    def _build_lstm(self, input_dim: int, embed_vector_dim: int, input_len: int, output_dim: int, size_mem: int):
         '''
         Creates a LSTM network in some default style. It requires self
         to initialize a sequential model first.
@@ -171,7 +171,7 @@ class IEEGdnn():
         self.model.add(Dense(output_dim, activation='relu'))
         return self.model
 
-    def build_same_cnn_lstm(self, num_timewins, size_mem= 128,size_fc=1024, dim=2, BIDIRECT=True, DROPOUT= False):
+    def build_same_cnn_lstm(self, num_timewins: int, size_mem: int = 128,size_fc: int =1024, dim: int=2, BIDIRECT: bool=True, DROPOUT: bool = False):
         '''
         Creates a CNN network with shared weights, with a LSTM layer to 
         integrate time from sequences of images 
@@ -217,8 +217,8 @@ class IEEGdnn():
         # model.add(Input(tensor=output))
         # return model
 
-    def build_cnn_lstm(self, num_timewins, size_mem= 128, 
-        size_fc=1024, dim=2, BIDIRECT=True, DROPOUT= False):
+    def build_cnn_lstm(self, num_timewins: int, size_mem: int = 128, 
+        size_fc: int =1024, dim: int=2, BIDIRECT: bool=True, DROPOUT: bool = False):
         '''
         Creates a CNN network with shared weights, with a LSTM layer to 
         integrate time from sequences of images 
@@ -270,7 +270,7 @@ class IEEGdnn():
         model = self._build_seq_output(model, size_fc)
         return model
 
-    def build_cnn_lstm_mix(self, num_timewins, size_mem= 128, size_fc = 1024, dim=2, BIDIRECT=True, DROPOUT= False):
+    def build_cnn_lstm_mix(self, num_timewins: int, size_mem: int = 128, size_fc: int = 1024, dim: int=2, BIDIRECT: bool=True, DROPOUT: bool = False):
         '''
         - NEED TO DETERMINE HOW TO FEED SEPARATE DATA INTO EACH OF THE CNN'S...
         CAN'T BE BUILT SEQUENTIALLY?
@@ -326,7 +326,7 @@ class IEEGdnn():
         finalmodel = Model(inputs=model.input, outputs=finalmodel)
         return finalmodel
         
-    def _build_output(self, finalmodel, size_fc=1024, DROPOUT= False):
+    def _build_output(self, finalmodel, size_fc: int =1024, DROPOUT: bool = False):
         '''
         Creates the final output layers of the sequential model: a fully connected layer
         followed by a final classification layer.
@@ -358,7 +358,7 @@ class IEEGdnn():
             output = Dropout(0.5)(output)
         return output
 
-    def _build_seq_output(self, finalmodel, size_fc=1024, DROPOUT= False):
+    def _build_seq_output(self, finalmodel, size_fc: int =1024, DROPOUT: bool = False):
         '''
         Creates the final output layers of the sequential model: a fully connected layer
         followed by a final classification layer.
@@ -397,7 +397,7 @@ class IEEGdnn():
     '''
     Functions for completing and running the entire model
     '''
-    def compile_model(self, model, loss='categorical_crossentropy', optimizer=None, metrics=['accuracy']):
+    def compile_model(self, model, loss: str ='categorical_crossentropy', optimizer: keras.optimizers = None, metrics: list =['accuracy']):
         optimizer = keras.optimizers.Adam(lr=0.001, 
                                         beta_1=0.9, 
                                         beta_2=0.999,
@@ -410,7 +410,7 @@ class IEEGdnn():
         return model.get_config()
 
     def train(self, model, xtrain, ytrain, xtest, ytest,
-        batch_size=32, epochs=10, AUGMENT=False):
+        batch_size: int =32, epochs: int =10, AUGMENT: bool=False):
         '''
         Main function to train the DNN model constructed:
 
