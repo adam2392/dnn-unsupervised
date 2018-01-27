@@ -48,7 +48,8 @@ logfilename="submit_trainpy.log"
 export SINGULARITY_HOME=$PWD:/home/$USER
 
 printf "Running training model"
-singularity -vvv -d exec --nv docker://python:latest ./tensorflow.simg python test_v1.py
+# docker://python:latest
+singularity -vvv -d exec --nv ./tensorflow.simg python3 test_v1.py
 # python main.py ${outputdatadir} ${tempdatadir}
 # python ./main.py ${outputdatadir} ${tempdatadir} ${CUDA_VISIBLE_DEVICES}
 
