@@ -44,14 +44,11 @@ fi
 # set jobname
 logfilename="submit_trainpy.log"
 
-# pull tensorflow image onto the marcc-hpc
-singularity pull --name tensorflow shub://marcc-hpc/tensorflow
-
 # redefine SINGULARITY_HOME to mount current working directory to base $HOME
 export SINGULARITY_HOME=$PWD:/home/$USER
 
 printf "Running training model"
-singularity -vvv -d exec --nv docker://python:latest ./tensorflow python --version
+singularity -vvv -d exec --nv docker://python:latest ./tensorflow.simg python --version
 # ./test_v1.py ${outputdatadir} ${tempdatadir}
 # python ./main.py ${outputdatadir} ${tempdatadir} ${CUDA_VISIBLE_DEVICES}
 
