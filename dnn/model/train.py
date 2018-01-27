@@ -9,7 +9,7 @@ import tensorflow as tf
 import keras
 
 ######### import DNN for training using GPUs #########
-from keras.utils.training_utils import multi_gpu_model
+# from keras.utils.training_utils import multi_gpu_model
 
 # utility functionality for keras - preprocessing sequential data
 from keras.preprocessing import sequence 
