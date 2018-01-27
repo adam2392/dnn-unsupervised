@@ -31,4 +31,6 @@ if __name__ == '__main__':
 
 	size_fc = 1024
 	DROPOUT = False #True
+
+	sys.stdou.write("Completed this!!!!")
 	# ieegdnn = model.ieeg_cnn_rnn.IEEGdnn(imsize=imsize, n_colors=numfreqs)
