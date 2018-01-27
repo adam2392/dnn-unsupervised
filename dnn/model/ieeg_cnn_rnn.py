@@ -13,7 +13,7 @@ import math as m
 
 ############################ ANN FUNCTIONS ############################
 ######### import DNN for training using GPUs #########
-from keras.utils.training_utils import multi_gpu_model
+# from keras.utils.training_utils import multi_gpu_model
 
 ######### import DNN frameworks #########
 import tensorflow as tf
