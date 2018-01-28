@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
     name='DNNTVB',
     version='1.1',
-    packages=['eeglearn'],
+    packages=['eegdnn'],
     install_requires=['numpy', 'scipy', 'scikit-learn', 'tensorflow', 'keras'],
     url='',
     license='GNU GENERAL PUBLIC LICENSE',
