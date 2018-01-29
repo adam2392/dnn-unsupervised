@@ -13,6 +13,14 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import scale
 
+from sklearn.metrics import roc_auc_score
+
+    
+def path_leaf(path):
+    head, tail = ntpath.split(path)
+    return tail or ntpath.basename(head)
+
+
 def poly_decay(epoch, NUM_EPOCHS, INIT_LR):
     # initialize the maximum number of epochs, base learning rate,
     # and power of the polynomial
@@ -31,7 +39,6 @@ def loadmodel(ieegdnn, **kwargs):
                                       poolsize=poolsize, filter_size=filtersize)
         vggcnn = ieegdnn._build_seq_output(vggcnn, size_fc, DROPOUT)
 
-from sklearn.metrics import roc_auc_score
 class Histories(keras.callbacks.Callback):
     def on_train_begin(self, logs={}):
         self.aucs = []
@@ -65,6 +72,7 @@ def normalize(images):
 if __name__ == '__main__':
     traindatadir = str(sys.argv[1])
     tempdatadir = str(sys.argv[2])
+    traindatadir = str(sys.argv[3])
     
     # os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"   # see issue #152
     os.environ["CUDA_VISIBLE_DEVICES"]=cuda_dev
@@ -72,7 +80,7 @@ if __name__ == '__main__':
     ##################### PARAMETERS FOR NN ####################
     # image parameters #
     imsize=32
-    numfreqs = 5
+    numfreqs = 4
     numclasses = 2 
 
     # layer parameters #
@@ -89,31 +97,12 @@ if __name__ == '__main__':
     # define number of epochs and batch size
     NUM_EPOCHS = 100
     batch_size = 32 # or 64... or 24
+    data_augmentation = True
 
     ieegdnn = model.ieeg_cnn_rnn.IEEGdnn(imsize=imsize, 
                                         n_colors=numfreqs,
                                         num_classes=numclasses)
 
-    ##################### INPUT DATA FOR NN ####################
-    image_filepath = os.path.join(traindatadir, 'trainimages.npy')
-    ylabel_filepath = os.path.join(traindatadir, 'trainlabels.npy')
-
-    # define data filepath to images
-    images = np.load(image_filepath)
-    images = normalizeimages(images) # normalize the images for each frequency band
-    # load the ylabeled data
-    ylabels = np.load(ylabel_filepath)
-    invert_y = 1 - ylabels
-    ylabels = np.concatenate((ylabels, invert_y),axis=1)
-
-    # format the data correctly 
-    # (X_train, y_train), (X_val, y_val), (X_test, y_test) = datahandler.reformatinput(images, labels)
-    X_train, X_test, y_train, y_test = train_test_split(images, labels, test_size=0.33, random_state=42)
-    X_train = X_train.astype("float32")
-    X_test = X_test.astype("float32")
-
-    assert ylabels.shape[1]==2
-    # assert images.shape
     ##################### TRAINING FOR NN ####################
     # VGG-12 style later
     vggcnn = ieegdnn._build_2dcnn(w_init=w_init, n_layers=n_layers, 
@@ -148,21 +137,96 @@ if __name__ == '__main__':
                                                 horizontal_flip=False,
                                                 fill_mode="nearest")
     
+    # This will do preprocessing and realtime data augmentation:
+    datagen = ImageDataGenerator(
+        featurewise_center=True,  # set input mean to 0 over the dataset
+        samplewise_center=False,  # set each sample mean to 0
+        featurewise_std_normalization=True,  # divide inputs by std of the dataset
+        samplewise_std_normalization=False,  # divide each input by its std
+        zca_whitening=False,  # apply ZCA whitening
+        rotation_range=5,  # randomly rotate images in the range (degrees, 0 to 180)
+        width_shift_range=0.1,  # randomly shift images horizontally (fraction of total width)
+        height_shift_range=0.1,  # randomly shift images vertically (fraction of total height)
+        horizontal_flip=True,  # randomly flip images
+        vertical_flip=False,
+        fill_mode='nearest')  # randomly flip images
+
     # checkpoint
     filepath=os.path.join(tempdatadir,"weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5")
-    checkpoint = ModelCheckpoint(filepath, monitor='val_acc', 
-                                        verbose=1, 
-                                        save_best_only=True, 
-                                        mode='max')
+    checkpoint = ModelCheckpoint(filepath, 
+                                monitor='val_acc', 
+                                verbose=1, 
+                                save_best_only=True, 
+                                mode='max')
     callbacks = [checkpoint, poly_decay]
     INIT_LR = 5e-3
     G=1
-    HH = vggcnn.fit_generator(
-        aug.flow(X_train, y_train, batch_size=batch_size * G), # adds augmentation to data using generator
-        validation_data=(X_test, y_test),  
-        steps_per_epoch=len(X_train) // (batch_size * G),    #
-        epochs=NUM_EPOCHS,
-        callbacks=callbacks, verbose=2)
+
+    ##################### INPUT DATA FOR NN ####################
+    # get all the separate files to use for training:
+    datafiles = []
+    for root, dirs, files in os.walk(traindatadir):
+        for file in files:
+            datafiles.append(os.path.join(root, file))
+    metadir = os.path.join(traindatadir, 'meta')
+    traindir = os.path.join(traindatadir)
+
+    sys.stdout.write('\nTraining on ' + str(len(datafiles)) + ' datasets!\n')
+
+    # train on each data file for some number of epochs
+    for idx, datafile in enumerate(datafiles):
+        filename = path_leaf(datafile)
+        metafile = os.path.join(metadir, filename)
+        images = np.load(datafile)
+        metadata = np.load(metafile)
+
+        # load the ylabeled data
+        ylabels = metadata['ylabels']
+        invert_y = 1 - ylabels
+        ylabels = np.concatenate((ylabels, invert_y),axis=1)
+
+        images = normalizeimages(images) # normalize the images for each frequency band
+        
+        # assert the shape of the images
+        assert images.shape[2] == images.shape[3]
+        assert images.shape[2] == imsize
+        assert images.shape[1] == numfreqs
+
+        # format the data correctly 
+        # (X_train, y_train), (X_val, y_val), (X_test, y_test) = datahandler.reformatinput(images, labels)
+        X_train, X_test, y_train, y_test = train_test_split(images, labels, test_size=0.33, random_state=42)
+        X_train = X_train.astype("float32")
+        X_test = X_test.astype("float32")
+
+        assert ylabels.shape[1]==2
+        # assert images.shape
+                
+        # augment data, or not and then trian the model!
+        if not data_augmentation:
+            print('Not using data augmentation.')
+            HH = model.fit(X_train, y_train,
+                      batch_size=batch_size,
+                      epochs=NUM_EPOCHS,
+                      validation_data=(X_test, y_test),
+                      shuffle=False,
+                      callbacks=callbacks)
+        else:
+            print('Using real-time data augmentation.')
+            # Compute quantities required for feature-wise normalization
+            # (std, mean, and principal components if ZCA whitening is applied).
+            datagen.fit(x_train)
+
+            # Fit the model on the batches generated by datagen.flow().
+            HH = model.fit_generator(
+                        datagen.flow(x_train, y_train, batch_size=batch_size),
+                                steps_per_epoch=X_train.shape[0] // batch_size,
+                                epochs=epochs,
+                                validation_data=(x_test, y_test),
+                                shuffle=False,
+                                callbacks=callbacks, verbose=2)
+
 
     # save final history object
-    vggcnn.save(os.path.join(tempdatadir, 'final_weights.h5'))
+    model.save(os.path.join(tempdatadir, 'final_weights.h5'))
+
+    np.savez('final_hh', HH)

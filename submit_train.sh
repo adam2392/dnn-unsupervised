@@ -22,9 +22,11 @@ echo "Begin analysis." # print beginning statement
 # Pause before running to check
 tempdatadir='/home-1/ali39@jhu.edu/data/dnn/_temp/'
 outputdatadir='/home-1/ali39@jhu.edu/data/dnn/_final/'
+traindatadir='/home-1/ali39@jhu.edu/data/dnn/traindata/'
 printf "\nThis is the data directories: \n"
 printf "Temp datadir: $tempdatadir \n"
 printf "Output datadir: $outputdatadir \n"
+printf "Train datadir: $traindatadir \n"
 printf "\n"
 
 #### Create all logging directories if needed
@@ -56,7 +58,8 @@ jobname="submit_trainpy.log"
 
 # create export commands
 exvars="tempdatadir=${tempdatadir},\
-outputdatadir=${outputdatadir} "
+outputdatadir=${outputdatadir},\
+traindatadir=${traindatadir} "
 
 ## job reqs
 if [[ "${modelType}" -eq 1 ]]; then
