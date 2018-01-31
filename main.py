@@ -70,7 +70,7 @@ def normalize(images):
     pass
 
 if __name__ == '__main__':
-    traindatadir = str(sys.argv[1])
+    outputdatadir = str(sys.argv[1])
     tempdatadir = str(sys.argv[2])
     traindatadir = str(sys.argv[3])
     

@@ -427,19 +427,30 @@ class DataHandler(object):
         # swap axes to have [samples, colors, W, H]
         return np.swapaxes(np.asarray(temp_interp), 0, 1)  
 
-    def computelabels(self, seiztimes, timepoints):
+    def computelabels(self, seizonsets, seizoffsets, timepoints):
         ylabels = np.zeros((timepoints.shape[0],1))
 
-        if len(seiztimes) == 0:
+        if len(seizonsets) == 0:
             print('no seizure times in <computelabels>!')
             return -1
-
-        for jdx, i in enumerate(seiztimes):
+        if len(seizoffsets) == 0:
             # Determine the starting window point of the seiztimes
-            start_position = np.where(timepoints[:,1]>i[0])[0][0]
+            start_position = np.where(timepoints[:,1]>seizonsets[0])[0][0]
+            ylabels[start_position:] = 1
+            return ylabels
+
+        for idx in range(len(seizoffsets)):
+            # Determine the starting window point of the seiztimes
+            start_position = np.where(timepoints[:,1]>seizonsets[idx])[0][0]
             
             # Determine the starting window point of the seiztimes
-            end_position = np.where(timepoints[:,1]>i[1])[0][0]
+            end_position = np.where(timepoints[:,1]>seizoffsets[idx])[0][0]
 
             ylabels[start_position:end_position] = 1
+
+        if len(seizonsets) >= idx + 1:
+            # Determine the starting window point of the seiztimes
+            start_position = np.where(timepoints[:,1]>seizonsets[idx+1])[0][0]
+            ylabels[start_position:] = 1
+
         return ylabels
