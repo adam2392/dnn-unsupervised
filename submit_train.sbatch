@@ -46,8 +46,9 @@ fi
 logfilename="submit_trainpy.log"
 
 # redefine SINGULARITY_HOME to mount current working directory to base $HOME
-export SINGULARITY_HOME=$PWD:/home-1/$USER
+export SINGULARITY_HOME=$PWD:/home/$USER
 
+echo $PWD
 printf "Running training model"
 # docker://python:latest
 singularity -vvv -d exec --nv ./tensorflow.simg python main.py ${outputdatadir} ${tempdatadir} ${traindatadir}
