@@ -104,11 +104,11 @@ if __name__ == '__main__':
 
     ##################### TRAINING FOR NN ####################
     # VGG-12 style later
-    vggcnn = ieegdnn._build_2dcnn(w_init=w_init, n_layers=n_layers, 
+    model = ieegdnn._build_2dcnn(w_init=w_init, n_layers=n_layers, 
                                   poolsize=poolsize, filter_size=filtersize)
-    vggcnn = ieegdnn._build_seq_output(vggcnn, size_fc, DROPOUT)
+    model = ieegdnn._build_seq_output(model, size_fc, DROPOUT)
     sys.stdout.write("Created VGG12 Style CNN")
-    print(vggcnn.summary())
+    sys.stdout.write(model.summary())
     
 
     modelname = 'cnn'
@@ -135,7 +135,7 @@ if __name__ == '__main__':
     metrics = ['accuracy']
 
     # compile model
-    cnn_config = ieegdnn.compile_model(vggcnn, 
+    cnn_config = ieegdnn.compile_model(model, 
                                     loss=loss, 
                                     optimizer=optimizer, 
                                     metrics=metrics)
