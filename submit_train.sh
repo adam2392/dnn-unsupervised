@@ -20,9 +20,9 @@ echo "Begin analysis." # print beginning statement
 # NEED TO RUN FOR EZ=0,1,2,3 and varying PZ all once
 
 # Pause before running to check
-tempdatadir='/home-1/ali39@jhu.edu/scratch/data/dnn/_temp/'
-outputdatadir='/home-1/ali39@jhu.edu/scratch/data/dnn/_final/'
-traindatadir='/home-1/ali39@jhu.edu/scratch/data/dnn/traindata/'
+tempdatadir='/home/ali39@jhu.edu/scratch/data/dnn/_temp/'
+outputdatadir='/home/ali39@jhu.edu/scratch/data/dnn/_final/'
+traindatadir='/home/ali39@jhu.edu/scratch/data/dnn/traindata/'
 printf "\nThis is the data directories: \n"
 printf "Temp datadir: $tempdatadir \n"
 printf "Output datadir: $outputdatadir \n"
