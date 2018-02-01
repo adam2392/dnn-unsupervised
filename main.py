@@ -108,8 +108,7 @@ if __name__ == '__main__':
                                   poolsize=poolsize, filter_size=filtersize)
     currmodel = ieegdnn._build_seq_output(currmodel, size_fc, DROPOUT)
     sys.stdout.write("Created VGG12 Style CNN")
-    sys.stdout.write(currmodel.summary())
-    
+    # sys.stdout.write(currmodel.summary())
 
     modelname = 'cnn'
     modeljsonfile = os.path.join(tempdatadir, modelname+"_model.json")
