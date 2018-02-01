@@ -46,7 +46,7 @@ fi
 logfilename="submit_trainpy.log"
 
 # redefine SINGULARITY_HOME to mount current working directory to base $HOME
-export SINGULARITY_HOME=$PWD:/home/$USER
+export SINGULARITY_HOME=$PWD:/home-1/$USER
 
 printf "Running training model"
 # docker://python:latest
