@@ -430,7 +430,7 @@ class DataHandler(object):
     def computelabels(self, seizonsets, seizoffsets, timepoints):
         ylabels = np.zeros((timepoints.shape[0],1))
 
-        if len(seizonsets) == 0:
+        if len(seizonsets) == 0 or seizonsets[0] == np.nan:
             print('no seizure times in <computelabels>!')
             return -1
         if len(seizoffsets) == 0:
