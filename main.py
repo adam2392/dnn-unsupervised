@@ -237,10 +237,10 @@ if __name__ == '__main__':
                         'weights-improvement-' + str(idx) + '.h5'))
         print("Saved model weights for ", idx)
 
-# save the final trained history
-trainedhistfile = os.path.join(outputdatadir, 'finalhistory')
-with open(trainedhistfile, 'wb') as file_pi:
-        pickle.dump(HH.history, file_pi)
-# save final history object
-model.save(os.path.join(outputdatadir, 
-                'final_weights' + '.h5'))
+        # save the final trained history
+        trainedhistfile = os.path.join(outputdatadir, 'finalhistory')
+        with open(trainedhistfile, 'wb') as file_pi:
+                pickle.dump(HH.history, file_pi)
+    # save final history object
+    model.save(os.path.join(outputdatadir, 
+                    'final_weights' + '.h5'))
