@@ -112,10 +112,10 @@ if __name__ == '__main__':
 
     modelname = 'cnn'
     modeljsonfile = os.path.join(tempdatadir, modelname+"_model.json")
-    if not os.path.exists(tempdatadir):
-        os.mkdir(tempdatadir)
-    if not os.path.exists(outputdatadir):
-        os.mkdir(outputdatadir)
+    # if not os.path.exists(tempdatadir):
+    #     os.mkdir(tempdatadir)
+    # if not os.path.exists(outputdatadir):
+    #     os.mkdir(outputdatadir)
     if not os.path.exists(modeljsonfile):
         # serialize model to JSON
         model_json = currmodel.to_json()
