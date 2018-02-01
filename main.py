@@ -101,7 +101,7 @@ if __name__ == '__main__':
     ieegdnn = model.ieeg_cnn_rnn.IEEGdnn(imsize=imsize, 
                                         n_colors=numfreqs,
                                         num_classes=numclasses)
-
+    sys.stdout.write(os.getcwd())
     ##################### TRAINING FOR NN ####################
     # VGG-12 style later
     currmodel = ieegdnn._build_2dcnn(w_init=w_init, n_layers=n_layers, 
