@@ -210,8 +210,8 @@ if __name__ == '__main__':
 
         if idx==0:
             sys.stdout.write("\n\n Images and ylabels shapes are: \n\n")
-            sys.stdout.write(images.shape)
-            sys.stdout.write(ylabels.shape)
+            print(images.shape)
+            print(ylabels.shape)
             sys.stdout.write("\n\n") 
 
         # images = normalizeimages(images) # normalize the images for each frequency band
