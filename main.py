@@ -101,7 +101,7 @@ if __name__ == '__main__':
     # define number of epochs and batch size
     NUM_EPOCHS = 10 # per dataset
     batch_size = 32 # or 64... or 24
-    data_augmentation = True
+    data_augmentation = False
 
     ieegdnn = model.ieeg_cnn_rnn.IEEGdnn(imsize=imsize, 
                                         n_colors=numfreqs,
