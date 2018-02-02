@@ -76,6 +76,11 @@ if __name__ == '__main__':
     tempdatadir = str(sys.argv[2])
     traindatadir = str(sys.argv[3])
 
+    if not os.path.exists(outputdatadir):
+        os.mkdir(outputdatadir)
+    if not os.path.exists(tempdatadir):
+        os.mkdir(tempdatadir)
+
     ##################### PARAMETERS FOR NN ####################
     # image parameters #
     imsize=32
@@ -103,9 +108,9 @@ if __name__ == '__main__':
                                         num_classes=numclasses)
     sys.stdout.write('\n\n')
     sys.stdout.write(os.getcwd())
-    for root, dirs, files in os.walk(os.getcwd()):
-        for file in files:
-            sys.stdout.write(root)
+    # for root, dirs, files in os.walk(os.getcwd()):
+    #     for file in files:
+            # sys.stdout.write(root)
     ##################### TRAINING FOR NN ####################
     # VGG-12 style later
     currmodel = ieegdnn._build_2dcnn(w_init=w_init, n_layers=n_layers, 
