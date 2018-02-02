@@ -41,28 +41,28 @@ def loadmodel(ieegdnn, **kwargs):
                                       poolsize=poolsize, filter_size=filtersize)
         vggcnn = ieegdnn._build_seq_output(vggcnn, size_fc, DROPOUT)
 
-class Histories(keras.callbacks.Callback):
-    def on_train_begin(self, logs={}):
-        self.aucs = []
-        self.losses = []
+# class Histories(keras.callbacks.Callback):
+#     def on_train_begin(self, logs={}):
+#         self.aucs = []
+#         self.losses = []
  
-    def on_train_end(self, logs={}):
-        return
+#     def on_train_end(self, logs={}):
+#         return
  
-    def on_epoch_begin(self, epoch, logs={}):
-        return
+#     def on_epoch_begin(self, epoch, logs={}):
+#         return
  
-    def on_epoch_end(self, epoch, logs={}):
-        self.losses.append(logs.get('loss'))
-        y_pred = self.model.predict(self.model.validation_data[0])
-        self.aucs.append(roc_auc_score(self.model.validation_data[1], y_pred))
-        return
+#     def on_epoch_end(self, epoch, logs={}):
+#         self.losses.append(logs.get('loss'))
+#         y_pred = self.model.predict(self.model.validation_data[0])
+#         self.aucs.append(roc_auc_score(self.model.validation_data[1], y_pred))
+#         return
  
-    def on_batch_begin(self, batch, logs={}):
-        return
+#     def on_batch_begin(self, batch, logs={}):
+#         return
  
-    def on_batch_end(self, batch, logs={}):
-        return
+#     def on_batch_end(self, batch, logs={}):
+#         return
 
 def normalize(images):
     '''
@@ -167,17 +167,17 @@ if __name__ == '__main__':
     
     # This will do preprocessing and realtime data augmentation:
     datagen = keras.preprocessing.image.ImageDataGenerator(
-        featurewise_center=True,  # set input mean to 0 over the dataset
-        samplewise_center=False,  # set each sample mean to 0
-        featurewise_std_normalization=True,  # divide inputs by std of the dataset
-        samplewise_std_normalization=False,  # divide each input by its std
-        zca_whitening=False,      # apply ZCA whitening
-        rotation_range=0,         # randomly rotate images in the range (degrees, 0 to 180)
-        width_shift_range=0.1,    # randomly shift images horizontally (fraction of total width)
-        height_shift_range=0.1,   # randomly shift images vertically (fraction of total height)
-        horizontal_flip=False,    # randomly flip images
-        vertical_flip=False,      # randomly flip images
-        fill_mode='nearest')  
+                    featurewise_center=True,  # set input mean to 0 over the dataset
+                    samplewise_center=False,  # set each sample mean to 0
+                    featurewise_std_normalization=True,  # divide inputs by std of the dataset
+                    samplewise_std_normalization=False,  # divide each input by its std
+                    zca_whitening=False,      # apply ZCA whitening
+                    rotation_range=0,         # randomly rotate images in the range (degrees, 0 to 180)
+                    width_shift_range=0.1,    # randomly shift images horizontally (fraction of total width)
+                    height_shift_range=0.1,   # randomly shift images vertically (fraction of total height)
+                    horizontal_flip=False,    # randomly flip images
+                    vertical_flip=False,      # randomly flip images
+                    fill_mode='nearest')  
 
     # checkpoint
     filepath=os.path.join(tempdatadir,"weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5")
@@ -186,7 +186,7 @@ if __name__ == '__main__':
                                     verbose=1, 
                                     save_best_only=True, 
                                     mode='max')
-    callbacks = [checkpoint, poly_decay]
+    callbacks = [checkpoint] #, poly_decay]
     INIT_LR = 5e-3
     G=1
 
@@ -197,12 +197,11 @@ if __name__ == '__main__':
     for root, dirs, files in os.walk(imagedir):
         for file in files:
             datafiles.append(os.path.join(root, file))
-
-
     sys.stdout.write('\nTraining on ' + str(len(datafiles)) + ' datasets!\n')
 
     # train on each data file for some number of epochs
     for idx, datafile in enumerate(datafiles):
+        print(idx)
         # filename = path_leaf(datafile)
         # data = os.path.dirname(datafile)
         data = np.load(datafile)
