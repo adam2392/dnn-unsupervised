@@ -145,12 +145,19 @@ if __name__ == '__main__':
                                     epsilon=1e-08,
                                     decay=0.0)
     metrics = ['accuracy']
-
+    loss='categorical_crossentropy'
     # compile model
-    currmodel, cnn_config = ieegdnn.compile_model(currmodel, 
-                                    loss=loss, 
-                                    optimizer=optimizer, 
-                                    metrics=metrics)
+    # currmodel, cnn_config = ieegdnn.compile_model(currmodel, 
+    #                                 loss=loss, 
+    #                                 optimizer=optimizer, 
+    #                                 metrics=metrics)
+    optimizer = keras.optimizers.Adam(lr=0.001, 
+                                        beta_1=0.9, 
+                                        beta_2=0.999,
+                                        epsilon=1e-08,
+                                        decay=0.0)
+    modelconfig = currmodel.compile(loss=loss, optimizer=optimizer, metrics=metrics)
+    print(modelconfig)
 
     # construct the image generator for data augmentation and construct the set of callbacks
     aug = keras.preprocessing.image.ImageDataGenerator(width_shift_range=0.1,
