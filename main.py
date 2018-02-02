@@ -197,7 +197,8 @@ if __name__ == '__main__':
     # train on each data file for some number of epochs
     for idx, datafile in enumerate(datafiles):
         # filename = path_leaf(datafile)
-        data = os.path.dirname(datafile)
+        # data = os.path.dirname(datafile)
+        data = np.load(datafile)
 
         images = data['image_tensor']
         metadata = data['metadata'].item()
