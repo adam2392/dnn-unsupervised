@@ -147,7 +147,7 @@ if __name__ == '__main__':
     metrics = ['accuracy']
 
     # compile model
-    cnn_config = ieegdnn.compile_model(currmodel, 
+    currmodel, cnn_config = ieegdnn.compile_model(currmodel, 
                                     loss=loss, 
                                     optimizer=optimizer, 
                                     metrics=metrics)
@@ -221,6 +221,8 @@ if __name__ == '__main__':
         assert images.shape[2] == imsize
         assert images.shape[1] == numfreqs
 
+        images = images.swapaxes(1,3)
+        print(images.shape)
         # format the data correctly 
         # (X_train, y_train), (X_val, y_val), (X_test, y_test) = datahandler.reformatinput(images, labels)
         X_train, X_test, y_train, y_test = train_test_split(images, ylabels, test_size=0.33, random_state=42)

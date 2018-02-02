@@ -407,7 +407,7 @@ class IEEGdnn():
         
         # store the final configuration of the model
         self.model_config = model.get_config()
-        return model.get_config()
+        return model, model.get_config()
 
     def train(self, model, xtrain, ytrain, xtest, ytest,
         batch_size=32, epochs=10, AUGMENT=False):
