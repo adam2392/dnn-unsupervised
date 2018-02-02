@@ -164,14 +164,14 @@ if __name__ == '__main__':
         samplewise_center=False,  # set each sample mean to 0
         featurewise_std_normalization=True,  # divide inputs by std of the dataset
         samplewise_std_normalization=False,  # divide each input by its std
-        zca_whitening=False,  # apply ZCA whitening
-        rotation_range=5,  # randomly rotate images in the range (degrees, 0 to 180)
-        width_shift_range=0.1,  # randomly shift images horizontally (fraction of total width)
-        height_shift_range=0.1,  # randomly shift images vertically (fraction of total height)
-        horizontal_flip=True,  # randomly flip images
-        vertical_flip=False,
-        fill_mode='nearest')  # randomly flip images
-
+        zca_whitening=False,      # apply ZCA whitening
+        rotation_range=0,         # randomly rotate images in the range (degrees, 0 to 180)
+        width_shift_range=0.1,    # randomly shift images horizontally (fraction of total width)
+        height_shift_range=0.1,   # randomly shift images vertically (fraction of total height)
+        horizontal_flip=False,    # randomly flip images
+        vertical_flip=False,      # randomly flip images
+        fill_mode='nearest')  
+    
     # checkpoint
     filepath=os.path.join(tempdatadir,"weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5")
     checkpoint = ModelCheckpoint(filepath, 
@@ -246,7 +246,7 @@ if __name__ == '__main__':
             HH = currmodel.fit_generator(
                         datagen.flow(X_train, y_train, batch_size=batch_size),
                                 steps_per_epoch=X_train.shape[0] // batch_size,
-                                epochs=epochs,
+                                epochs=EPOCHS,
                                 validation_data=(X_test, y_test),
                                 shuffle=False,
                                 callbacks=callbacks, verbose=2)
