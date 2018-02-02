@@ -26,13 +26,13 @@ ml cuda/9.0
 ml singularity 
 
 # cd /scratch/groups/ssarma2/dnn-unsupervised/
-mkdir -p /scratch/users/$USER/dnn-unsupervised
+# mkdir -p /scratch/users/$USER/dnn-unsupervised
 cd /scratch/users/$USER/dnn-unsupervised/
 
 # grep for SLURM_EXPORT_ENV
-echo ${tempdatadir}
-echo ${outputdatadir}
-echo ${traindatadir}
+echo "Temp data dir is : ${tempdatadir}"
+echo "Output data dir is: ${outputdatadir}"
+echo "Train data dir is: ${traindatadir}"
 echo ${CUDA_VISIBLE_DEVICES}
 
 # create log directory 
@@ -51,7 +51,7 @@ export SINGULARITY_HOME=$PWD:/home/$USER
 echo $PWD
 printf "Running training model"
 # docker://python:latest
-singularity -vvv -d exec --nv ./tensorflow.simg python main.py ${outputdatadir} ${tempdatadir} ${traindatadir}
+singularity -vvv -B /scratch/ -d exec --nv ./tensorflow.simg python main.py ${outputdatadir} ${tempdatadir} ${traindatadir}
 # python test_v1.py ${outputdatadir} ${tempdatadir}
 # python ./main.py ${outputdatadir} ${tempdatadir} ${CUDA_VISIBLE_DEVICES}
 
