@@ -171,7 +171,7 @@ if __name__ == '__main__':
         horizontal_flip=False,    # randomly flip images
         vertical_flip=False,      # randomly flip images
         fill_mode='nearest')  
-    
+
     # checkpoint
     filepath=os.path.join(tempdatadir,"weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5")
     checkpoint = ModelCheckpoint(filepath, 
@@ -246,7 +246,7 @@ if __name__ == '__main__':
             HH = currmodel.fit_generator(
                         datagen.flow(X_train, y_train, batch_size=batch_size),
                                 steps_per_epoch=X_train.shape[0] // batch_size,
-                                epochs=EPOCHS,
+                                epochs=NUM_EPOCHS,
                                 validation_data=(X_test, y_test),
                                 shuffle=False,
                                 callbacks=callbacks, verbose=2)
