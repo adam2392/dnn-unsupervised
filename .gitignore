@@ -1,4 +1,6 @@
 */MNIST_data/*
+*.simg
+*.keras
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
