@@ -208,6 +208,12 @@ if __name__ == '__main__':
         invert_y = 1 - ylabels
         ylabels = np.concatenate((ylabels, invert_y),axis=1)
 
+        if idx==0:
+            sys.stdout.write("\n\n Images and ylabels shapes are: \n\n")
+            sys.stdout.write(images.shape)
+            sys.stdout.write(ylabels.shape)
+            sys.stdout.write("\n\n") 
+
         # images = normalizeimages(images) # normalize the images for each frequency band
         
         # assert the shape of the images
@@ -217,7 +223,7 @@ if __name__ == '__main__':
 
         # format the data correctly 
         # (X_train, y_train), (X_val, y_val), (X_test, y_test) = datahandler.reformatinput(images, labels)
-        X_train, X_test, y_train, y_test = train_test_split(images, labels, test_size=0.33, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(images, ylabels, test_size=0.33, random_state=42)
         X_train = X_train.astype("float32")
         X_test = X_test.astype("float32")
                 
