@@ -51,7 +51,7 @@ export SINGULARITY_HOME=$PWD:/home/$USER
 echo $PWD
 printf "Running training model"
 # docker://python:latest
-singularity -vvv -B /scratch/ -d exec --nv ./tensorflow.simg python main.py ${outputdatadir} ${tempdatadir} ${traindatadir}
+singularity -vvv -d exec -B /scratch/ --nv ./tensorflow.simg python main.py ${outputdatadir} ${tempdatadir} ${traindatadir}
 # python test_v1.py ${outputdatadir} ${tempdatadir}
 # python ./main.py ${outputdatadir} ${tempdatadir} ${CUDA_VISIBLE_DEVICES}
 
