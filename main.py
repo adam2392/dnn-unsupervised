@@ -17,6 +17,7 @@ from sklearn.preprocessing import scale
 from sklearn.metrics import roc_auc_score
 import ntpath
 import json
+import pickle
     
 def path_leaf(path):
     head, tail = ntpath.split(path)
