@@ -120,6 +120,8 @@ if __name__ == '__main__':
     # sys.stdout.write("Created VGG12 Style CNN")
 
     # VGG-12 style 3D CNN
+    poolsize = (2,2,2)    # maxpooling size
+    filtersize = (3,3,3)  # filter size
     currmodel = ieegdnn._build_3dcnn(w_init=w_init, n_layers=n_layers, 
                                   poolsize=poolsize, filter_size=filtersize)
     currmodel = ieegdnn._build_seq_output(currmodel, size_fc, DROPOUT)
