@@ -76,11 +76,10 @@ if __name__ == '__main__':
     outputdatadir = str(sys.argv[1])
     tempdatadir = str(sys.argv[2])
     traindatadir = str(sys.argv[3])
-
     if not os.path.exists(outputdatadir):
-        os.mkdir(outputdatadir)
+        os.makedirs(outputdatadir)
     if not os.path.exists(tempdatadir):
-        os.mkdir(tempdatadir)
+        os.makedirs(tempdatadir)
 
     ##################### PARAMETERS FOR NN ####################
     # image parameters #
@@ -109,9 +108,7 @@ if __name__ == '__main__':
                                         num_classes=numclasses)
     sys.stdout.write('\n\n')
     sys.stdout.write(os.getcwd())
-    # for root, dirs, files in os.walk(os.getcwd()):
-    #     for file in files:
-            # sys.stdout.write(root)
+
     ##################### TRAINING FOR NN ####################
     # VGG-12 style later
     # currmodel = ieegdnn._build_2dcnn(w_init=w_init, n_layers=n_layers, 
@@ -120,17 +117,17 @@ if __name__ == '__main__':
     # sys.stdout.write("Created VGG12 Style CNN")
 
     # VGG-12 style 3D CNN
-    poolsize = (2,2,2)    # maxpooling size
-    filtersize = (3,3,3)  # filter size
-    currmodel = ieegdnn._build_3dcnn(w_init=w_init, n_layers=n_layers, 
-                                  poolsize=poolsize, filter_size=filtersize)
-    currmodel = ieegdnn._build_seq_output(currmodel, size_fc, DROPOUT)
-    sys.stdout.write("Created VGG12 Style 3D CNN")
+    # poolsize = (2,2,2)    # maxpooling size
+    # filtersize = (3,3,3)  # filter size
+    # currmodel = ieegdnn._build_3dcnn(w_init=w_init, n_layers=n_layers, 
+    #                               poolsize=poolsize, filter_size=filtersize)
+    # currmodel = ieegdnn._build_seq_output(currmodel, size_fc, DROPOUT)
+    # sys.stdout.write("Created VGG12 Style 3D CNN")
 
     # CNN-LSTM style ANN
-    # currmodel = ieegdnn.build_cnn_lstm(num_timewins=10, size_mem=128, size_fc=size_fc,
-    #                 dim=2, BIDIRECT=False, DROPOUT=False)
-    # sys.stdout.write("Created CNN-LSTM simple style")
+    currmodel = ieegdnn.build_cnn_lstm(num_timewins=10, size_mem=128, size_fc=size_fc,
+                    dim=2, BIDIRECT=False, DROPOUT=False)
+    sys.stdout.write("Created CNN-LSTM simple style")
 
     # CNN-LSTM mix style ANN
 
@@ -139,10 +136,6 @@ if __name__ == '__main__':
     print(currmodel.summary())
     modelname = '3dcnn'
     modeljsonfile = os.path.join(tempdatadir, modelname+"_model.json")
-    # if not os.path.exists(tempdatadir):
-    #     os.mkdir(tempdatadir)
-    # if not os.path.exists(outputdatadir):
-    #     os.mkdir(outputdatadir)
     if not os.path.exists(modeljsonfile):
         # serialize model to JSON
         model_json = currmodel.to_json()
@@ -163,19 +156,10 @@ if __name__ == '__main__':
                                     epsilon=1e-08,
                                     decay=0.0)
     metrics = ['accuracy']
-    loss='categorical_crossentropy'
-    # compile model
-    # currmodel, cnn_config = ieegdnn.compile_model(currmodel, 
-    #                                 loss=loss, 
-    #                                 optimizer=optimizer, 
-    #                                 metrics=metrics)
-    optimizer = keras.optimizers.Adam(lr=0.001, 
-                                        beta_1=0.9, 
-                                        beta_2=0.999,
-                                        epsilon=1e-08,
-                                        decay=0.0)
+
     modelconfig = currmodel.compile(loss=loss, optimizer=optimizer, metrics=metrics)
     print(modelconfig)
+    print("model input shape is: ", currmodel.input_shape)
 
     # construct the image generator for data augmentation and construct the set of callbacks
     aug = keras.preprocessing.image.ImageDataGenerator(width_shift_range=0.1,

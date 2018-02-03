@@ -5,7 +5,6 @@
 #SBATCH --mail-user=ali39@jhu.edu
 #SBATCH --output=_out/%A.out 
 #SBATCH --error=_out/%A.err
-
 #SBATCH -p gpu # or -p parallel
 #SBATCH --gres=gpu:1
 #SBATCH --ntasks-per-node=1
