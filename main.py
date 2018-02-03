@@ -100,7 +100,7 @@ if __name__ == '__main__':
     DROPOUT = False     # should we use Hinton Dropout method?
 
     # define number of epochs and batch size
-    NUM_EPOCHS = 10 # per dataset
+    NUM_EPOCHS = 100 # per dataset
     batch_size = 32 # or 64... or 24
     data_augmentation = False
 
@@ -114,13 +114,22 @@ if __name__ == '__main__':
             # sys.stdout.write(root)
     ##################### TRAINING FOR NN ####################
     # VGG-12 style later
-    currmodel = ieegdnn._build_2dcnn(w_init=w_init, n_layers=n_layers, 
-                                  poolsize=poolsize, filter_size=filtersize)
-    currmodel = ieegdnn._build_seq_output(currmodel, size_fc, DROPOUT)
-    sys.stdout.write("Created VGG12 Style CNN")
-    # sys.stdout.write(currmodel.summary())
+    # currmodel = ieegdnn._build_2dcnn(w_init=w_init, n_layers=n_layers, 
+    #                               poolsize=poolsize, filter_size=filtersize)
+    # currmodel = ieegdnn._build_seq_output(currmodel, size_fc, DROPOUT)
+    # sys.stdout.write("Created VGG12 Style CNN")
 
-    modelname = 'cnn'
+    # CNN-LSTM style ANN
+    currmodel = ieegdnn.build_cnn_lstm(num_timewins=10, size_mem=128, size_fc=size_fc,
+                    dim=2, BIDIRECT=False, DROPOUT=False)
+    sys.stdout.write("Created CNN-LSTM simple style")
+    print(currmodel.summary())
+
+    # CNN-LSTM mix style ANN
+
+    # CNN-LSTM birectional
+
+    modelname = 'cnn-lstm'
     modeljsonfile = os.path.join(tempdatadir, modelname+"_model.json")
     # if not os.path.exists(tempdatadir):
     #     os.mkdir(tempdatadir)

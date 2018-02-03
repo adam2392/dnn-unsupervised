@@ -20,9 +20,9 @@ echo "Begin analysis." # print beginning statement
 # NEED TO RUN FOR EZ=0,1,2,3 and varying PZ all once
 
 # Pause before running to check
-tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/_temp/'
-outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/_final/'
-traindatadir='/scratch/users/ali39@jhu.edu/data/dnn/'
+tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/_tempcnnlstm/'
+outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/_finalcnnlstm/'
+traindatadir='/scratch/users/ali39@jhu.edu/data/dnn/traindata/'
 
 # /scratch/users/ali39@jhu.edu
 printf "\nThis is the data directories: \n"
@@ -65,9 +65,9 @@ traindatadir=${traindatadir} "
 
 ## job reqs
 if [[ "${modelType}" -eq 1 ]]; then
-	walltime=5:00:0
+	walltime=1:00:0
 else
-	walltime=5:00:0					# the walltime for each computationfi
+	walltime=1:00:0					# the walltime for each computationfi
 fi
 
 # build basic sbatch command with all params parametrized
