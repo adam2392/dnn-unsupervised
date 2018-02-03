@@ -193,7 +193,7 @@ if __name__ == '__main__':
     G=1
 
     ##################### INPUT DATA FOR NN ####################
-    imagedir = os.path.join(traindatadir, 'image_3d')
+    imagedir = os.path.join(traindatadir, 'image_2d')
     # get all the separate files to use for training:
     datafiles = []
     for root, dirs, files in os.walk(imagedir):
