@@ -119,17 +119,23 @@ if __name__ == '__main__':
     # currmodel = ieegdnn._build_seq_output(currmodel, size_fc, DROPOUT)
     # sys.stdout.write("Created VGG12 Style CNN")
 
+    # VGG-12 style 3D CNN
+    currmodel = ieegdnn._build_3dcnn(w_init=w_init, n_layers=n_layers, 
+                                  poolsize=poolsize, filter_size=filtersize)
+    currmodel = ieegdnn._build_seq_output(currmodel, size_fc, DROPOUT)
+    sys.stdout.write("Created VGG12 Style 3D CNN")
+
     # CNN-LSTM style ANN
-    currmodel = ieegdnn.build_cnn_lstm(num_timewins=10, size_mem=128, size_fc=size_fc,
-                    dim=2, BIDIRECT=False, DROPOUT=False)
-    sys.stdout.write("Created CNN-LSTM simple style")
-    print(currmodel.summary())
+    # currmodel = ieegdnn.build_cnn_lstm(num_timewins=10, size_mem=128, size_fc=size_fc,
+    #                 dim=2, BIDIRECT=False, DROPOUT=False)
+    # sys.stdout.write("Created CNN-LSTM simple style")
 
     # CNN-LSTM mix style ANN
 
     # CNN-LSTM birectional
 
-    modelname = 'cnn-lstm'
+    print(currmodel.summary())
+    modelname = '3dcnn'
     modeljsonfile = os.path.join(tempdatadir, modelname+"_model.json")
     # if not os.path.exists(tempdatadir):
     #     os.mkdir(tempdatadir)
@@ -201,7 +207,7 @@ if __name__ == '__main__':
     G=1
 
     ##################### INPUT DATA FOR NN ####################
-    imagedir = os.path.join(traindatadir, 'image_2d')
+    imagedir = os.path.join(traindatadir, 'image_3d')
     # get all the separate files to use for training:
     datafiles = []
     for root, dirs, files in os.walk(imagedir):
