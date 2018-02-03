@@ -125,7 +125,7 @@ if __name__ == '__main__':
     # sys.stdout.write("Created VGG12 Style 3D CNN")
 
     # CNN-LSTM style ANN
-    currmodel = ieegdnn.build_cnn_lstm(num_timewins=10, size_mem=128, size_fc=size_fc,
+    currmodel = ieegdnn.build_same_cnn_lstm(num_timewins=10, size_mem=128, size_fc=size_fc,
                     dim=2, BIDIRECT=False, DROPOUT=False)
     sys.stdout.write("Created CNN-LSTM simple style")
 
@@ -211,8 +211,8 @@ if __name__ == '__main__':
         if idx == 0:
             print(data.keys())
 
-        images = data['arr_0']
-        # images = data['image_tensor']
+        # images = data['arr_0']
+        images = data['image_tensor']
         metadata = data['metadata'].item()
 
         # load the ylabeled data
