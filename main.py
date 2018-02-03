@@ -219,12 +219,16 @@ if __name__ == '__main__':
 
     # train on each data file for some number of epochs
     for idx, datafile in enumerate(datafiles):
-        print(idx)
         # filename = path_leaf(datafile)
         # data = os.path.dirname(datafile)
         data = np.load(datafile)
 
-        images = data['image_tensor']
+        print(idx)
+        if idx == 0:
+            print(data.keys())
+
+        images = data['arr_0']
+        # images = data['image_tensor']
         metadata = data['metadata'].item()
 
         # load the ylabeled data
