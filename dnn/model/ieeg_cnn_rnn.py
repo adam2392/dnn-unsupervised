@@ -171,6 +171,17 @@ class IEEGdnn():
         self.model.add(Dense(output_dim, activation='relu'))
         return self.model
 
+    def _appendlstm(self, fixed_model, num_timewins, size_mem, size_fc):
+        # create sequential model to get this all before the LSTM
+        model = Sequential()
+        model.add(TimeDistributed(fixed_cnn_model, input_shape=(num_timewins, self.imsize, self.imsize, self.n_colors)))
+        model.add(LSTM(units=size_mem, 
+                    activation='relu', 
+                    return_sequences=False))
+        model = self._build_seq_output(model, size_fc, DROPOUT=True)
+        model = Model(inputs=model.input, outputs = model.output)
+        return model
+
     def build_same_cnn_lstm(self, num_timewins, size_mem= 128,size_fc=1024, dim=2, BIDIRECT=True, DROPOUT= False):
         '''
         Creates a CNN network with shared weights, with a LSTM layer to 
@@ -398,11 +409,13 @@ class IEEGdnn():
     Functions for completing and running the entire model
     '''
     def compile_model(self, model, loss='categorical_crossentropy', optimizer=None, metrics=['accuracy']):
-        optimizer = keras.optimizers.Adam(lr=0.001, 
+        if not optimizer:
+            optimizer = keras.optimizers.Adam(lr=0.001, 
                                         beta_1=0.9, 
                                         beta_2=0.999,
                                         epsilon=1e-08,
                                         decay=0.0)
+
         model.compile(loss=loss, optimizer=optimizer, metrics=metrics)
         
         # store the final configuration of the model

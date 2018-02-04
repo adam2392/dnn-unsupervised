@@ -9,6 +9,178 @@ from sklearn.decomposition import PCA
 from scipy.interpolate import griddata
 from sklearn.preprocessing import scale
 
+import keras
+
+class DataGenerator(object):
+    def __init__(self, dim_x = 32, dim_y = 32, dim_z = 32, batch_size = 32, shuffle = True):
+        'Initialization'
+        self.dim_x = dim_x
+        self.dim_y = dim_y
+        self.dim_z = dim_z
+        self.batch_size = batch_size
+        self.shuffle = shuffle
+
+    def __get_exploration_order(self, list_IDs):
+        'Generates order of exploration'
+        # Find exploration order
+        indexes = np.arange(len(list_IDs))
+        if self.shuffle == True:
+          np.random.shuffle(indexes)
+        return indexes
+
+    # def __data_generation(self, labels, list_IDs_temp):
+    #     'Generates data of batch_size samples' 
+    #     # X : (n_samples, v_size, v_size, v_size, n_channels)
+    #     # Initialization
+    #     X = np.empty((self.batch_size, self.dim_x, self.dim_y, self.dim_z, 1))
+    #     y = np.empty((self.batch_size), dtype = int)
+
+    #     # Generate data
+    #     for i, ID in enumerate(list_IDs_temp):
+    #       # Store volume
+    #       X[i, :, :, :, 0] = np.load(ID + '.npy')
+
+    #       # Store class
+    #       y[i] = labels[ID]
+
+    #     return X, y
+
+    def __load_data(self, file_ID):
+        data = np.load(file_ID)
+        images = data['image_tensor']
+        metadata = data['metadata'].item()
+
+        # load the ylabeled data
+        ylabels = metadata['ylabels']
+        invert_y = 1 - ylabels
+        y = np.concatenate((ylabels, invert_y),axis=1)
+
+        # images = normalizeimages(images) # normalize the images for each frequency band
+        # assert the shape of the images
+        assert images.shape[2] == images.shape[3]
+        assert images.shape[2] == self.dim_x
+        assert images.shape[1] == self.dim_z
+        images = images.swapaxes(1,3)
+        X = images.astype("float32")
+        return X, y
+
+    # def generate(self, labels, list_IDs):
+    #     'Generates batches of samples'
+    #     # Infinite loop
+    #     while 1:
+    #       # Generate order of exploration of dataset
+    #       indexes = self.__get_exploration_order(list_IDs)
+
+    #       # Generate batches
+    #       imax = int(len(indexes)/self.batch_size)
+    #       for i in range(imax):
+    #           # Find list of IDs
+    #           list_IDs_temp = [list_IDs[k] for k in indexes[i*self.batch_size:(i+1)*self.batch_size]]
+
+    #           # Generate data
+    #           X, y = self.__data_generation(labels, list_IDs_temp)
+
+    #           yield X, y
+
+    def generate_fromdir(self, list_files):
+        'Generates batches of samples'
+        # Infinite loop
+        while 1:
+            # Generate order of exploration of dataset
+            indexes = self.__get_exploration_order(list_files)
+
+            for i in range(len(indexes)):
+                # get current file to load up
+                file_ID = list_files[i]
+
+                X, y = self.__load_data(file_ID)
+
+                # Generate batches on this file's data
+                imax = int(len(y)/self.batch_size)
+                data_indices = self.__get_exploration_order(range(len(y)))
+                for j in range(imax):
+                    # Find list of indices through the data 
+                    indices = data_indices[j*self.batch_size:(j+1)*self.batch_size]
+
+                    batchX = X[indices, ...]
+                    batchy = y[indices]
+
+                    yield batchX, batchy
+
+    def standardize(self, x):
+        """Apply the normalization configuration to a batch of inputs.
+        # Arguments
+            x: batch of inputs to be normalized.
+        # Returns
+            The inputs, normalized.
+        """
+        if self.samplewise_center:
+            x -= np.mean(x, keepdims=True)
+        if self.samplewise_std_normalization:
+            x /= (np.std(x, keepdims=True) + keras.epsilon())
+
+        if self.featurewise_center:
+            if self.mean is not None:
+                x -= self.mean
+            else:
+                warnings.warn('This ImageDataGenerator specifies '
+                              '`featurewise_center`, but it hasn\'t '
+                              'been fit on any training data. Fit it '
+                              'first by calling `.fit(numpy_data)`.')
+        if self.featurewise_std_normalization:
+            if self.std is not None:
+                x /= (self.std + K.epsilon())
+            else:
+                warnings.warn('This ImageDataGenerator specifies '
+                              '`featurewise_std_normalization`, but it hasn\'t '
+                              'been fit on any training data. Fit it '
+                              'first by calling `.fit(numpy_data)`.')
+        return x
+    def fit(self, x,
+            augment=False,
+            rounds=1,
+            seed=None):
+        """Fits internal statistics to some sample data.
+        Required for featurewise_center, featurewise_std_normalization
+        and zca_whitening.
+        # Arguments
+            x: Numpy array, the data to fit on. Should have rank 4.
+                In case of grayscale data,
+                the channels axis should have value 1, and in case
+                of RGB data, it should have value 3.
+            augment: Whether to fit on randomly augmented samples
+            rounds: If `augment`,
+                how many augmentation passes to do over the data
+            seed: random seed.
+        # Raises
+            ValueError: in case of invalid input `x`.
+        """
+        x = np.asarray(x, dtype=keras.floatx())
+        if seed is not None:
+            np.random.seed(seed)
+
+        x = np.copy(x)
+        if augment:
+            ax = np.zeros(tuple([rounds * x.shape[0]] + list(x.shape)[1:]), dtype=K.floatx())
+            for r in range(rounds):
+                for i in range(x.shape[0]):
+                    ax[i + r * x.shape[0]] = self.random_transform(x[i])
+            x = ax
+
+        if self.featurewise_center:
+            self.mean = np.mean(x, axis=(0, self.row_axis, self.col_axis))
+            broadcast_shape = [1, 1, 1]
+            broadcast_shape[self.channel_axis - 1] = x.shape[self.channel_axis]
+            self.mean = np.reshape(self.mean, broadcast_shape)
+            x -= self.mean
+
+        if self.featurewise_std_normalization:
+            self.std = np.std(x, axis=(0, self.row_axis, self.col_axis))
+            broadcast_shape = [1, 1, 1]
+            broadcast_shape[self.channel_axis - 1] = x.shape[self.channel_axis]
+            self.std = np.reshape(self.std, broadcast_shape)
+            x /= (self.std + K.epsilon())
+
 class FileReader(object):
     """
     Read one or multiple numpy arrays from a text/bz2 file.
