@@ -83,6 +83,7 @@ if __name__ == '__main__':
     ##################### INPUT DATA FOR NN ####################
     alldatafile = os.path.join(traindatadir, 'testdata', 'id001_ac_fft.npz')
     data = np.load(alldatafile)
+    print(data.keys())
     images = data['image_tensor']
     metadata = data['metadata'].item()
 
