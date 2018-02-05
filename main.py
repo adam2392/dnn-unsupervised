@@ -182,7 +182,7 @@ if __name__ == '__main__':
     ##################### INPUT DATA FOR NN ####################
     alldatafile = os.path.join(traindatadir, 'finaldata', 'allimages_2d.npz')
     data = np.load(alldatafile)
-    images = data['image_tensor']
+    images = data['images']
     metadata = data['metadata'].item()
 
     # reshape
