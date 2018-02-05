@@ -83,14 +83,15 @@ if __name__ == '__main__':
     ##################### INPUT DATA FOR NN ####################
     alldatafile = os.path.join(traindatadir, 'testdata', 'id001_ac_fft.npz')
     data = np.load(alldatafile)
-    images = data['images']
+    images = data['image_tensor']
+    metadata = data['metadata'].item()
 
     # reshape
     images = images.reshape((-1, numfreqs, imsize, imsize))
     images = images.swapaxes(1,3)
 
     # load the ylabeled data
-    ylabels = data['labels']
+    ylabels = metadata['ylabels']
     invert_y = 1 - ylabels
     ylabels = np.concatenate((ylabels, invert_y),axis=1)
     sys.stdout.write("\n\n Images and ylabels shapes are: \n\n")
