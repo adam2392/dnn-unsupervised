@@ -97,10 +97,10 @@ if __name__ == '__main__':
 
     # fully connected output #
     size_fc = 512       # size of fully connected layers
-    DROPOUT = False     # should we use Hinton Dropout method?
+    DROPOUT = True     # should we use Hinton Dropout method?
 
     # define number of epochs and batch size
-    NUM_EPOCHS = 500 # per dataset
+    NUM_EPOCHS = 50 # per dataset
     batch_size = 32 # or 64... or 24
     data_augmentation = True
 
