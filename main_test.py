@@ -70,6 +70,7 @@ if __name__ == '__main__':
 
     # initialize loss function, SGD optimizer and metrics
     loss = 'binary_crossentropy'
+    loss = 'sparse_categorical_crossentropy'
     optimizer = keras.optimizers.Adam(lr=0.001, 
                                     beta_1=0.9, 
                                     beta_2=0.999,
@@ -95,8 +96,8 @@ if __name__ == '__main__':
 
     # load the ylabeled data
     ylabels = metadata['ylabels']
-    invert_y = 1 - ylabels
-    ylabels = np.concatenate((ylabels, invert_y),axis=1)
+    # invert_y = 1 - ylabels
+    # ylabels = np.concatenate((ylabels, invert_y),axis=1)
     sys.stdout.write("\n\n Images and ylabels shapes are: \n\n")
     print(images.shape)
     print(ylabels.shape)
@@ -109,13 +110,36 @@ if __name__ == '__main__':
     
     print(images.shape)
     images = images.astype("float32")
-
-    images = normalizeimage(images)
+    
     print(images.shape)
     # augment data, or not and then trian the model!
     currmodel.predict(images)
 
     score = currmodel.evaluate(images, ylabels, verbose=1)
+    print('Test score:', score[0])
+    print('Test accuracy:', score[1])
+
+    predicted = currmodel.predict(images)
+    ytrue = ylabels
+
+    print(ytrue.shape)
+    print(predicted.shape)
+
+    print('Mean accuracy score: ', accuracy_score(ytrue, predicted))
+    print('F1 score:', f1_score(ytrue, predicted))
+    print('Recall:', recall_score(ytrue, predicted))
+    print('Precision:', precision_score(ytrue, predicted))
+    print('\n clasification report:\n', classification_report(ytrue, predicted))
+    print('\n confusion matrix:\n',confusion_matrix(ytrue, predicted))
+
+    print('\n\n Now normalizing \n\n')
+
+    normimages = normalizeimage(images)
+    print(normimages.shape)
+    # augment data, or not and then trian the model!
+    currmodel.predict(normimages)
+
+    score = currmodel.evaluate(normimages, ylabels, verbose=1)
     print('Test score:', score[0])
     print('Test accuracy:', score[1])
 
@@ -176,5 +200,22 @@ if __name__ == '__main__':
     print('\n clasification report:\n', classification_report(ytrue, predicted))
     print('\n confusion matrix:\n',confusion_matrix(ytrue, predicted))
 
+    print('\n\n Now normalizing \n\n')
+
+    # augment data, or not and then trian the model!
+    currmodel.predict(normimages)
+
+    score = currmodel.evaluate(images, ylabels, verbose=1)
+    print('Test score:', score[0])
+    print('Test accuracy:', score[1])
+
+    predicted = currmodel.predict(images)
+    ytrue = ylabels
+    print('Mean accuracy score: ', accuracy_score(ytrue, predicted))
+    print('F1 score:', f1_score(ytrue, predicted))
+    print('Recall:', recall_score(ytrue, predicted))
+    print('Precision:', precision_score(ytrue, predicted))
+    print('\n clasification report:\n', classification_report(ytrue, predicted))
+    print('\n confusion matrix:\n',confusion_matrix(ytrue, predicted))
 
     
