@@ -64,11 +64,7 @@ outputdatadir=${outputdatadir},\
 traindatadir=${traindatadir} "
 
 ## job reqs
-if [[ "${modelType}" -eq 1 ]]; then
-	walltime=1:00:0
-else
-	walltime=1:00:0					# the walltime for each computationfi
-fi
+walltime=3:00:0
 
 # build basic sbatch command with all params parametrized
 sbatcomm="sbatch \
