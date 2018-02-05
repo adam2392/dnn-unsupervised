@@ -620,7 +620,7 @@ class DataHandler(object):
 
             ylabels[start_position:end_position] = 1
 
-        if len(seizonsets) >= idx + 1:
+        if len(seizonsets) > idx + 1:
             # Determine the starting window point of the seiztimes
             start_position = np.where(timepoints[:,1]>seizonsets[idx+1])[0][0]
             ylabels[start_position:] = 1
