@@ -22,7 +22,7 @@ echo "Begin analysis." # print beginning statement
 # Pause before running to check
 tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/2dcnn/'
 outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/final2dcnn/'
-traindatadir='/scratch/users/ali39@jhu.edu/data/dnn/traindata/'
+traindatadir='/scratch/users/ali39@jhu.edu/data/dnn/'
 
 # /scratch/users/ali39@jhu.edu
 printf "\nThis is the data directories: \n"
@@ -79,7 +79,7 @@ sbatcomm="sbatch \
 # build a scavenger job, gpu job, or other job
 printf "Sbatch should run now\n"
 
-echo $sbatcomm $exvars ./runtvbarrayjob.sbatch 
+echo $sbatcomm $exvars ./submit_train.sbatch
 
 ${sbatcomm} --export=$exvars ./submit_train.sbatch
 
