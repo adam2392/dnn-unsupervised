@@ -83,6 +83,7 @@ if __name__ == '__main__':
     if not os.path.exists(tempdatadir):
         os.makedirs(tempdatadir)
 
+    historyfile = os.path.join(outputdatadir, 'history_2dcnn.pkl')
     ##################### PARAMETERS FOR NN ####################
     # image parameters #
     imsize=32
@@ -231,6 +232,8 @@ if __name__ == '__main__':
                             shuffle=False,
                             callbacks=callbacks, verbose=2)
 
+    with open(historyfile, 'wb') as file_pi:
+        pickle.dump(HH.history, file_pi)
     # save final history object
     currmodel.save(os.path.join(outputdatadir, 
                     'final_weights' + '.h5'))
