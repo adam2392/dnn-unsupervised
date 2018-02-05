@@ -121,6 +121,10 @@ if __name__ == '__main__':
 
     predicted = currmodel.predict(images)
     ytrue = ylabels
+
+    print(ytrue.shape)
+    print(predicted.shape)
+
     print('Mean accuracy score: ', accuracy_score(ytrue, predicted))
     print('F1 score:', f1_score(ytrue, predicted))
     print('Recall:', recall_score(ytrue, predicted))
