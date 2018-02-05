@@ -21,7 +21,7 @@ echo "Begin analysis." # print beginning statement
 
 # Pause before running to check
 tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/_temp2dcnn/'
-outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/_final2dcnn/'
+outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/_final2dcnn/v2/'
 traindatadir='/scratch/users/ali39@jhu.edu/data/dnn/traindata/'
 
 # /scratch/users/ali39@jhu.edu
