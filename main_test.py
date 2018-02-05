@@ -86,6 +86,7 @@ if __name__ == '__main__':
     print(data.keys())
     images = data['image_tensor']
     metadata = data['metadata'].item()
+    numfreqs = 4
 
     # reshape
     images = images.reshape((-1, numfreqs, imsize, imsize))
