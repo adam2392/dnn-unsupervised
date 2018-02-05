@@ -183,14 +183,13 @@ if __name__ == '__main__':
     alldatafile = os.path.join(traindatadir, 'finaldata', 'allimages_2d.npz')
     data = np.load(alldatafile)
     images = data['images']
-    metadata = data['metadata'].item()
 
     # reshape
     images = images.reshape((-1, numfreqs, imsize, imsize))
     images = images.swapaxes(1,3)
 
     # load the ylabeled data
-    ylabels = metadata['ylabels']
+    ylabels = data['labels']
     invert_y = 1 - ylabels
     ylabels = np.concatenate((ylabels, invert_y),axis=1)
     sys.stdout.write("\n\n Images and ylabels shapes are: \n\n")
