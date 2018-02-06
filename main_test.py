@@ -70,7 +70,7 @@ if __name__ == '__main__':
 
     # initialize loss function, SGD optimizer and metrics
     loss = 'binary_crossentropy'
-    loss = 'sparse_categorical_crossentropy'
+    # loss = 'sparse_categorical_crossentropy'
     optimizer = keras.optimizers.Adam(lr=0.001, 
                                     beta_1=0.9, 
                                     beta_2=0.999,
