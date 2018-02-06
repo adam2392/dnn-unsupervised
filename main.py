@@ -184,7 +184,7 @@ if __name__ == '__main__':
     alldatafile = os.path.join(traindatadir, 'testdata', 'id001_ac_fft.npz')
     data = np.load(alldatafile)
     print(data.keys())
-    images = data['image_tensor']
+    testimages = data['image_tensor']
     metadata = data['metadata'].item()
     # reshape
     testimages = testimages.reshape((-1, numfreqs, imsize, imsize))
