@@ -125,12 +125,12 @@ if __name__ == '__main__':
     print(ytrue.shape)
     print(predicted.shape)
 
-    print('Mean accuracy score: ', accuracy_score(ytrue, predicted))
-    print('F1 score:', f1_score(ytrue, predicted))
-    print('Recall:', recall_score(ytrue, predicted))
-    print('Precision:', precision_score(ytrue, predicted))
-    print('\n clasification report:\n', classification_report(ytrue, predicted))
-    print('\n confusion matrix:\n',confusion_matrix(ytrue, predicted))
+    # print('Mean accuracy score: ', accuracy_score(ytrue, predicted))
+    # print('F1 score:', f1_score(ytrue, predicted))
+    # print('Recall:', recall_score(ytrue, predicted))
+    # print('Precision:', precision_score(ytrue, predicted))
+    # print('\n clasification report:\n', classification_report(ytrue, predicted))
+    # print('\n confusion matrix:\n',confusion_matrix(ytrue, predicted))
 
     print('\n\n Now normalizing \n\n')
 
@@ -148,13 +148,14 @@ if __name__ == '__main__':
 
     print(ytrue.shape)
     print(predicted.shape)
+    print(predicted[0:5,:])
 
-    print('Mean accuracy score: ', accuracy_score(ytrue, predicted))
-    print('F1 score:', f1_score(ytrue, predicted))
-    print('Recall:', recall_score(ytrue, predicted))
-    print('Precision:', precision_score(ytrue, predicted))
-    print('\n clasification report:\n', classification_report(ytrue, predicted))
-    print('\n confusion matrix:\n',confusion_matrix(ytrue, predicted))
+    # print('Mean accuracy score: ', accuracy_score(ytrue, predicted))
+    # print('F1 score:', f1_score(ytrue, predicted))
+    # print('Recall:', recall_score(ytrue, predicted))
+    # print('Precision:', precision_score(ytrue, predicted))
+    # print('\n clasification report:\n', classification_report(ytrue, predicted))
+    # print('\n confusion matrix:\n',confusion_matrix(ytrue, predicted))
 
 
 
@@ -193,12 +194,12 @@ if __name__ == '__main__':
 
     predicted = currmodel.predict(images)
     ytrue = ylabels
-    print('Mean accuracy score: ', accuracy_score(ytrue, predicted))
-    print('F1 score:', f1_score(ytrue, predicted))
-    print('Recall:', recall_score(ytrue, predicted))
-    print('Precision:', precision_score(ytrue, predicted))
-    print('\n clasification report:\n', classification_report(ytrue, predicted))
-    print('\n confusion matrix:\n',confusion_matrix(ytrue, predicted))
+    # print('Mean accuracy score: ', accuracy_score(ytrue, predicted))
+    # print('F1 score:', f1_score(ytrue, predicted))
+    # print('Recall:', recall_score(ytrue, predicted))
+    # print('Precision:', precision_score(ytrue, predicted))
+    # print('\n clasification report:\n', classification_report(ytrue, predicted))
+    # print('\n confusion matrix:\n',confusion_matrix(ytrue, predicted))
 
     print('\n\n Now normalizing \n\n')
 
@@ -211,11 +212,11 @@ if __name__ == '__main__':
 
     predicted = currmodel.predict(images)
     ytrue = ylabels
-    print('Mean accuracy score: ', accuracy_score(ytrue, predicted))
-    print('F1 score:', f1_score(ytrue, predicted))
-    print('Recall:', recall_score(ytrue, predicted))
-    print('Precision:', precision_score(ytrue, predicted))
-    print('\n clasification report:\n', classification_report(ytrue, predicted))
-    print('\n confusion matrix:\n',confusion_matrix(ytrue, predicted))
+    # print('Mean accuracy score: ', accuracy_score(ytrue, predicted))
+    # print('F1 score:', f1_score(ytrue, predicted))
+    # print('Recall:', recall_score(ytrue, predicted))
+    # print('Precision:', precision_score(ytrue, predicted))
+    # print('\n clasification report:\n', classification_report(ytrue, predicted))
+    # print('\n confusion matrix:\n',confusion_matrix(ytrue, predicted))
 
     
