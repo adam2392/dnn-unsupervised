@@ -36,16 +36,6 @@ echo "Output data dir is: ${outputdatadir}"
 echo "Train data dir is: ${traindatadir}"
 echo ${CUDA_VISIBLE_DEVICES}
 
-# create log directory 
-# logdir='_logs'
-# if [ -d "$logdir" ]; then  
-# 	echo "log directory exists!"
-# else
-# 	mkdir $logdir
-# fi
-# # set jobname
-# logfilename="submit_trainpy.log"
-
 ################### SETUP SINGULARITY CONTAINER  ####################
 # redefine SINGULARITY_HOME to mount current working directory to base $HOME
 export SINGULARITY_HOME=$PWD:/home/$USER
