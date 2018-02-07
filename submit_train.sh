@@ -20,8 +20,8 @@ echo "Begin analysis." # print beginning statement
 # NEED TO RUN FOR EZ=0,1,2,3 and varying PZ all once
 
 # Pause before running to check
-tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/2dcnn_fragility/'
-outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/2dcnn_fragility/'
+tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/test_2dcnn_fragility/'
+outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/test_2dcnn_fragility/'
 traindatadir='/scratch/users/ali39@jhu.edu/data/dnn/'
 
 # /scratch/users/ali39@jhu.edu
