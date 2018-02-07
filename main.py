@@ -30,6 +30,15 @@ class TestCallback(Callback):
         x, y = self.test_data
         loss, acc = self.model.evaluate(x, y, verbose=0)
         print('\nTesting loss: {}, acc: {}\n'.format(loss, acc))
+        predicted = self.model.predict_classes(testimages)
+        ytrue = y
+        print('Mean accuracy score: ', accuracy_score(ytrue, predicted))
+        print('F1 score:', f1_score(ytrue, predicted))
+        print('Recall:', recall_score(ytrue, predicted))
+        print('Precision:', precision_score(ytrue, predicted))
+        print('\n clasification report:\n', classification_report(ytrue, predicted))
+        print('\n confusion matrix:\n',confusion_matrix(ytrue, predicted))
+
     
 def path_leaf(path):
     head, tail = ntpath.split(path)
@@ -259,10 +268,19 @@ if __name__ == '__main__':
                             epochs=NUM_EPOCHS,
                             validation_data=(testimages, testlabels),
                             shuffle=False,
-                            callbacks=callbacks, verbose=2)
+                            callbacks=callbacks.append(TestCallback((testimages, testlabels))), verbose=2)
 
     with open(historyfile, 'wb') as file_pi:
         pickle.dump(HH.history, file_pi)
     # save final history object
     currmodel.save(os.path.join(outputdatadir, 
                     'final_weights' + '.h5'))
+
+    predicted = currmodel.predict_classes(testimages)
+    ytrue = testlabels
+    print('Mean accuracy score: ', accuracy_score(ytrue, predicted))
+    print('F1 score:', f1_score(ytrue, predicted))
+    print('Recall:', recall_score(ytrue, predicted))
+    print('Precision:', precision_score(ytrue, predicted))
+    print('\n clasification report:\n', classification_report(ytrue, predicted))
+    print('\n confusion matrix:\n',confusion_matrix(ytrue, predicted))

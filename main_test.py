@@ -210,8 +210,8 @@ if __name__ == '__main__':
     print('Test score:', score[0])
     print('Test accuracy:', score[1])
 
-    predicted = currmodel.predict(images)
-    ytrue = ylabels
+    # predicted = currmodel.predict_classes(images)
+    # ytrue = ylabels
     # print('Mean accuracy score: ', accuracy_score(ytrue, predicted))
     # print('F1 score:', f1_score(ytrue, predicted))
     # print('Recall:', recall_score(ytrue, predicted))
