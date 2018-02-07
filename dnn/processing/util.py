@@ -460,7 +460,7 @@ class DataHandler(object):
 
         numcontacts = feature_tensor.shape[0]     # Number of electrodes
         n_colors = feature_tensor.shape[1]
-        n_colors = 4
+        # n_colors = 4
         numsamples = feature_tensor.shape[2]    
 
         # Interpolate the values into a grid of x/y coords
@@ -619,7 +619,7 @@ class DataHandler(object):
             # Determine the starting window point of the seiztimes
             end_position = np.where(timepoints[:,1]>seizoffsets[idx])[0][0]
 
-            print(start_position, end_position)
+            # print(start_position, end_position)
             ylabels[start_position:end_position] = 1
 
         if len(seizonsets) > idx + 1:
