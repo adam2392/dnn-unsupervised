@@ -146,7 +146,7 @@ if __name__ == '__main__':
 
     # initialize loss function, SGD optimizer and metrics
     loss = 'binary_crossentropy'
-    optimizer = keras.optimizers.Adam(lr=0.001, 
+    optimizer = keras.optimizers.Adam(lr=0.0005, 
                                     beta_1=0.9, 
                                     beta_2=0.999,
                                     epsilon=1e-08,
