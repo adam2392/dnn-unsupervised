@@ -279,11 +279,14 @@ if __name__ == '__main__':
         if szlabel.ndim == 1:
             szlabel = szlabel[np.newaxis,...]
             normlabel = normlabel[np.newaxis,...]
+            normimg = normimg[np.newaxis,...]
+            szimg = szimg[np.newaxis,...]
+
         print(normimg.shape)
         print(szimg.shape)
         print(images.shape)
         print(ylabels.shape)
-        images = np.concatenate((images, normimg[np.newaxis,...], szimg[np.newaxis,...]), axis=0)
+        images = np.concatenate((images, normimg, szimg), axis=0)
         ylabels = np.concatenate((ylabels, normlabel, szlabel), axis=0)
         print(images.shape)
         print(ylabels.shape)
