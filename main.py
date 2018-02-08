@@ -117,7 +117,7 @@ if __name__ == '__main__':
     DROPOUT = True     # should we use Hinton Dropout method?
 
     # define number of epochs and batch size
-    NUM_EPOCHS = 50 # per dataset
+    NUM_EPOCHS = 1 # per dataset
     batch_size = 32 # or 64... or 24
     data_augmentation = True
 
@@ -159,7 +159,7 @@ if __name__ == '__main__':
 
     # initialize loss function, SGD optimizer and metrics
     loss = 'binary_crossentropy'
-    optimizer = keras.optimizers.Adam(lr=0.0005, 
+    optimizer = keras.optimizers.Adam(lr=0.0001, 
                                     beta_1=0.9, 
                                     beta_2=0.999,
                                     epsilon=1e-08,
@@ -193,7 +193,7 @@ if __name__ == '__main__':
                                     save_best_only=True, 
                                     mode='max')
     callbacks = [checkpoint] #, poly_decay]
-    INIT_LR = 5e-3
+    # INIT_LR = 5e-3
     G=1
 
     ##################### TEST DATA FOR NN ####################
@@ -282,6 +282,10 @@ if __name__ == '__main__':
 
     predicted = currmodel.predict_classes(testimages)
     ytrue = testlabels
+
+    print(ytrue.shape)
+    print(predicted.shape)
+
     print('Mean accuracy score: ', accuracy_score(ytrue, predicted))
     print('F1 score:', f1_score(ytrue, predicted))
     print('Recall:', recall_score(ytrue, predicted))

@@ -64,7 +64,7 @@ outputdatadir=${outputdatadir},\
 traindatadir=${traindatadir} "
 
 ## job reqs
-walltime=1:30:0
+walltime=0:30:0
 
 # build basic sbatch command with all params parametrized
 sbatcomm="sbatch \
