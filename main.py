@@ -266,7 +266,7 @@ if __name__ == '__main__':
 
         # add one example from test set to show
         normind = np.where(testlabels[:,0].squeeze() == 0)[0]
-        normind = normdind[len(normind)/2]
+        normind = normind[len(normind)/2]
         szind = np.where(testlabels[:,0].squeeze() == 1)[0]
         szind = szind[len(szind)/2]
         print(normind)
