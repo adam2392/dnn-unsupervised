@@ -117,7 +117,7 @@ if __name__ == '__main__':
     DROPOUT = True     # should we use Hinton Dropout method?
 
     # define number of epochs and batch size
-    NUM_EPOCHS = 1 # per dataset
+    NUM_EPOCHS = 50 # per dataset
     batch_size = 32 # or 64... or 24
     data_augmentation = True
 
@@ -159,7 +159,7 @@ if __name__ == '__main__':
 
     # initialize loss function, SGD optimizer and metrics
     loss = 'binary_crossentropy'
-    optimizer = keras.optimizers.Adam(lr=0.0001, 
+    optimizer = keras.optimizers.Adam(lr=0.00005, 
                                     beta_1=0.9, 
                                     beta_2=0.999,
                                     epsilon=1e-08,
@@ -281,7 +281,7 @@ if __name__ == '__main__':
                     'final_weights' + '.h5'))
 
     predicted = currmodel.predict_classes(testimages)
-    ytrue = testlabels
+    ytrue = np.argmax(testlabels, axis=1)
 
     print(ytrue.shape)
     print(predicted.shape)
