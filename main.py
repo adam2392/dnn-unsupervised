@@ -276,7 +276,7 @@ if __name__ == '__main__':
         szimg = testimages[szind,...]
         szlabel = testlabels[szind,...]
 
-        if szlabel.dim == 1:
+        if szlabel.ndim == 1:
             szlabel = szlabel[np.newaxis,...]
             normlabel = normlabel[np.newaxis,...]
         print(normimg.shape)
