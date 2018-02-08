@@ -1,0 +1,61 @@
+Temp data dir is : /scratch/users/ali39@jhu.edu/data/dnn/temp/test_2dcnn_fragility_notnorm_v2/
+Output data dir is: /scratch/users/ali39@jhu.edu/data/dnn/output/test_2dcnn_fragility_notnorm_v2/
+Train data dir is: /scratch/users/ali39@jhu.edu/data/dnn/
+1
+/scratch/users/ali39@jhu.edu/dnn-unsupervised
+Running training model
+
+/scratch/users/ali39@jhu.edu/dnn-unsupervisedCreated VGG12 Style CNN_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+input_1 (InputLayer)         (None, 32, 32, 1)         0         
+_________________________________________________________________
+conv2d_1 (Conv2D)            (None, 30, 30, 32)        320       
+_________________________________________________________________
+conv2d_2 (Conv2D)            (None, 28, 28, 32)        9248      
+_________________________________________________________________
+conv2d_3 (Conv2D)            (None, 26, 26, 32)        9248      
+_________________________________________________________________
+conv2d_4 (Conv2D)            (None, 24, 24, 32)        9248      
+_________________________________________________________________
+max_pooling2d_1 (MaxPooling2 (None, 12, 12, 32)        0         
+_________________________________________________________________
+conv2d_5 (Conv2D)            (None, 10, 10, 64)        18496     
+_________________________________________________________________
+conv2d_6 (Conv2D)            (None, 8, 8, 64)          36928     
+_________________________________________________________________
+max_pooling2d_2 (MaxPooling2 (None, 4, 4, 64)          0         
+_________________________________________________________________
+conv2d_7 (Conv2D)            (None, 2, 2, 128)         73856     
+_________________________________________________________________
+max_pooling2d_3 (MaxPooling2 (None, 1, 1, 128)         0         
+_________________________________________________________________
+flatten_1 (Flatten)          (None, 128)               0         
+_________________________________________________________________
+dropout_1 (Dropout)          (None, 128)               0         
+_________________________________________________________________
+dense_1 (Dense)              (None, 512)               66048     
+_________________________________________________________________
+dropout_2 (Dropout)          (None, 512)               0         
+_________________________________________________________________
+dense_2 (Dense)              (None, 2)                 1026      
+=================================================================
+Total params: 224,418
+Trainable params: 224,418
+Non-trainable params: 0
+_________________________________________________________________
+None
+Saved model to disk
+None
+model input shape is:  (None, 32, 32, 1)
+['image_tensor', 'metadata']
+
+
+ Images and ylabels shapes are: 
+
+(57560, 32, 32, 1)
+(57560, 2)
+
+
+(57560, 32, 32, 1)
+Using real-time data augmentation.
