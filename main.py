@@ -266,9 +266,9 @@ if __name__ == '__main__':
 
         # add one example from test set to show
         normind = np.where(testlabels[:,0].squeeze() == 0)[0]
-        normind = normind[len(normind)/2]
+        normind = normind[int(len(normind)/2)]
         szind = np.where(testlabels[:,0].squeeze() == 1)[0]
-        szind = szind[len(szind)/2]
+        szind = szind[int(len(szind)/2)]
         print(normind)
         print(szind)
         normimg = testimages[normind,...]
