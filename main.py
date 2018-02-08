@@ -288,6 +288,10 @@ if __name__ == '__main__':
         print(ylabels.shape)
         images = np.concatenate((images, normimg, szimg), axis=0)
         ylabels = np.concatenate((ylabels, normlabel, szlabel), axis=0)
+
+        testimages = np.delete(testimages, np.append(normind, szind), axis=0)
+        testlabels = np.delete(testlabels, np.append(normind, szind), axis=0)
+
         print(images.shape)
         print(ylabels.shape)
 
