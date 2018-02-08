@@ -117,7 +117,7 @@ if __name__ == '__main__':
     DROPOUT = True     # should we use Hinton Dropout method?
 
     # define number of epochs and batch size
-    NUM_EPOCHS = 50 # per dataset
+    NUM_EPOCHS = 30 # per dataset
     batch_size = 32 # or 64... or 24
     data_augmentation = True
 
@@ -257,7 +257,7 @@ if __name__ == '__main__':
                             steps_per_epoch=images.shape[0] // batch_size,
                             epochs=NUM_EPOCHS,
                             validation_data=(X_test, y_test),
-                            shuffle=False,
+                            shuffle=True,
                             callbacks=callbacks, verbose=2)
 
         # Compute quantities required for feature-wise normalization
