@@ -200,7 +200,7 @@ if __name__ == '__main__':
                                     verbose=1, 
                                     save_best_only=True, 
                                     mode='max')
-    callbacks = [checkpoint, TestCallback()] #, poly_decay]
+    callbacks = [checkpoint] #, poly_decay]
     # INIT_LR = 5e-3
     G=1
 
