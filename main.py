@@ -18,7 +18,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score, \
     recall_score, classification_report, \
-    f1_score
+    f1_score, roc_auc_score
 
 # utilitiy libs
 import ntpath
@@ -29,20 +29,46 @@ from keras.callbacks import Callback
 class TestCallback(Callback):
     def __init__(self, test_data):
         self.test_data = test_data
+        self.aucs = []
 
     def on_epoch_end(self, epoch, logs={}):
         x, y = self.test_data
         loss, acc = self.model.evaluate(x, y, verbose=0)
         print('\nTesting loss: {}, acc: {}\n'.format(loss, acc))
-        predicted = self.model.predict_classes(testimages)
-        ytrue = y
+
+        predicted = self.model.predict(x)
+        self.aucs.append(roc_auc_score(y, predicted))
+
+        predicted = self.model.predict_classes(x)
+        ytrue = np.argmax(y, axis=1)
         print('Mean accuracy score: ', accuracy_score(ytrue, predicted))
         print('F1 score:', f1_score(ytrue, predicted))
         print('Recall:', recall_score(ytrue, predicted))
         print('Precision:', precision_score(ytrue, predicted))
         print('\n clasification report:\n', classification_report(ytrue, predicted))
         print('\n confusion matrix:\n',confusion_matrix(ytrue, predicted))
-
+# class Histories(keras.callbacks.Callback):
+#     def on_train_begin(self, logs={}):
+#         self.aucs = []
+#         self.losses = []
+ 
+#     def on_train_end(self, logs={}):
+#         return
+ 
+#     def on_epoch_begin(self, epoch, logs={}):
+#         return
+ 
+#     def on_epoch_end(self, epoch, logs={}):
+#         self.losses.append(logs.get('loss'))
+#         y_pred = self.model.predict(self.model.validation_data[0])
+#         self.aucs.append(roc_auc_score(self.model.validation_data[1], y_pred))
+#         return
+ 
+#     def on_batch_begin(self, batch, logs={}):
+#         return
+ 
+#     def on_batch_end(self, batch, logs={}):
+#         return
     
 def path_leaf(path):
     head, tail = ntpath.split(path)
@@ -67,28 +93,7 @@ def loadmodel(ieegdnn, **kwargs):
                                       poolsize=poolsize, filter_size=filtersize)
         vggcnn = ieegdnn._build_seq_output(vggcnn, size_fc, DROPOUT)
 
-# class Histories(keras.callbacks.Callback):
-#     def on_train_begin(self, logs={}):
-#         self.aucs = []
-#         self.losses = []
- 
-#     def on_train_end(self, logs={}):
-#         return
- 
-#     def on_epoch_begin(self, epoch, logs={}):
-#         return
- 
-#     def on_epoch_end(self, epoch, logs={}):
-#         self.losses.append(logs.get('loss'))
-#         y_pred = self.model.predict(self.model.validation_data[0])
-#         self.aucs.append(roc_auc_score(self.model.validation_data[1], y_pred))
-#         return
- 
-#     def on_batch_begin(self, batch, logs={}):
-#         return
- 
-#     def on_batch_end(self, batch, logs={}):
-#         return
+
 
 if __name__ == '__main__':
     outputdatadir = str(sys.argv[1])
@@ -275,23 +280,19 @@ if __name__ == '__main__':
         normlabel = testlabels[normind,...]
         szimg = testimages[szind,...]
         szlabel = testlabels[szind,...]
-
         if szlabel.ndim == 1:
             szlabel = szlabel[np.newaxis,...]
             normlabel = normlabel[np.newaxis,...]
             normimg = normimg[np.newaxis,...]
             szimg = szimg[np.newaxis,...]
-
         print(normimg.shape)
         print(szimg.shape)
         print(images.shape)
         print(ylabels.shape)
         images = np.concatenate((images, normimg, szimg), axis=0)
         ylabels = np.concatenate((ylabels, normlabel, szlabel), axis=0)
-
         testimages = np.delete(testimages, np.append(normind, szind), axis=0)
         testlabels = np.delete(testlabels, np.append(normind, szind), axis=0)
-
         print(images.shape)
         print(ylabels.shape)
 
@@ -314,6 +315,8 @@ if __name__ == '__main__':
     predicted = currmodel.predict_classes(testimages)
     ytrue = np.argmax(testlabels, axis=1)
 
+    y_pred = model.predict_proba(testimages)
+    print("ROC_AUC_SCORES: ", roc_auc_score(ytrue, y_pred))
     # if running on validation dataset of images
     # predicted = currmodel.predict_classes(X_test)
     # ytrue = np.argmax(y_test, axis=1)
@@ -327,3 +330,5 @@ if __name__ == '__main__':
     print('Precision:', precision_score(ytrue, predicted))
     print('\n clasification report:\n', classification_report(ytrue, predicted))
     print('\n confusion matrix:\n',confusion_matrix(ytrue, predicted))
+
+
