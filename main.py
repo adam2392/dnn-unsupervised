@@ -178,9 +178,9 @@ if __name__ == '__main__':
 
     # This will do preprocessing and realtime data augmentation:
     datagen = keras.preprocessing.image.ImageDataGenerator(
-                    featurewise_center=False,  # set input mean to 0 over the dataset
+                    featurewise_center=True,  # set input mean to 0 over the dataset
                     samplewise_center=False,  # set each sample mean to 0
-                    featurewise_std_normalization=False,  # divide inputs by std of the dataset
+                    featurewise_std_normalization=True,  # divide inputs by std of the dataset
                     samplewise_std_normalization=False,  # divide each input by its std
                     zca_whitening=False,      # apply ZCA whitening
                     rotation_range=0,         # randomly rotate images in the range (degrees, 0 to 180)
@@ -315,7 +315,7 @@ if __name__ == '__main__':
     predicted = currmodel.predict_classes(testimages)
     ytrue = np.argmax(testlabels, axis=1)
 
-    y_pred = model.predict_proba(testimages)
+    y_pred = model.predict(testimages)
     print("ROC_AUC_SCORES: ", roc_auc_score(ytrue, y_pred))
     # if running on validation dataset of images
     # predicted = currmodel.predict_classes(X_test)
