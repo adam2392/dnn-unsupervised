@@ -184,8 +184,8 @@ if __name__ == '__main__':
                     samplewise_std_normalization=True,  # divide each input by its std
                     zca_whitening=False,      # apply ZCA whitening
                     rotation_range=0,         # randomly rotate images in the range (degrees, 0 to 180)
-                    width_shift_range=0.0,    # randomly shift images horizontally (fraction of total width)
-                    height_shift_range=0.0,   # randomly shift images vertically (fraction of total height)
+                    width_shift_range=0.01,    # randomly shift images horizontally (fraction of total width)
+                    height_shift_range=0.01,   # randomly shift images vertically (fraction of total height)
                     horizontal_flip=False,    # randomly flip images
                     vertical_flip=False,      # randomly flip images
                     fill_mode='nearest')  
