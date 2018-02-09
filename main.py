@@ -27,12 +27,15 @@ import pickle
 
 from keras.callbacks import Callback
 class TestCallback(Callback):
-    def __init__(self, test_data):
-        self.test_data = test_data
+    def __init__(self):
+        # self.test_data = test_data
         self.aucs = []
 
     def on_epoch_end(self, epoch, logs={}):
-        x, y = self.test_data
+        # x, y = self.test_data
+        x = self.model.validation_data[0]
+        y = self.model.validation_data[1]
+
         loss, acc = self.model.evaluate(x, y, verbose=0)
         print('\nTesting loss: {}, acc: {}\n'.format(loss, acc))
 
@@ -197,7 +200,7 @@ if __name__ == '__main__':
                                     verbose=1, 
                                     save_best_only=True, 
                                     mode='max')
-    callbacks = [checkpoint] #, poly_decay]
+    callbacks = [checkpoint, TestCallback()] #, poly_decay]
     # INIT_LR = 5e-3
     G=1
 
@@ -303,7 +306,7 @@ if __name__ == '__main__':
                             epochs=NUM_EPOCHS,
                             validation_data=(testimages, testlabels),
                             shuffle=True,
-                            callbacks=callbacks.append(TestCallback((testimages, testlabels))), verbose=2)
+                            callbacks=callbacks, verbose=2)
 
     with open(historyfile, 'wb') as file_pi:
         pickle.dump(HH.history, file_pi)
