@@ -183,9 +183,9 @@ if __name__ == '__main__':
                     featurewise_std_normalization=False,  # divide inputs by std of the dataset
                     samplewise_std_normalization=True,  # divide each input by its std
                     zca_whitening=False,      # apply ZCA whitening
-                    rotation_range=0,         # randomly rotate images in the range (degrees, 0 to 180)
-                    width_shift_range=0.01,    # randomly shift images horizontally (fraction of total width)
-                    height_shift_range=0.01,   # randomly shift images vertically (fraction of total height)
+                    rotation_range=5,         # randomly rotate images in the range (degrees, 0 to 180)
+                    width_shift_range=0.02,    # randomly shift images horizontally (fraction of total width)
+                    height_shift_range=0.02,   # randomly shift images vertically (fraction of total height)
                     horizontal_flip=False,    # randomly flip images
                     vertical_flip=False,      # randomly flip images
                     fill_mode='nearest')  
@@ -271,11 +271,11 @@ if __name__ == '__main__':
 
         # add one example from test set to show
         normind = np.where(testlabels[:,0].squeeze() == 0)[0]
-        normind = normind[0:int(len(normind)/5)]
+        normind = normind[0:int(len(normind)/20)]
         szind = np.where(testlabels[:,0].squeeze() == 1)[0]
-        szind = szind[0:int(len(szind)/5)]
-        print(normind)
-        print(szind)
+        szind = szind[0:int(len(szind)/20)]
+        # print(normind)
+        # print(szind)
         normimg = testimages[normind,...]
         normlabel = testlabels[normind,...]
         szimg = testimages[szind,...]
@@ -315,7 +315,7 @@ if __name__ == '__main__':
     predicted = currmodel.predict_classes(testimages)
     ytrue = np.argmax(testlabels, axis=1)
 
-    y_pred = model.predict(testimages)
+    y_pred = currmodel.predict(testimages)
     print("ROC_AUC_SCORES: ", roc_auc_score(ytrue, y_pred))
     # if running on validation dataset of images
     # predicted = currmodel.predict_classes(X_test)
