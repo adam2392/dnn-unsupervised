@@ -122,8 +122,8 @@ if __name__ == '__main__':
     DROPOUT = True     # should we use Hinton Dropout method?
 
     # define number of epochs and batch size
-    NUM_EPOCHS = 30 # per dataset
-    batch_size = 32 # or 64... or 24
+    NUM_EPOCHS = 10 # per dataset
+    batch_size = 64 # or 64... or 24
     data_augmentation = True
 
     ieegdnn = model.ieeg_cnn_rnn.IEEGdnn(imsize=imsize, 
@@ -316,7 +316,7 @@ if __name__ == '__main__':
     ytrue = np.argmax(testlabels, axis=1)
 
     y_pred = currmodel.predict(testimages)
-    print("ROC_AUC_SCORES: ", roc_auc_score(ytrue, y_pred))
+    print("ROC_AUC_SCORES: ", roc_auc_score(testlabels, y_pred))
     # if running on validation dataset of images
     # predicted = currmodel.predict_classes(X_test)
     # ytrue = np.argmax(y_test, axis=1)
