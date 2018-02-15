@@ -88,7 +88,7 @@ if __name__ == '__main__':
     ##################### PARAMETERS FOR NN ####################
     # image parameters #
     imsize=32
-    numfreqs = 1
+    numfreqs = 4
     numclasses = 2 
 
     # layer parameters #
