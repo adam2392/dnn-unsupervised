@@ -8,7 +8,6 @@ import numpy as np
 import pandas as pd
 import scipy
 from sklearn import cluster
-
 from sklearn.preprocessing import MinMaxScaler
 import tvbsim
 
@@ -36,7 +35,7 @@ def get_factors(x):
             factors.append(i)
     return factors
 
-class PreProcess():
+class PreProcess(object):
     def __init__(self,datafiles=[],freqbands=None):
         if not freqbands:
             # establish frequency bands
@@ -77,7 +76,7 @@ class PreProcess():
         for idx, band in enumerate(freqbandindices):
             indices = freqbandindices[band]
             # average between these two indices
-            power_binned[:,idx,:] = np.mean(power[:,indices[0]:indices[1]+1,:], axis=1) #[np.newaxis,:,:]
+            power_binned[:,idx,:] = np.mean(np.abs(power[:,indices[0]:indices[1]+1,:]), axis=1) #[np.newaxis,:,:]
 
         return power_binned
 

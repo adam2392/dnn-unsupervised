@@ -1,9 +1,7 @@
-import spectrum
+import numpy as np
 import scipy
 from scipy import interpolate
 from bisect import bisect_left
-import numpy as np
-
 
 def next_fast_len(target):
     """
@@ -78,6 +76,7 @@ def next_fast_len(target):
     if p5 < match:
         match = p5
     return match
+
 def tridisolve(d, e, b, overwrite_b=True):
     """Symmetric tridiagonal system solver, from Golub and Van Loan p157.
     .. note:: Copied from NiTime.
@@ -295,173 +294,3 @@ def dpss_windows(N, half_nbw, Kmax, low_bias=True, interp_from=None,
     assert len(dpss) > 0  # should never happen
     assert dpss.shape[1] == N  # old nitime bug
     return dpss, eigvals
-
-class FrequencyAnalysis:
-    def __init__(self, winsize, stepsize, samplerate):
-        self.winsize = winsize      # time window in seconds
-        self.stepsize = stepsize    # step size in seconds
-        self.samplerate = samplerate # in Hz
-
-    def buffer(self, x, n, p=0, opt=None):
-        '''Mimic MATLAB routine to generate buffer array
-
-        MATLAB docs here: https://se.mathworks.com/help/signal/ref/buffer.html
-
-        Args
-        ----
-        x:   signal array
-        n:   number of data segments
-        p:   number of values to overlap
-        opt: initial condition options. default sets the first `p` values
-             to zero, while 'nodelay' begins filling the buffer immediately.
-        '''
-
-        n = int(n)
-        
-        if p >= n:
-            raise ValueError('p ({}) must be less than n ({}).'.format(p,n))
-
-        # Calculate number of columns of buffer array
-        cols = int(np.floor(len(x)/float(n-p)))
-
-        # Check for opt parameters
-        if opt == 'nodelay':
-            # Need extra column to handle additional values left
-            cols -= 1
-        elif opt != None:
-            raise SystemError('Only `None` (default initial condition) and '
-                              '`nodelay` (skip initial condition) have been '
-                              'implemented')
-
-        # Create empty buffer array. N = size of window X # cols
-        b = np.zeros((int(n), int(cols)))
-
-        # Fill buffer by column handling for initial condition and overlap
-        j = 0
-        for i in range(cols):
-            # Set first column to n values from x, move to next iteration
-            if i == 0 and opt == 'nodelay':
-                b[0:n,i] = x[0:n]
-                continue
-                
-            # set first values of row to last p values
-            elif i != 0 and p != 0:
-                b[:p, i] = b[-p:, i-1]
-            # If initial condition, set p elements in buffer array to zero
-            else:
-                b[:p, i] = 0
-
-            # Assign values to buffer array from x
-            b[p:,i] = x[p*(i+1):p*(i+2)]
-
-        return b
-
-class MultiTaperFFT(FrequencyAnalysis):
-    def __init__(self, winsize, stepsize, samplerate, timewidth, freqsout, method=None):
-        FrequencyAnalysis.__init__(self, winsize, stepsize, samplerate)
-
-        # multitaper FFT using welch's method
-        self.timewidth = timewidth
-        # self.freqsout = freqsout # vector of frequencies to get analysis for
-        
-        # possible values of method are 'eigen', 'hann', 
-        if not method:
-            self.method = 'eigen'
-            print('Default method of tapering is eigen')
-
-        self.freqsfft = np.linspace(0, self.samplerate//2, (self.winsize*self.samplerate/1000)//2+1)
-
-    def loadrawdata(self, rawdata):
-        self.rawdata = rawdata
-
-        print("Loaded raw data in MultiTaperFFT!")
-
-    def mtwelch(self):
-        # get dimensions of raw data
-        numchans, numeegsamps = self.rawdata.shape
-
-        # get dimensions of raw data
-        numchans, numeegsamps = self.rawdata.shape
-
-        ###### could BE A BUG FROM HARD CODING
-        # get num samples for each FFT window and the freqs to get fft at
-        numsamps = np.round(self.winsize*self.samplerate/1000)
-        overlapsamps = int(np.ceil(self.stepsize*self.samplerate/1000))
-        
-        # get number of samples in a window 
-        numwinsamps = int(self.winsize*self.samplerate/1000)
-        # get number of samples in a step
-        numstepsamps = int(self.stepsize*self.samplerate/1000)
-        # get list of times for beginning and end of each window
-        timestarts = np.arange(0, numeegsamps-numwinsamps+1, numstepsamps)
-        timeends = np.arange(numwinsamps-1, numeegsamps, numstepsamps)
-        timepoints = np.append(timestarts.reshape(len(timestarts), 1), timeends.reshape(len(timestarts), 1), axis=1)
-        
-        # set the number of tapers to use
-        numtapers = 2*self.timewidth-1
-
-        taperind = 1
-        vweights = 1
-
-        taperpownorm = 1
-        taperampnorm = 1
-
-        # get discrete tapering windows
-        # [w, eigens] = spectrum.mtm.dpss(self.winsize, self.timewidth, numtapers)
-        w, eigens = dpss_windows(numwinsamps, self.timewidth, numtapers)
-        vweights = np.ones((1,1,len(eigens)))
-        vweights[0,0,:] = eigens / np.sum(eigens)
-
-        # transpose to make Freq X tapers
-        w = w.T
-
-        powermultitaper = np.zeros((numchans, len(self.freqsfft), len(timepoints)), dtype=complex)
-        phasemultitaper = np.zeros((numchans, len(self.freqsfft), len(timepoints)))
-
-
-        for ichan in range(0, numchans):
-            timefreqmat, fxphase = self.fftchan(ichan, numsamps, overlapsamps, numtapers, w, vweights)
-            
-            # average over windows and scale amplitude
-            timefreqmat = timefreqmat * taperpownorm **2
-
-           # save time freq data
-            powermultitaper[ichan, :, :] = timefreqmat
-
-            # save phase data - only of first taper -> can test complex average
-            phasemultitaper[ichan, :, :] = fxphase[:,:,0]
-
-
-        powermultitaper = np.log10(powermultitaper)
-        
-#         powermultitaper = np.tanh(powermultitaper)
-    
-        return powermultitaper, self.freqsfft, timepoints, phasemultitaper
-
-    def fftchan(self, ichan, numsamps, overlapsamps, numtapers, w, vweights):
-        eeg = self.rawdata[ichan,:]
-
-        # split signal into windows and apply tapers to each one
-        eegwin = self.buffer(eeg, numsamps, overlapsamps, opt='nodelay')
-        detrendedeeg = scipy.signal.detrend(eegwin, axis=0)
-        # need to adapt to repmat of matlab
-        eegwin = np.repeat(detrendedeeg[:,:,np.newaxis], repeats=numtapers, axis=2)
-        windows = eegwin.shape[1] * self.winsize/1000
-        wpermuted = np.transpose(np.repeat(w[:,:,np.newaxis], axis=2, repeats=windows), [0, 2, 1])
-
-        # get coefficients, power and phases
-        fx = np.fft.fft(np.multiply(wpermuted, eegwin), axis=0)
-        fx = fx[0:len(self.freqsfft),:,:] / np.sqrt(numsamps)
-
-        # freq/window/taper to get the power
-        fxpow = np.multiply(fx,np.conj(fx))
-        fxpow = np.concatenate((fxpow[0,:,:][np.newaxis,:,:], 
-                                2*fxpow[1:int(numsamps/2),:,:], 
-                                fxpow[-1, :, :][np.newaxis,:,:]), 
-                               axis=0)
-        fxphase = np.angle(fxpow)
-
-        # average over tapers, weighted by eigenvalues
-        timefreqmat = np.mean(fxpow*vweights, axis=2)
-        
-        return timefreqmat, fxphase

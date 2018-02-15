@@ -3,10 +3,7 @@
 ##############################################################
 #
 # Shell script for submitting parallel python jobs on SLURM 
-# to run jobs for training deep neural networks.
-# 
-# - trainbasecnn/ for training a baseline CNN on real data and 
-# simulated data
+# cluster with nodes, CPUS, tasks, GPUs
 #
 ##############################################################
 # ml python/3.6.0
@@ -14,16 +11,18 @@
 module unload git
 ml anaconda-python/3.6
 source activate dnn
+# ml parallel
 
+## activate virtualenv/condaenv to use their modules
 
 # 1. Prompt user for input that runs the analysis
 echo "Begin analysis." # print beginning statement
 # NEED TO RUN FOR EZ=0,1,2,3 and varying PZ all once
 
 # Pause before running to check
-tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/fft_real/'
-outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/fft_real/train_v1/'
-traindatadir='/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/'
+tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/test_fragility_v3/'
+outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/test_fragility_v3/'
+traindatadir='/scratch/users/ali39@jhu.edu/data/dnn/'
 
 # /scratch/users/ali39@jhu.edu
 printf "\nThis is the data directories: \n"
@@ -49,21 +48,23 @@ NUM_PROCSPERNODE=6  	# number of processors per node (1-24). Use 24 for GNU jobs
 NUM_NODES=1				# number of nodes to request
 NUM_CPUPERTASK=1
 
-# set the parameters for the GPU partition
 partition=gpu 	# debug, shared, unlimited, parallel, gpu, lrgmem, scavenger
+# partition=debug
+qos=scavenger
 numgpus=1
+
 gpu="gpu:$numgpus"
 echo $gpu
-
 # set jobname
 jobname="submit_trainpy.log"
-## job reqs
-walltime=0:45:0
 
 # create export commands
 exvars="tempdatadir=${tempdatadir},\
 outputdatadir=${outputdatadir},\
 traindatadir=${traindatadir} "
+
+## job reqs
+walltime=0:45:0
 
 # build basic sbatch command with all params parametrized
 sbatcomm="sbatch \
