@@ -22,7 +22,7 @@ ml singularity
 source activate dnn
 
 # cd to the scratch location 
-cd /scratch/users/$USER/dnn-unsupervised/
+cd /scratch/users/$USER/dnn-unsupervised/bin/
 
 ########################## DEBUG OUTPUT  ###########################
 # grep for SLURM_EXPORT_ENV
