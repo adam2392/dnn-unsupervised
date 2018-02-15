@@ -1,5 +1,6 @@
 import sys
 sys.path.append('../../dnn/')
+sys.path.append('../dnn/')
 import os
 import numpy as np
 
