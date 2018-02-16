@@ -104,8 +104,8 @@ if __name__ == '__main__':
     DROPOUT = True     # should we use Hinton Dropout method?
 
     # define number of epochs and batch size
-    NUM_EPOCHS = 100 # per dataset
-    batch_size = 24 # or 64... or 24
+    NUM_EPOCHS = 500 # per dataset
+    batch_size = 64 # or 64... or 24
     data_augmentation = True
 
     ieegdnn = model.ieeg_cnn_rnn.IEEGdnn(imsize=imsize, 
@@ -163,12 +163,12 @@ if __name__ == '__main__':
                     featurewise_std_normalization=True,  # divide inputs by std of the dataset
                     # samplewise_std_normalization=True,  # divide each input by its std
                     zca_whitening=False,      # apply ZCA whitening
-                    rotation_range=10,         # randomly rotate images in the range (degrees, 0 to 180)
+                    rotation_range=5,         # randomly rotate images in the range (degrees, 0 to 180)
                     width_shift_range=0.1,    # randomly shift images horizontally (fraction of total width)
                     height_shift_range=0.1,   # randomly shift images vertically (fraction of total height)
                     horizontal_flip=False,    # randomly flip images
                     vertical_flip=False,      # randomly flip images
-                    # channel_shift_range=4,
+                    channel_shift_range=4,
                     fill_mode='nearest')  
 
     # checkpoint
@@ -177,7 +177,7 @@ if __name__ == '__main__':
                                     verbose=1, 
                                     save_best_only=True, 
                                     mode='max')
-    reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.8,
+    reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5,
                               patience=10, min_lr=1e-8)
     testcheck = TestCallback()
     callbacks = [checkpoint, reduce_lr, testcheck] #, poly_decay]
