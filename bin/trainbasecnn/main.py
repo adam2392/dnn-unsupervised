@@ -159,9 +159,9 @@ if __name__ == '__main__':
     # This will do preprocessing and realtime data augmentation:
     datagen = keras.preprocessing.image.ImageDataGenerator(
                     featurewise_center=True,  # set input mean to 0 over the dataset
-                    # samplewise_center=True,  # set each sample mean to 0
+                    samplewise_center=True,  # set each sample mean to 0
                     featurewise_std_normalization=True,  # divide inputs by std of the dataset
-                    # samplewise_std_normalization=True,  # divide each input by its std
+                    samplewise_std_normalization=True,  # divide each input by its std
                     zca_whitening=False,      # apply ZCA whitening
                     # rotation_range=3,         # randomly rotate images in the range (degrees, 0 to 180)
                     # width_shift_range=0.02,    # randomly shift images horizontally (fraction of total width)
@@ -237,9 +237,6 @@ if __name__ == '__main__':
                             class_weight=class_weight,
                             callbacks=callbacks, verbose=2)
 
-        # Compute quantities required for feature-wise normalization
-        # (std, mean, and principal components if ZCA whitening is applied).
-
     with open(historyfile, 'wb') as file_pi:
         pickle.dump(HH.history, file_pi)
     # save final history object
@@ -250,7 +247,6 @@ if __name__ == '__main__':
     # ytrue = np.argmax(testlabels, axis=1)
     # y_pred = currmodel.predict(testimages)
 
-
     prob_predicted = currmodel.predict(X_test)
     ytrue = np.argmax(y_test, axis=1)
     y_pred = currmodel.predict_classes(X_test)
@@ -259,8 +255,7 @@ if __name__ == '__main__':
     print(ytrue.shape)
     print(y_pred.shape)
 
-    print("ROC_AUC_SCORES: ", roc_auc_score(ytrue, prob_predicted))
-
+    print("ROC_AUC_SCORES: ", roc_auc_score(y_test, prob_predicted))
     print('Mean accuracy score: ', accuracy_score(ytrue, y_pred))
     print('F1 score:', f1_score(ytrue, y_pred))
     print('Recall:', recall_score(ytrue, y_pred))
