@@ -40,8 +40,8 @@ class TestCallback(Callback):
 
     def on_epoch_end(self, epoch, logs=None):
         # x, y = self.test_data
-        x = self.model.validation_data[0]
-        y = self.model.validation_data[1]
+        x = self.validation_data[0]
+        y = self.validation_data[1]
 
         loss, acc = self.model.evaluate(x, y, verbose=0)
         print('\nTesting loss: {}, acc: {}\n'.format(loss, acc))
@@ -230,7 +230,7 @@ if __name__ == '__main__':
         datagen.fit(X_train)
         HH = currmodel.fit_generator(
                     datagen.flow(X_train, y_train,batch_size=batch_size),
-                            steps_per_epoch=images.shape[0] // batch_size,
+                            steps_per_epoch=X_train.shape[0] // batch_size,
                             epochs=NUM_EPOCHS,
                             validation_data=(X_test, y_test),
                             shuffle=True,
@@ -239,7 +239,6 @@ if __name__ == '__main__':
 
         # Compute quantities required for feature-wise normalization
         # (std, mean, and principal components if ZCA whitening is applied).
-        datagen.fit(images)
 
     with open(historyfile, 'wb') as file_pi:
         pickle.dump(HH.history, file_pi)
