@@ -31,12 +31,14 @@ import ntpath
 import json
 import pickle
 
+from sklearn.utils import class_weight
+
 class TestCallback(Callback):
     def __init__(self):
         # self.test_data = test_data
         self.aucs = []
 
-    def on_epoch_end(self, epoch, logs={}):
+    def on_epoch_end(self, epoch, logs=None):
         # x, y = self.test_data
         x = self.model.validation_data[0]
         y = self.model.validation_data[1]
@@ -142,7 +144,7 @@ if __name__ == '__main__':
 
     # initialize loss function, SGD optimizer and metrics
     loss = 'binary_crossentropy'
-    optimizer = keras.optimizers.Adam(lr=5e-4, 
+    optimizer = keras.optimizers.Adam(lr=5e-3, 
                                     beta_1=0.9, 
                                     beta_2=0.999,
                                     epsilon=1e-08,
@@ -176,8 +178,9 @@ if __name__ == '__main__':
                                     save_best_only=True, 
                                     mode='max')
     reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5,
-                              patience=4, min_lr=1e-6)
-    callbacks = [checkpoint, reduce_lr] #, poly_decay]
+                              patience=4, min_lr=1e-8)
+    testcheck = TestCallback()
+    callbacks = [checkpoint, reduce_lr, testcheck] #, poly_decay]
     # INIT_LR = 5e-3
     G=1
 
@@ -189,10 +192,10 @@ if __name__ == '__main__':
     images = images.reshape((-1, numfreqs, imsize, imsize))
     images = images.swapaxes(1,3)
 
-    # load the ylabeled data
+    # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
     ylabels = data['ylabels']
     invert_y = 1 - ylabels
-    ylabels = np.concatenate((ylabels, invert_y),axis=1)
+    ylabels = np.concatenate((invert_y, ylabels),axis=1)
 
     # ERROR CHECK assert the shape of the images #
     sys.stdout.write("\n\n Images and ylabels shapes are: \n\n")
@@ -208,6 +211,10 @@ if __name__ == '__main__':
     # format the data correctly 
     X_train, X_test, y_train, y_test = train_test_split(images, ylabels, test_size=0.33, random_state=42)
    
+
+    class_weight = class_weight.compute_class_weight('balanced', 
+                                                 np.unique(ylabels).astype(int),
+                                                 np.argmax(ylabels, axis=1))
     # augment data, or not and then trian the model!
     if not data_augmentation:
         print('Not using data augmentation. Implement Solution still!')
@@ -216,6 +223,7 @@ if __name__ == '__main__':
                   epochs=NUM_EPOCHS,
                   validation_data=(X_test, y_test),
                   shuffle=False,
+                  class_weight=class_weight,
                   callbacks=callbacks)
     else:
         print('Using real-time data augmentation.')
@@ -226,6 +234,7 @@ if __name__ == '__main__':
                             epochs=NUM_EPOCHS,
                             validation_data=(X_test, y_test),
                             shuffle=True,
+                            class_weight=class_weight,
                             callbacks=callbacks, verbose=2)
 
         # Compute quantities required for feature-wise normalization
@@ -238,23 +247,26 @@ if __name__ == '__main__':
     currmodel.save(finalweightsfile)
 
     # if running on test dataset of images
-    predicted = currmodel.predict_classes(testimages)
-    ytrue = np.argmax(testlabels, axis=1)
+    # prob_predicted = currmodel.predict(testimages)
+    # ytrue = np.argmax(testlabels, axis=1)
+    # y_pred = currmodel.predict(testimages)
 
-    y_pred = currmodel.predict(testimages)
-    print("ROC_AUC_SCORES: ", roc_auc_score(testlabels, y_pred))
-    # if running on validation dataset of images
-    # predicted = currmodel.predict_classes(X_test)
-    # ytrue = np.argmax(y_test, axis=1)
 
+    prob_predicted = currmodel.predict(X_test)
+    ytrue = np.argmax(y_test, axis=1)
+    y_pred = currmodel.predict_classes(X_test)
+
+    print(prob_predicted.shape)
     print(ytrue.shape)
-    print(predicted.shape)
+    print(y_pred.shape)
 
-    print('Mean accuracy score: ', accuracy_score(ytrue, predicted))
-    print('F1 score:', f1_score(ytrue, predicted))
-    print('Recall:', recall_score(ytrue, predicted))
-    print('Precision:', precision_score(ytrue, predicted))
-    print('\n clasification report:\n', classification_report(ytrue, predicted))
-    print('\n confusion matrix:\n',confusion_matrix(ytrue, predicted))
+    print("ROC_AUC_SCORES: ", roc_auc_score(testlabels, prob_predicted))
+
+    print('Mean accuracy score: ', accuracy_score(ytrue, y_pred))
+    print('F1 score:', f1_score(ytrue, y_pred))
+    print('Recall:', recall_score(ytrue, y_pred))
+    print('Precision:', precision_score(ytrue, y_pred))
+    print('\n clasification report:\n', classification_report(ytrue, y_pred))
+    print('\n confusion matrix:\n',confusion_matrix(ytrue, y_pred))
 
 
