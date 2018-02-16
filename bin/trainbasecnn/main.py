@@ -43,18 +43,18 @@ class TestCallback(Callback):
         x = self.validation_data[0]
         y = self.validation_data[1]
 
-        loss, acc = self.model.evaluate(x, y, verbose=0)
-        print('\nTesting loss: {}, acc: {}\n'.format(loss, acc))
+        # loss, acc = self.model.evaluate(x, y, verbose=0)
+        # print('\nTesting loss: {}, acc: {}\n'.format(loss, acc))
 
-        predicted = self.model.predict(x)
-        self.aucs.append(roc_auc_score(y, predicted))
+        predicted_probs = self.model.predict(x)
+        self.aucs.append(roc_auc_score(y, predicted_probs))
 
         predicted = self.model.predict_classes(x)
         ytrue = np.argmax(y, axis=1)
         print('Mean accuracy score: ', accuracy_score(ytrue, predicted))
-        print('F1 score:', f1_score(ytrue, predicted))
-        print('Recall:', recall_score(ytrue, predicted))
-        print('Precision:', precision_score(ytrue, predicted))
+        # print('F1 score:', f1_score(ytrue, predicted))
+        # print('Recall:', recall_score(ytrue, predicted))
+        # print('Precision:', precision_score(ytrue, predicted))
         print('\n clasification report:\n', classification_report(ytrue, predicted))
         print('\n confusion matrix:\n',confusion_matrix(ytrue, predicted))
     
@@ -144,7 +144,7 @@ if __name__ == '__main__':
 
     # initialize loss function, SGD optimizer and metrics
     loss = 'binary_crossentropy'
-    optimizer = keras.optimizers.Adam(lr=5e-3, 
+    optimizer = keras.optimizers.Adam(lr=1e-4, 
                                     beta_1=0.9, 
                                     beta_2=0.999,
                                     epsilon=1e-08,
@@ -177,8 +177,8 @@ if __name__ == '__main__':
                                     verbose=1, 
                                     save_best_only=True, 
                                     mode='max')
-    reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5,
-                              patience=4, min_lr=1e-8)
+    reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.8,
+                              patience=10, min_lr=1e-8)
     testcheck = TestCallback()
     callbacks = [checkpoint, reduce_lr, testcheck] #, poly_decay]
     # INIT_LR = 5e-3
@@ -259,7 +259,7 @@ if __name__ == '__main__':
     print(ytrue.shape)
     print(y_pred.shape)
 
-    print("ROC_AUC_SCORES: ", roc_auc_score(testlabels, prob_predicted))
+    print("ROC_AUC_SCORES: ", roc_auc_score(ytrue, prob_predicted))
 
     print('Mean accuracy score: ', accuracy_score(ytrue, y_pred))
     print('F1 score:', f1_score(ytrue, y_pred))
