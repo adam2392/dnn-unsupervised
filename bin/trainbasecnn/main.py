@@ -70,6 +70,19 @@ def loadmodel(ieegdnn, **kwargs):
                                       poolsize=poolsize, filter_size=filtersize)
         vggcnn = ieegdnn._build_seq_output(vggcnn, size_fc, DROPOUT)
 
+def preprocess_withnoise(image_tensor):
+    # preprocessing_function: function that will be implied on each input.
+    #         The function will run before any other modification on it.
+    #         The function should take one argument:
+    #         one image (Numpy tensor with rank 3),
+    #         and should output a Numpy tensor with the same shape.
+    assert image_tensor.shape[0] == image_tensor.shape[1]
+    stdmult=0.1
+    numchans = image_tensor.shape[2]
+    for i in range(numchans):
+        feat = image_tensor[...,i]
+        image_tensor[...,i] = np.random.normal(scale=stdmult*np.std(feat), size=feat.size)
+    return image_tensor
 
 if __name__ == '__main__':
     outputdatadir = str(sys.argv[1])
@@ -164,12 +177,13 @@ if __name__ == '__main__':
                     # samplewise_std_normalization=True,  # divide each input by its std
                     zca_whitening=False,      # apply ZCA whitening
                     rotation_range=5,         # randomly rotate images in the range (degrees, 0 to 180)
-                    width_shift_range=0.1,    # randomly shift images horizontally (fraction of total width)
-                    height_shift_range=0.1,   # randomly shift images vertically (fraction of total height)
+                    width_shift_range=0.2,    # randomly shift images horizontally (fraction of total width)
+                    height_shift_range=0.2,   # randomly shift images vertically (fraction of total height)
                     horizontal_flip=False,    # randomly flip images
                     vertical_flip=False,      # randomly flip images
                     channel_shift_range=4,
-                    fill_mode='nearest')  
+                    fill_mode='nearest',
+                    preprocessing_function=preprocess_withnoise)  
 
     # checkpoint
     checkpoint = ModelCheckpoint(tempfilepath, 
