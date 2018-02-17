@@ -78,10 +78,11 @@ def preprocess_withnoise(image_tensor):
     #         and should output a Numpy tensor with the same shape.
     assert image_tensor.shape[0] == image_tensor.shape[1]
     stdmult=0.1
+    imsize = image_tensor.shape[0]
     numchans = image_tensor.shape[2]
     for i in range(numchans):
         feat = image_tensor[...,i]
-        image_tensor[...,i] = np.random.normal(scale=stdmult*np.std(feat), size=feat.size)
+        image_tensor[...,i] = image_tensor[...,i] + np.random.normal(scale=stdmult*np.std(feat), size=feat.size).reshape(imsize,imsize)
     return image_tensor
 
 if __name__ == '__main__':
