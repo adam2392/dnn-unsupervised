@@ -60,7 +60,7 @@ class TestCallback(Callback):
         print('Precision:', precision_score(ytrue, predicted))
         print('\n clasification report:\n', classification_report(ytrue, predicted))
         print('\n confusion matrix:\n',confusion_matrix(ytrue, predicted))
-        
+
 class TrainCNN(BaseTrain):
     def __init__(self, dnnmodel, batch_size, NUM_EPOCHS, AUGMENT):
         self.dnnmodel = dnnmodel
@@ -191,7 +191,7 @@ class TrainCNN(BaseTrain):
         self.testfilepaths = []
         for root, dirs, files in os.walk(self.directory):
             for file in files:
-                if any(pat in file for pat in listofpats)
+                if any(pat in file for pat in listofpats):
                     self.filepaths.append(os.path.join(root, file))
                 else:
                     self.testfilepaths.append(os.path.join(root,file))
