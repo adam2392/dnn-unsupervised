@@ -11,6 +11,8 @@ import keras.backend as K
 import warnings
 import keras
 
+from keras.preprocessing.sequence import pad_sequences
+
 # import all image transformation utility functions
 from .util import random_rotation, random_shift,\
             random_shear, random_zoom, random_channel_shift,\
@@ -146,6 +148,7 @@ class DataDirGenerator(object):
     def flow_from_directory(self, 
                             directory,
                             batch_size=32, 
+                            num_timesteps=5,
                             num_classes=2,
                             numchannels=3,
                             imsize=32,
@@ -156,6 +159,7 @@ class DataDirGenerator(object):
         return DirectoryIterator(
             directory, self,
             batch_size=batch_size, 
+            num_timesteps=num_timesteps,
             num_classes=num_classes,
             numchannels=numchannels,
             imsize=imsize,
@@ -401,6 +405,7 @@ class DirectoryIterator(Iterator):
                  directory, 
                  image_data_generator,
                  batch_size=32, 
+                 num_timesteps=5,
                  num_classes=2,
                  numchannels=3,
                  imsize=32,
@@ -410,6 +415,7 @@ class DirectoryIterator(Iterator):
                  interpolation='nearest'):
         if data_format is None:
             data_format = K.image_data_format()
+        self.num_timesteps = num_timesteps
         self.data_format = data_format
         self.directory = directory
         self.image_data_generator = image_data_generator
@@ -433,43 +439,93 @@ class DirectoryIterator(Iterator):
 
     def _get_batches_of_transformed_sequences(self, index_array):
         # build batch of image data
-        for i, j in enumerate(index_array):
-            fpath = self.filepaths[j]
+        for i, index in enumerate(index_array):
+            fpath = self.filepaths[index]
             
             # load in a certain file and randomly sample the image
             imgdata = np.load(fpath)
             images = imgdata['image_tensor']
             metadata = imgdata['metadata'].item()
             y = metadata['ylabels']
-            invert_y = 1 - y
-            y = np.concatenate((y, invert_y),axis=1)
-
-            # transform the images if necessary
-            # reshape
-            images = images.reshape((-1, self.numchannels, self.imsize, self.imsize))
-            images = images.swapaxes(1,3)
 
             # get the random index in this dataset
             numsamples = y.shape[0]
+
+            # reformat data if necessary
+            images, y = self._reformatdata(images, y)
+
+            # get it as a sequence
             N = 1 # number of samples to get from this dataset | Todo change into higher number
             assert numsamples == images.shape[0]
             randind = random.sample(range(numsamples), k=N)
-            x = images[randind,...].squeeze()
-            y = y[randind,...].squeeze()
-
-            # apply transforms and standardize
-            x = self.image_data_generator.random_transform(x)
-            x = self.image_data_generator.standardize(x)
+            randind = randind[0]
+            sampimages, samplabels = self._sample_as_seq(images, y, randind)
+            
+            # apply normalization to each image
+            for idx in range(0, len(sampimages)):
+                sampimage = sampimages[idx,...]
+                # apply transforms and standardize
+                sampimage = self.image_data_generator.random_transform(sampimage)
+                sampimage = self.image_data_generator.standardize(sampimage)
 
             if i == 0:
                 # init batch of X and Y
-                batch_x = np.zeros((len(index_array),) + x.shape, dtype=K.floatx())
-                batch_y = np.zeros((len(index_array),) + y.shape, dtype=K.floatx())
+                batch_x = np.zeros((len(index_array),) + sampimages.shape, dtype=K.floatx())
+                batch_y = np.zeros((len(index_array),) + samplabels.shape, dtype=K.floatx())
 
-            batch_x[i] = x
-            batch_y[i] = y
+            batch_x[i] = sampimages
+            batch_y[i] = samplabels
 
         return batch_x, batch_y
+
+    def _sample_as_seq(self, sampdata, samplabels, randind):
+        '''
+        Get sampled data as a sequence
+        '''
+        endlen = sampdata.shape[0]
+
+        if randind + self.num_timesteps >= endlen:
+            print("padding...")
+            sampdata = sampdata[randind:, ...]
+            sampdata = self._paddata(sampdata, padding='post')
+
+            samplabels = samplabels[randind:, ...]
+            samplabels = self._paddata(samplabels, padding='post')
+        else:
+            sampdata = sampdata[randind:randind+self.num_timesteps, ...]
+            samplabels = samplabels[randind:randind+self.num_timesteps, ...]
+        return sampdata, samplabels
+
+    def _paddata(self, sampdata, padding):
+        '''
+        Pad a sample data on the 
+        '''
+        samplen = sampdata.shape[0]
+        numsamps_topad = self.num_timesteps - samplen
+        imshape = sampdata.shape[1:]
+        assert imshape[0] == self.imsize
+        assert imshape[-1] == self.numchannels
+
+        # pad with zeros
+        if samplen < self.num_timesteps:
+            padmat = np.zeros(((samplen,)+imshape))
+            if padding == 'pre':
+                # pad on the pre
+                sampdata = np.concatenate((padmat, sampdata), axis=0)
+            elif padding == 'post':
+                # pad on the pre
+                sampdata = np.concatenate((sampdata, padmat), axis=0)
+        return sampdata
+
+    def _reformatdata(self, images, y):
+        invert_y = 1 - y
+        y = np.concatenate((y, invert_y),axis=1)
+
+        # transform the images if necessary
+        # reshape
+        images = images.reshape((-1, self.numchannels, self.imsize, self.imsize))
+        images = images.swapaxes(1,3)
+        return images, y
 
     def next(self):
         """For python 2.x.
@@ -481,5 +537,5 @@ class DirectoryIterator(Iterator):
             index_array = next(self.index_generator)
         # The transformation of images is not under thread lock
         # so it can be done in parallel
-        return self._get_batches_of_transformed_samples(index_array)
+        return self._get_batches_of_transformed_sequences(index_array)
 

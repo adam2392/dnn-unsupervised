@@ -434,8 +434,8 @@ class DirectoryIterator(Iterator):
 
     def _get_batches_of_transformed_samples(self, index_array):
         # build batch of image data
-        for i, j in enumerate(index_array):
-            fpath = self.filepaths[j]
+        for i, index in enumerate(index_array):
+            fpath = self.filepaths[index]
             
             # load in a certain file and randomly sample the image
             imgdata = np.load(fpath)

@@ -53,6 +53,7 @@ class iEEGSeq(BaseNet):
         self.DROPOUT = DROPOUT
         self.BIDIRECT = BIDIRECT
         self.FREEZE = FREEZE
+        
         # start off with a relatively simple sequential model
         self.model = Sequential() 
 
