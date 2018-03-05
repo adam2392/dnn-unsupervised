@@ -28,6 +28,7 @@ from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Input, Concatenate, Permute, Reshape, Merge
 
 from keras.layers import concatenate
+from keras.optimizers import Adam
 
 # utility functionality for keras
 # from keras.preprocessing import sequence
@@ -35,12 +36,12 @@ from keras.layers.embeddings import Embedding
 from keras.layers import TimeDistributed, Dense, Dropout, Flatten
 
 class iEEGSeq(BaseNet):
-    def __init__(self, name, num_classes=2, num_timewins=5, DROPOUT=True, BIDIRECT=False):
+    def __init__(self, name, num_classes=2, num_timewins=5, DROPOUT=True, BIDIRECT=False, FREEZE=True):
         '''
         Parameters:
         num_classes         (int) the number of classes in prediction space
         '''
-        _availmodels = ['SAMECNNLSTM', 'CNNLSTM', 'MIX']
+        _availmodels = ['SAME', 'CNNLSTM', 'MIX']
         if name not in _availmodels:
             raise AttributeError('Name needs to be one of the following:'
                 'SAMECNNLSTM CNNLSTM MIX')
@@ -51,15 +52,30 @@ class iEEGSeq(BaseNet):
         self.num_timewins = num_timewins            # number of windows to look at per sequence
         self.DROPOUT = DROPOUT
         self.BIDIRECT = BIDIRECT
+        self.FREEZE = FREEZE
         # start off with a relatively simple sequential model
         self.model = Sequential() 
+
+    # def configure(self):
+    #     # initialize loss function, SGD optimizer and metrics
+    #     loss = 'binary_crossentropy'
+    #     optimizer = Adam(lr=1e-4, 
+    #                                     beta_1=0.9, 
+    #                                     beta_2=0.999,
+    #                                     epsilon=1e-08,
+    #                                     decay=0.0)
+    #     metrics = ['accuracy']
+    #     self.modelconfig = self.model.compile(loss=loss, 
+    #                                             optimizer=optimizer,
+    #                                             metrics=metrics)
 
     def buildmodel(self, convnet):   
         size_mem=128
         num_timewins = self.num_timewins
         self.input_shape = convnet.input_shape
 
-        if self.name == 'SAMECNNLSTM':
+        # self.model = convnet
+        if self.name == 'SAME':
             self._build_same_cnn_lstm(convnet, num_timewins=num_timewins, size_mem=size_mem, BIDIRECT=self.BIDIRECT)
         elif self.name == 'CNNLSTM':
             self._build_cnn_lstm(convnet, num_timewins=num_timewins, size_mem=size_mem, BIDIRECT=self.BIDIRECT)
@@ -71,15 +87,16 @@ class iEEGSeq(BaseNet):
     def buildoutput(self):
         size_fc = 1024 # size of the FC layer
 
-        if self.name == 'SAMECNNLSTM' or self.name == 'CNNLSTM':
+        if self.name == 'SAME' or self.name == 'CNNLSTM':
             self._build_seq_output(size_fc=size_fc)
+            # self.model = Model(inputs=self.model.input, outputs = self.model.output)
         elif self.name == 'MIX':
             self._build_output(self.auxmodel, size_fc)
-            self.model = Model(inputs=self.model.input, outputs=self.output)
+            # self.model = Model(inputs=self.model.input, outputs=self.output)
         elif self.name == 'LOAD':
             self.model = self._build_seq_output(size_fc=size_fc)
-            self.model = Model(inputs=self.model.input, outputs = self.model.output)
-        
+            # self.model = Model(inputs=self.model.input, outputs = self.model.output)
+        return self.model
     def _build_same_cnn_lstm(self, convnet, num_timewins, size_mem=128, BIDIRECT=True):
         '''
         Creates a CNN network with shared weights, with a LSTM layer to 
@@ -93,11 +110,17 @@ class iEEGSeq(BaseNet):
         Returns:
         model               the sequential model object with all layers added in LSTM style
         '''
+        if self.FREEZE:
+            # convnet.compile()
+            convnet.trainable = False
+            # convnet.compile()
+
         # flatten layer from single CNN (e.g. model.output_shape == (None, 64, 32, 32) -> (None, 65536))
         convnet.add(Flatten())
         cnn_output_shape = convnet.output_shape[1] # store the output shape (total number of features)
         cnn_input_shape = tuple(list(convnet.input_shape)[1:])
 
+        # self.model = convnet
         # create sequential model to get this all before the LSTM
         self.model.add(TimeDistributed(convnet, input_shape=(num_timewins,)+cnn_input_shape))
         if BIDIRECT:
@@ -168,9 +191,12 @@ class iEEGSeq(BaseNet):
             # adds a flattened layer for the convnet (e.g. model.output_shape == (None, 64, 32, 32) -> (None, 65536))
             convnets.append(convnet)
 
+        if self.FREEZE:
+            for net in convnets:
+                net.trainable = False
+
         # create a concatenated layer from all the parallel CNNs
         # self.model.add(InputLayer(input_shape=(num_timewins,)+cnn_input_shape))
-
         # create a concatenated layer from all the parallel CNNs
         self.model.add(Merge(convnets, mode='concat'))
         # self.model.add(Concatenate(convnets))

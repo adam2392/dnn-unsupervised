@@ -17,6 +17,7 @@ from keras import Model
 from keras.models import Sequential, Model
 from keras.layers import InputLayer
 
+from keras.optimizers import Adam
 # for CNN
 from keras.layers import Conv1D, Conv2D, Conv3D, MaxPooling2D, MaxPooling3D
 # for general NN behavior
@@ -57,6 +58,19 @@ class iEEGCNN(BaseNet):
             'filteringsize': self.filter_size
         }
         pprint.pprint(summary)
+
+    # def configure(self):
+    #     # initialize loss function, SGD optimizer and metrics
+    #     loss = 'binary_crossentropy'
+    #     optimizer = Adam(lr=1e-4, 
+    #                                     beta_1=0.9, 
+    #                                     beta_2=0.999,
+    #                                     epsilon=1e-08,
+    #                                     decay=0.0)
+    #     metrics = ['accuracy']
+    #     self.modelconfig = self.model.compile(loss=loss, 
+    #                                             optimizer=optimizer,
+    #                                             metrics=metrics)
 
     def buildmodel(self):
         w_init = None                       # weight initialization
