@@ -19,12 +19,6 @@ from sklearn.metrics import precision_score, \
     recall_score, classification_report, \
     f1_score, roc_auc_score
 
-# utilitiy libs
-import ntpath
-import json
-import pickle
-from sklearn.utils import class_weight
-
 if __name__ == '__main__':
     outputdatadir = str(sys.argv[1])
     tempdatadir = str(sys.argv[2])
@@ -37,14 +31,12 @@ if __name__ == '__main__':
     # data dirs for training
     modelname = '2dcnn'
     pattraindir = os.path.join(traindatadir, 'realtng')
-    alldatafile = os.path.join(traindatadir, 'realtng', 'allimages.npz')
-
     # list of patients to train on
     listofpats_train = [
                     'id001',
                     'id002', 
                     'id008', 
-                    'id010', 
+                    # 'id010', 
                     'id011', 
                     'id012', 
                     'id013'
@@ -52,7 +44,6 @@ if __name__ == '__main__':
     listofpats_test = [
                     'id010'
                 ]
-
     ##################### PARAMETERS FOR NN - CREATE NN ####################
     imsize=32
     n_colors =3 
@@ -115,5 +106,3 @@ if __name__ == '__main__':
     print('Precision:', precision_score(ytrue, y_pred))
     print('\n clasification report:\n', classification_report(ytrue, y_pred))
     print('\n confusion matrix:\n',confusion_matrix(ytrue, y_pred))
-
-

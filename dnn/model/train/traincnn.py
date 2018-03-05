@@ -35,6 +35,7 @@ def preprocess_imgwithnoise(image_tensor):
         feat = image_tensor[...,i]
         image_tensor[...,i] = image_tensor[...,i] + np.random.normal(scale=stdmult*np.std(feat), size=feat.size).reshape(imsize,imsize)
     return image_tensor
+
 class TestCallback(Callback):
     def __init__(self):
         # self.test_data = test_data
@@ -59,6 +60,7 @@ class TestCallback(Callback):
         print('Precision:', precision_score(ytrue, predicted))
         print('\n clasification report:\n', classification_report(ytrue, predicted))
         print('\n confusion matrix:\n',confusion_matrix(ytrue, predicted))
+        
 class TrainCNN(BaseTrain):
     def __init__(self, dnnmodel, batch_size, NUM_EPOCHS, AUGMENT):
         self.dnnmodel = dnnmodel
@@ -85,6 +87,15 @@ class TrainCNN(BaseTrain):
 
         # save final weights
         self.dnnmodel.save(finalweightsfile)
+
+    def summaryinfo(self):
+        summary = {
+            'batch_size': self.batch_size,
+            'epochs': self.NUM_EPOCHS,
+            'augment': self.AUGMENT,
+            ''
+        }
+        pprint.pprint(summary)
 
     def testoutput(self):
         y_test = self.y_test
