@@ -9,6 +9,8 @@ import model.ieeg_cnn_rnn
 import model.train
 import processing.util as util
 
+from processing.generators.generatorfromfile import 
+
 # deep learning, scientific computing libs
 import keras
 from keras.models import Sequential, Model
@@ -86,8 +88,6 @@ if __name__ == '__main__':
     NUM_EPOCHS = 100 # per dataset
     batch_size = 32 # or 64... or 24
     data_augmentation = True
-    # INIT_LR = 5e-3  # learning rate (initial if a callback to decrease it)
-    # G=1 # number of GPUs
 
     ##################### TRAINING FOR NN ####################
     ####### CNN-LSTM style ANN #######
@@ -100,10 +100,6 @@ if __name__ == '__main__':
                         return_sequences=False))
     currmodel = ieegdnn._build_seq_output(model, size_fc, DROPOUT=True)
     currmodel = Model(inputs=model.input, outputs = model.output)
-
-    # CNN-LSTM mix style ANN
-
-    # CNN-LSTM birectional
 
     print(currmodel.summary())
     if not os.path.exists(modeljsonfile):
