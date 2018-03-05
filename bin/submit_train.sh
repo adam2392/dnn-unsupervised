@@ -78,9 +78,9 @@ sbatcomm="sbatch \
 # build a scavenger job, gpu job, or other job
 printf "Sbatch should run now\n"
 
-echo $sbatcomm $exvars ./submit_train.sbatch
+echo $sbatcomm $exvars ./run_train.sbatch
 
-${sbatcomm} --export=$exvars ./submit_train.sbatch
+${sbatcomm} --export=$exvars ./run_train.sbatch
 
 read -p "Continuing in 0.5 Seconds...." -t 0.5
 echo "Continuing ...."

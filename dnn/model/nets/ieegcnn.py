@@ -8,7 +8,6 @@ import math as m
 ############################ ANN FUNCTIONS ############################
 ######### import DNN for training using GPUs #########
 # from keras.utils.training_utils import multi_gpu_model
-
 ######### import DNN frameworks #########
 import tensorflow as tf
 import keras
@@ -92,6 +91,7 @@ class iEEGCNN(BaseNet):
                 filter_size=filter_size)
         else:
             raise ValueError('Model dimension besides (1,2,3) not implemented!')
+
 
     def buildoutput(self):
         size_fc = 1024

@@ -66,6 +66,7 @@ if __name__ == '__main__':
                   modeldim=modeldim, 
                   DROPOUT=DROPOUT)
     cnn.buildmodel()
+    cnn.buildoutput()
     print(cnn.model.input_shape)
     print(cnn.model.summary())
     sys.stdout.write("Created VGG12 Style CNN")
