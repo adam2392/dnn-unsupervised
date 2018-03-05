@@ -33,7 +33,7 @@ if __name__ == '__main__':
     modelfile = os.path.join(outputdatadir, 'cnn_model.json')
     modelname = '2dcnn-lstm'
     pattraindir = os.path.join(traindatadir, 'realtng')
-    
+
     # list of patients to train on
     listofpats_train = [
                     'id001',
@@ -75,20 +75,25 @@ if __name__ == '__main__':
     NUM_EPOCHS = 100
     AUGMENT = True
 
-    cnn_trainer = trainseq.TrainSeq(dnnmodel, batch_size, numtimesteps, NUM_EPOCHS, AUGMENT)
+    seq_trainer = trainseq.TrainSeq(dnnmodel, batch_size, numtimesteps, NUM_EPOCHS, AUGMENT)
+
+    # load model and configure
+    seq_trainer.loadmodel(modelfile, weightsfile)
+    seq_trainer.configure(tempdatadir)
+    # load directory of data
+    seq_trainer.loaddirofdata(pattraindir, listofpats_train, LOAD=True)
 
     # configure, load generator and load training/testing data
-    cnn_trainer.configure(tempdatadir)
-    cnn_trainer.loadgenerator()
-    cnn_trainer.loaddirofdata(pattraindir, listofpats_train, LOAD=True)
-    cnn_trainer.train()
+    seq_trainer.loadgenerator()
+    
+    # run traiing
+    seq_trainer.train()
 
     # print out summary info for the model and the training
-    cnn.summaryinfo()
-    cnn_trainer.summaryinfo()
+    seq_trainer.summaryinfo()
 
     # save model, final weights and the history object
-    cnn_trainer.saveoutput(modelname=modelname, outputdatadir=outputdatadir)
+    seq_trainer.saveoutput(modelname=modelname, outputdatadir=outputdatadir)
 
     # get the history object as a result of training
     HH = cnn_trainer.HH

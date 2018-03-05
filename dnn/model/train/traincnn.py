@@ -12,6 +12,8 @@ from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 from keras.callbacks import Callback
 
+from keras.preprocessing.image import ImageDataGenerator
+
 from sklearn.utils import class_weight
 
 # metrics for postprocessing of the results
@@ -276,7 +278,7 @@ class TrainCNN(BaseTrain):
 
     def loadgenerator(self):
         # This will do preprocessing and realtime data augmentation:
-        self.generator = keras.preprocessing.image.ImageDataGenerator(
+        self.generator = ImageDataGenerator(
                     # featurewise_center=True,  # set input mean to 0 over the dataset
                     samplewise_center=True,  # set each sample mean to 0
                     # featurewise_std_normalization=True,  # divide inputs by std of the dataset
