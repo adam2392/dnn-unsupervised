@@ -59,7 +59,6 @@ if __name__ == '__main__':
     cnn.buildmodel()
     cnn.buildoutput()
     print(cnn.model.input_shape)
-    print(cnn.model.summary())
     sys.stdout.write("Created VGG12 Style CNN")
 
     # instantiate this current model
@@ -79,6 +78,10 @@ if __name__ == '__main__':
     cnn_trainer.loadgenerator()
     cnn_trainer.loaddirofdata(pattraindir, listofpats_train, LOAD=True)
     cnn_trainer.train()
+
+    # print out summary info for the model and the training
+    cnn.summaryinfo()
+    cnn_trainer.summaryinfo()
 
     # save model, final weights and the history object
     cnn_trainer.saveoutput(modelname=modelname, outputdatadir=outputdatadir)
