@@ -220,7 +220,7 @@ class TrainCNN(BaseTrain):
             class_weight = sklearn.utils.compute_class_weight('balanced', 
                                                      np.unique(ylabels).astype(int),
                                                      np.argmax(ylabels, axis=1))
-            self.X_train = image_tensor
+            self.X_train = image_tensors
             self.y_train = ylabels
 
             '''     LOAD TESTING DATA      '''

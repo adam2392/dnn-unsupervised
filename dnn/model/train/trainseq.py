@@ -152,7 +152,7 @@ class TrainSeq(BaseTrain):
         reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5,
                               patience=10, min_lr=1e-8)
         testcheck = TestCallback()
-        callbacks = [checkpoint, reduce_lr, testcheck]
+        self.callbacks = [checkpoint, reduce_lr, testcheck]
 
     def loadmodel(self, modelfile, weightsfile):
         # load json and create model
