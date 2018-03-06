@@ -35,6 +35,9 @@ from keras.optimizers import Adam
 from keras.layers.embeddings import Embedding
 from keras.layers import TimeDistributed, Dense, Dropout, Flatten
 
+import json
+import pickle
+
 class iEEGSeq(BaseNet):
     def __init__(self, name, num_classes=2, num_timewins=5, DROPOUT=True, BIDIRECT=False, FREEZE=True):
         '''
@@ -69,6 +72,21 @@ class iEEGSeq(BaseNet):
     #     self.modelconfig = self.model.compile(loss=loss, 
     #                                             optimizer=optimizer,
     #                                             metrics=metrics)
+    def loadmodel(self, modelfile, weightsfile):
+        # load json and create model
+        json_file = open(modelfile, 'r')
+        loaded_model_json = json_file.read()
+        json_file.close()
+
+        # fixed_cnn_model = ieegdnn.load_model(weightsfile, freeze=True)
+        fixed_cnn_model = keras.models.model_from_json(loaded_model_json)
+        fixed_cnn_model.load_weights(weightsfile)
+
+        # remove the last 2 dense FC layers and freeze it
+        fixed_cnn_model.pop()
+        fixed_cnn_model.pop()
+        
+        return fixed_cnn_model
 
     def buildmodel(self, convnet):   
         size_mem=128

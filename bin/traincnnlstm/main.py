@@ -6,7 +6,10 @@ import numpy as np
 
 # Custom Built libraries
 from model.nets.ieegcnn import iEEGCNN
+from model.nets.ieegseq import iEEGSeq
 from model.train import trainseq
+
+import keras
 
 # metrics for postprocessing of the results
 from sklearn.metrics import confusion_matrix
@@ -31,6 +34,7 @@ if __name__ == '__main__':
     # load in model and weights -> NEED TO ADAPT OUTPUTDATADIR to get the correct weights! (version exp)
     weightsfile = os.path.join(outputdatadir, 'final_weights.h5')
     modelfile = os.path.join(outputdatadir, 'cnn_model.json')
+
     modelname = '2dcnn-lstm'
     pattraindir = os.path.join(traindatadir, 'realtng')
 
@@ -47,28 +51,42 @@ if __name__ == '__main__':
     listofpats_test = [
                     'id010'
                 ]
-    # alldatafile = os.path.join(traindatadir, 'realtng', 'allimages.npz')
     ##################### PARAMETERS FOR NN ####################
+    # CNN PARAMS
     imsize=32
     n_colors =3 
     num_classes=2
     modeldim=2
     DROPOUT=True
 
-    cnn = iEEGCNN(imsize=imsize,
-                  n_colors=n_colors, 
-                  num_classes=num_classes, 
-                  modeldim=modeldim, 
-                  DROPOUT=DROPOUT)
-    cnn.buildmodel()
-    cnn.buildoutput()
-    print(cnn.model.input_shape)
-    sys.stdout.write("Created VGG12 Style CNN")
-    # instantiate this current model
-    dnnmodel = cnn.model
+    # LSTM PARAMS
+    name = 'MIX'
+    name = 'SAME'
+    num_timewins=5
+    DROPOUT=True
+    BIDIRECT=False
+    cnnseq = iEEGSeq(name=name,
+                    num_classes=num_classes,
+                    num_timewins=num_timewins,
+                    DROPOUT=DROPOUT,
+                    BIDIRECT=BIDIRECT)
 
-    print(dnnmodel.summary())
-    print("model input shape is: ", dnnmodel.input_shape)
+    # LOAD A CNN NEURAL NETWORK FROM PREVIOUS TRAINS
+    fixed_cnn_model = cnnseq.loadmodel(modelfile, weightsfile)
+
+    sys.stdout.write("Created VGG12 Style CNN")
+    # set weights to false
+    fixed_cnn_model.trainable = False
+    print(fixed_cnn_model.summary())
+    print("Each CNN model input shape is: ", fixed_cnn_model.input_shape)
+
+    # BUILD THE SEQUENTIAL MODEL
+    cnnseq.buildmodel(fixed_cnn_model)
+    cnnseq.buildoutput()
+
+    # print cnn-seq model's summary
+    cnnseq.model.summary()
+
     ##################### TRAINING FOR NN ####################
     numtimesteps = 10
     batch_size = 32
@@ -77,16 +95,15 @@ if __name__ == '__main__':
 
     seq_trainer = trainseq.TrainSeq(dnnmodel, batch_size, numtimesteps, NUM_EPOCHS, AUGMENT)
 
-    # load model and configure
-    seq_trainer.loadmodel(modelfile, weightsfile)
+    # configure, load generator
     seq_trainer.configure(tempdatadir)
-    # load directory of data
-    seq_trainer.loaddirofdata(pattraindir, listofpats_train, LOAD=True)
-
-    # configure, load generator and load training/testing data
     seq_trainer.loadgenerator()
+    # load directory of data to compute file paths for the data we want per patient
+    seq_trainer.loaddirofdata(pattraindir, listofpats_train)
+    # use the training data and loop through once to compute the class weights
+    seq_trainer.compute_classweights()
     
-    # run traiing
+    # run training
     seq_trainer.train()
 
     # print out summary info for the model and the training
@@ -96,10 +113,6 @@ if __name__ == '__main__':
     seq_trainer.saveoutput(modelname=modelname, outputdatadir=outputdatadir)
 
     # get the history object as a result of training
-    HH = cnn_trainer.HH
+    HH = seq_trainer.HH
     dnnmodel = cnn_trainer.dnnmodel
-
-    # get the testing data to run a final summary output
-    X_test = cnn_trainer.X_test
-    y_test = cnn_trainer.y_test
 

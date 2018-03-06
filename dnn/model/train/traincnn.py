@@ -191,7 +191,7 @@ class TrainCNN(BaseTrain):
         ''' Get list of file paths '''
         self.filepaths = []
         self.testfilepaths = []
-        for root, dirs, files in os.walk(self.directory):
+        for root, dirs, files in os.walk(datadir):
             for file in files:
                 if any(pat in file for pat in listofpats):
                     self.filepaths.append(os.path.join(root, file))
