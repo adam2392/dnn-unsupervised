@@ -45,8 +45,11 @@ class TestCallback(Callback):
 
     def on_epoch_end(self, epoch, logs={}):
         # x, y = self.test_data
-        x = self.model.validation_data[0]
-        y = self.model.validation_data[1]
+        # x = self.model.validation_data[0]
+        # y = self.model.validation_data[1]
+        x = self.validation_data[0]
+        y = self.validation_data[1]
+
 
         loss, acc = self.model.evaluate(x, y, verbose=0)
         print('\nTesting loss: {}, acc: {}\n'.format(loss, acc))
