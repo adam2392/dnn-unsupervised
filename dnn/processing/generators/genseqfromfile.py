@@ -525,6 +525,7 @@ class DirectoryIterator(Iterator):
         # reshape
         images = images.reshape((-1, self.numchannels, self.imsize, self.imsize))
         images = images.swapaxes(1,3)
+        images = images.astype("float32")
         return images, y
 
     def next(self):

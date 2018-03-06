@@ -22,7 +22,7 @@ echo "Begin analysis." # print beginning statement
 
 # Pause before running to check
 tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/fft_real/'
-outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/fft_real/train_v8/'
+outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/fft_real/train_v8/id008/'
 traindatadir='/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/'
 
 # /scratch/users/ali39@jhu.edu
