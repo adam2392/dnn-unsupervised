@@ -190,10 +190,8 @@ class TrainCNN(BaseTrain):
     def formatdata(self, images):
         images = images.swapaxes(1,3)
 
-        assert images.shape[2] == images.shape[1]
-        assert images.shape[2] == imsize
-        assert images.shape[3] == numfreqs
-
+        print(images.shape)
+        
         # lower sample by casting to 32 bits
         images = images.astype("float32")
         return images
