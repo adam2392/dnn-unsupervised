@@ -187,6 +187,16 @@ class TrainCNN(BaseTrain):
         self.y_test = y_test
         self.class_weight = class_weight
 
+    def formatdata(self, images):
+        images = images.swapaxes(1,3)
+
+        assert images.shape[2] == images.shape[1]
+        assert images.shape[2] == imsize
+        assert images.shape[3] == numfreqs
+
+        # lower sample by casting to 32 bits
+        images = images.astype("float32")
+        return images
     def loaddirofdata(self, datadir, listofpats, LOAD):
         ''' Get list of file paths '''
         self.filepaths = []
@@ -220,6 +230,8 @@ class TrainCNN(BaseTrain):
             class_weight = sklearn.utils.compute_class_weight('balanced', 
                                                      np.unique(ylabels).astype(int),
                                                      np.argmax(ylabels, axis=1))
+            
+            image_tensors = self.formatdata(image_tensors)
             self.X_train = image_tensors
             self.y_train = ylabels
 
@@ -239,6 +251,7 @@ class TrainCNN(BaseTrain):
             invert_y = 1 - ylabels
             ylabels = np.concatenate((invert_y, ylabels),axis=1)  
 
+            image_tensors = self.formatdata(image_tensors)
             self.X_test = image_tensors
             self.y_test = ylabels
             self.class_weight = class_weight

@@ -46,7 +46,7 @@ if __name__ == '__main__':
                 ]
     ##################### PARAMETERS FOR NN - CREATE NN ####################
     imsize=32
-    n_colors =3 
+    n_colors =4
     num_classes=2
     modeldim=2
     DROPOUT=True
