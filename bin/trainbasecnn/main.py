@@ -35,11 +35,11 @@ if __name__ == '__main__':
     listofpats_train = [
                     'id001',
                     'id002', 
-                    # 'id008', 
+                    'id008', 
                     'id010', 
                     'id011', 
                     'id012', 
-                    'id013'
+                    # 'id013'
                 ]
     listofpats_test = [
                     'id010'
