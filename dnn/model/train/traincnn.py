@@ -141,7 +141,7 @@ class TrainCNN(BaseTrain):
         reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5,
                               patience=10, min_lr=1e-8)
         testcheck = TestCallback()
-        callbacks = [checkpoint, reduce_lr, testcheck]
+        self.callbacks = [checkpoint, reduce_lr, testcheck]
 
     def loaddata(self, datafile, imsize, numchans):
         ''' Get all data '''
