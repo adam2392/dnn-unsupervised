@@ -271,7 +271,7 @@ class TrainSeq(BaseTrain):
         invert_y = 1 - ylabels
         ylabels = np.concatenate((invert_y, ylabels),axis=1)  
         # format the data correctly 
-        class_weight = class_weight.compute_class_weight('balanced', 
+        class_weight = sklearn.utils.compute_class_weight('balanced', 
                                                  np.unique(ylabels).astype(int),
                                                  np.argmax(ylabels, axis=1))
         self.class_weight = class_weight

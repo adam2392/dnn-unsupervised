@@ -14,7 +14,7 @@ from keras.callbacks import Callback
 
 from keras.preprocessing.image import ImageDataGenerator
 
-from sklearn.utils import class_weight
+import sklearn.utils
 
 # metrics for postprocessing of the results
 from sklearn.metrics import confusion_matrix
@@ -177,7 +177,7 @@ class TrainCNN(BaseTrain):
         # format the data correctly 
         X_train, X_test, y_train, y_test = train_test_split(images, ylabels, test_size=0.33, random_state=42)
     
-        class_weight = class_weight.compute_class_weight('balanced', 
+        class_weight = sklearn.utils.compute_class_weight('balanced', 
                                                  np.unique(ylabels).astype(int),
                                                  np.argmax(ylabels, axis=1))
 
@@ -217,7 +217,7 @@ class TrainCNN(BaseTrain):
             invert_y = 1 - ylabels
             ylabels = np.concatenate((invert_y, ylabels),axis=1)  
             # format the data correctly 
-            class_weight = class_weight.compute_class_weight('balanced', 
+            class_weight = sklearn.utils.compute_class_weight('balanced', 
                                                      np.unique(ylabels).astype(int),
                                                      np.argmax(ylabels, axis=1))
             self.X_train = image_tensor
