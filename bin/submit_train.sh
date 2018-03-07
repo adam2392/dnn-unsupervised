@@ -21,8 +21,8 @@ echo "Begin analysis." # print beginning statement
 # NEED TO RUN FOR EZ=0,1,2,3 and varying PZ all once
 
 # Pause before running to check
-tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/fft_real/id013/'
-outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/fft_real/train_v8/id013/'
+tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/fft_real/id008/'
+outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/fft_real/train_v8/id008/'
 traindatadir='/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/'
 
 # /scratch/users/ali39@jhu.edu
