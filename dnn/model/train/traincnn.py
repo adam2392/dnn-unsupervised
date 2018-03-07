@@ -23,6 +23,8 @@ from sklearn.metrics import precision_score, \
     recall_score, classification_report, \
     f1_score, roc_auc_score
 
+import pprint
+
 def preprocess_imgwithnoise(image_tensor):
     # preprocessing_function: function that will be implied on each input.
     #         The function will run before any other modification on it.
