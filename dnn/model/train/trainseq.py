@@ -286,7 +286,7 @@ class TrainSeq(BaseTrain):
 
         print('Using real-time data augmentation.')
         HH = dnnmodel.fit_generator(self.generator.flow(X_train, y_train, batch_size=self.batch_size),
-                                    num_timesteps=num_timesteps
+                                    num_timesteps=num_timesteps,
                                     steps_per_epoch=X_train.shape[0] // self.batch_size,
                                     epochs=self.NUM_EPOCHS,
                                     validation_data=(X_test, y_test),

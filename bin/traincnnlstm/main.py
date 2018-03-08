@@ -17,10 +17,6 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score, \
     recall_score, classification_report, \
     f1_score, roc_auc_score
-    
-def path_leaf(path):
-    head, tail = ntpath.split(path)
-    return tail or ntpath.basename(head)
 
 if __name__ == '__main__':
     outputdatadir = str(sys.argv[1])
@@ -71,8 +67,20 @@ if __name__ == '__main__':
                     DROPOUT=DROPOUT,
                     BIDIRECT=BIDIRECT)
 
-    # LOAD A CNN NEURAL NETWORK FROM PREVIOUS TRAINS
-    fixed_cnn_model = cnnseq.loadmodel(modelfile, weightsfile)
+    if not LOAD:
+        cnn = iEEGCNN(imsize=imsize,
+              n_colors=n_colors, 
+              num_classes=num_classes, 
+              modeldim=modeldim, 
+              DROPOUT=DROPOUT)
+        cnn.buildmodel()
+        cnn.summaryinfo()
+
+        print("EACH CNN MODEL INPUT IS: ", cnn.model.input_shape)
+        fixed_cnn_model = cnn.model
+    else:
+        # LOAD A CNN NEURAL NETWORK FROM PREVIOUS TRAINS
+        fixed_cnn_model = cnnseq.loadmodel(modelfile, weightsfile)
 
     sys.stdout.write("Created VGG12 Style CNN")
     # set weights to false
@@ -80,7 +88,7 @@ if __name__ == '__main__':
     print(fixed_cnn_model.summary())
     print("Each CNN model input shape is: ", fixed_cnn_model.input_shape)
 
-    # BUILD THE SEQUENTIAL MODEL
+    # BUILD THE SEQUENTIAL MODEL - pass in the fixed_cnn model
     cnnseq.buildmodel(fixed_cnn_model)
     cnnseq.buildoutput()
 
@@ -90,7 +98,7 @@ if __name__ == '__main__':
     ##################### TRAINING FOR NN ####################
     numtimesteps = 10
     batch_size = 32
-    NUM_EPOCHS = 100
+    NUM_EPOCHS = 200
     AUGMENT = True
 
     seq_trainer = trainseq.TrainSeq(dnnmodel, batch_size, numtimesteps, NUM_EPOCHS, AUGMENT)
