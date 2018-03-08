@@ -66,7 +66,7 @@ if __name__ == '__main__':
                     num_timewins=num_timewins,
                     DROPOUT=DROPOUT,
                     BIDIRECT=BIDIRECT)
-
+    LOAD = False
     if not LOAD:
         cnn = iEEGCNN(imsize=imsize,
               n_colors=n_colors, 
