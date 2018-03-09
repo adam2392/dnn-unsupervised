@@ -24,12 +24,62 @@ from sklearn.metrics import precision_score, \
     f1_score, roc_auc_score
 
 # for smart splitting of lists
-import more_itertools as mit
 import pprint
 
 def path_leaf(path):
     head, tail = ntpath.split(path)
     return tail or ntpath.basename(head)
+
+def windowed(seq, n, fillvalue=None, step=1):
+    """Return a sliding window of width *n* over the given iterable.
+
+        >>> all_windows = windowed([1, 2, 3, 4, 5], 3)
+        >>> list(all_windows)
+        [(1, 2, 3), (2, 3, 4), (3, 4, 5)]
+
+    When the window is larger than the iterable, *fillvalue* is used in place
+    of missing values::
+
+        >>> list(windowed([1, 2, 3], 4))
+        [(1, 2, 3, None)]
+
+    Each window will advance in increments of *step*:
+
+        >>> list(windowed([1, 2, 3, 4, 5, 6], 3, fillvalue='!', step=2))
+        [(1, 2, 3), (3, 4, 5), (5, 6, '!')]
+
+    """
+    if n < 0:
+        raise ValueError('n must be >= 0')
+    if n == 0:
+        yield tuple()
+        return
+    if step < 1:
+        raise ValueError('step must be >= 1')
+
+    it = iter(seq)
+    window = deque([], n)
+    append = window.append
+
+    # Initial deque fill
+    for _ in range(n):
+        append(next(it, fillvalue))
+    yield tuple(window)
+
+    # Appending new items to the right causes old items to fall off the left
+    i = 0
+    for item in it:
+        append(item)
+        i = (i + 1) % step
+        if i % step == 0:
+            yield tuple(window)
+
+    # If there are items from the iterable in the window, pad with the given
+    # value and emit them.
+    if (i % step) and (step - i < n):
+        for _ in range(step - i):
+            append(fillvalue)
+        yield tuple(window)
 
 class TestCallback(Callback):
     def __init__(self):
@@ -202,12 +252,21 @@ class TrainSeq(BaseTrain):
         formatted_Y = []
 
         # Option 1: use numpy array split to split along the channels
-        formatted_X = list(mit.windowed(seqofimgs, 
+        # formatted_X = list(mit.windowed(seqofimgs, 
+        #                                 n=self.numtimesteps, 
+        #                                 step=self.numtimesteps//2))
+        # formatted_Y = list(mit.windowed(seqoflabbels, 
+        #                                 n=self.numtimesteps, 
+        #                                 step=self.numtimesteps//2))
+        formatted_X = list(windowed(seqofimgs, 
                                         n=self.numtimesteps, 
                                         step=self.numtimesteps//2))
-        formatted_Y = list(mit.windowed(seqoflabbels, 
+        formatted_Y = list(windowed(seqoflabbels, 
                                         n=self.numtimesteps, 
                                         step=self.numtimesteps//2))
+
+
+
 
         # use list comprehension to supposedly get the same answer
         size = self.numtimesteps
