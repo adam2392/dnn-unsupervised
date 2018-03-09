@@ -101,7 +101,7 @@ if __name__ == '__main__':
     NUM_EPOCHS = 200
     AUGMENT = True
 
-    seq_trainer = trainseq.TrainSeq(dnnmodel, batch_size, numtimesteps, NUM_EPOCHS, AUGMENT)
+    seq_trainer = trainseq.TrainSeq(fixed_cnn_model, batch_size, numtimesteps, NUM_EPOCHS, AUGMENT)
 
     # configure, load generator
     seq_trainer.configure(tempdatadir)
