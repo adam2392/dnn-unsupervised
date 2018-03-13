@@ -128,7 +128,7 @@ class TrainSeq(BaseTrain):
     def __init__(self, dnnmodel, batch_size, numtimesteps, NUM_EPOCHS, AUGMENT):
         self.dnnmodel = dnnmodel                # the dnn model we will use to train
         self.batch_size = batch_size            # the batch size per training epoch
-        self.num_timesteps = numtimesteps        # the number of time steps in our sequence data
+        self.numtimesteps = numtimesteps        # the number of time steps in our sequence data
         self.NUM_EPOCHS = NUM_EPOCHS            # epochs to train on
         self.AUGMENT = AUGMENT                  # augment data or not?
 
@@ -291,13 +291,13 @@ class TrainSeq(BaseTrain):
         Pad a sample data on the 
         '''
         samplen = sampdata.shape[0]
-        numsamps_topad = self.num_timesteps - samplen
+        numsamps_topad = self.numtimesteps - samplen
         imshape = sampdata.shape[1:]
         assert imshape[0] == self.imsize
         assert imshape[-1] == self.numchannels
 
         # pad with zeros
-        if samplen < self.num_timesteps:
+        if samplen < self.numtimesteps:
             padmat = np.zeros(((samplen,)+imshape))
             if padding == 'pre':
                 # pad on the pre
@@ -342,11 +342,11 @@ class TrainSeq(BaseTrain):
         class_weight = self.class_weight
         callbacks = self.callbacks
         dnnmodel = self.dnnmodel
-        num_timesteps = self.num_timesteps
+        numtimesteps = self.numtimesteps
 
         print('Using real-time data augmentation.')
         HH = dnnmodel.fit_generator(self.generator.flow(X_train, y_train, batch_size=self.batch_size),
-                                    num_timesteps=num_timesteps,
+                                    num_timesteps=numtimesteps,
                                     steps_per_epoch=X_train.shape[0] // self.batch_size,
                                     epochs=self.NUM_EPOCHS,
                                     validation_data=(X_test, y_test),
