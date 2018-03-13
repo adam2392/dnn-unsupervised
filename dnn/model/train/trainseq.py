@@ -128,7 +128,7 @@ class TrainSeq(BaseTrain):
     def __init__(self, dnnmodel, batch_size, numtimesteps, NUM_EPOCHS, AUGMENT):
         self.dnnmodel = dnnmodel                # the dnn model we will use to train
         self.batch_size = batch_size            # the batch size per training epoch
-        self.numtimesteps = numtimesteps        # the number of time steps in our sequence data
+        self.num_timesteps = numtimesteps        # the number of time steps in our sequence data
         self.NUM_EPOCHS = NUM_EPOCHS            # epochs to train on
         self.AUGMENT = AUGMENT                  # augment data or not?
 
