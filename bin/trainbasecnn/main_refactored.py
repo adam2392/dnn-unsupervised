@@ -21,12 +21,12 @@ from sklearn.metrics import precision_score, \
 
 def mainmodel():
     ##################### PARAMETERS FOR NN - CREATE NN ####################
-    imsize=32				# the size of the square image
-    n_colors =4				# the #channels in convnet
-    num_classes=2			# output dimension
-    DROPOUT=True			# use DROPOUT?
+    imsize=32               # the size of the square image
+    n_colors =4             # the #channels in convnet
+    num_classes=2           # output dimension
+    DROPOUT=True            # use DROPOUT?
 
-    modeldim=2				# (optional): dim of model (1,2,3)
+    modeldim=2              # (optional): dim of model (1,2,3)
 
     # build the baseline CNN model
     cnn = iEEGCNN(imsize=imsize,
@@ -35,7 +35,7 @@ def mainmodel():
                   modeldim=modeldim, 
                   DROPOUT=DROPOUT)
     cnn.buildmodel()
-	# instantiate this current model
+    # instantiate this current model
     dnnmodel = cnn.model
 
     print("Input shape for the model is: ", dnnmodel.input_shape)
@@ -44,7 +44,7 @@ def mainmodel():
     return dnnmodel
     
 def maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir):
-	modelname = '2dcnn'
+    modelname = '2dcnn'
     # list of patients to train on
     listofpats_train = [# 'id001',
                     # 'id002', 
@@ -61,7 +61,7 @@ def maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir):
                     # 'id011', 
                     # 'id012', 
                     'id013']
-	##################### PARAMETERS FOR TRAINING - CREATE TRAINER ####################
+    ##################### PARAMETERS FOR TRAINING - CREATE TRAINER ####################
     batch_size = 32
     NUM_EPOCHS = 100
     AUGMENT = True
@@ -71,7 +71,7 @@ def maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir):
     # configure, load generator and load training/testing data
     cnn_trainer.configure(tempdatadir)
     cnn_trainer.loaddirs(traindatadir, testdatadir, 
-    					listofpats_train, listofpats_test)
+                        listofpats_train, listofpats_test)
     cnn_trainer.loadtrainingdata()
     cnn_trainer.loadtestdata()
     cnn_trainer.train()
@@ -87,7 +87,7 @@ def maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir):
     return cnn_trainer
 
 def maintest(dnnmodel, cnn_trainer):
-	# get the testing data to run a final summary output
+    # get the testing data to run a final summary output
     X_test = cnn_trainer.X_test
     y_test = cnn_trainer.y_test
 
@@ -114,11 +114,11 @@ if __name__ == '__main__':
     testdatadir = str(sys.argv[4])              # the test data directory
 
     '''
-	outputdatadir = ''
-	tempdatadir = ''
-	traindatadir = ''
-	testdatadir = ''
-	'''
+    outputdatadir = ''
+    tempdatadir = ''
+    traindatadir = ''
+    testdatadir = ''
+    '''
     # create the output and temporary saving directories
     if not os.path.exists(outputdatadir):
         os.makedirs(outputdatadir)
