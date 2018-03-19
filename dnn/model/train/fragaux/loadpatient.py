@@ -7,7 +7,7 @@ import datetime
 import time
 from dateutil.relativedelta import relativedelta
 
-import utils as futil
+from .utils import *
 
 class LoadPat(object):
     '''
@@ -38,8 +38,8 @@ class LoadPat(object):
         self.clinoutcome = clinoutcome
         self.reference = None
         # get relevant channel data
-        self.patid, self.seizid = futil.splitpatient(patient)
-        self.included_chans, self.onsetchans, self.clinresult = futil.returnindices(self.patid, self.seizid)
+        self.patid, self.seizid = splitpatient(patient)
+        self.included_chans, self.onsetchans, self.clinresult = returnindices(self.patid, self.seizid)
 
         self.included_chans = self.included_chans.astype(int)
         if self.onsetchans is not None:
