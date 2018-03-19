@@ -62,12 +62,11 @@ def preprocess_imgwithnoise(image_tensor):
     return image_tensor
 
 class TrainFragAux(BaseTrain):
-    def __init__(self, dnnmodel, numwins, batch_size, NUM_EPOCHS, AUGMENT):
+    def __init__(self, dnnmodel, batch_size, NUM_EPOCHS, AUGMENT):
         self.dnnmodel = dnnmodel
         self.batch_size = batch_size
         self.NUM_EPOCHS = NUM_EPOCHS
         self.AUGMENT = AUGMENT
-        self.numwins = numwins
 
     def configure(self, tempdatadir):
         # initialize loss function, SGD optimizer and metrics
