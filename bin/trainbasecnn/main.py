@@ -34,12 +34,12 @@ if __name__ == '__main__':
     modelname = '2dcnn'
     # list of patients to train on
     listofpats_train = [
-                    'id001',
-                    'id002', 
+                    # 'id001',
+                    # 'id002', 
                     'id008', 
-                    'id010', 
-                    'id011', 
-                    'id012', 
+                    # 'id010', 
+                    # 'id011', 
+                    # 'id012', 
                     'id013'
                 ]
     listofpats_test = [

@@ -150,6 +150,12 @@ class TrainCNN(BaseTrain):
             for file in files:
                 if any(pat in file for pat in listofpats_train):
                     self.filepaths.append(os.path.join(root, file))
+
+        # add data from the real data
+        for root, dirs, files in os.walk(testdatadir):
+            for file in files:
+                if any(pat not in file for pat in listofpats_train):
+                    self.filepaths.append(os.path.join(root, file))
         print("training data is found in: ", root)
 
     def formatdata(self, images):
