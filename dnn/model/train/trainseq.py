@@ -222,10 +222,6 @@ class TrainSeq(BaseTrain):
         fixed_cnn_model.pop()
         fixed_cnn_model.trainable = False
 
-    # To Do: LOAD DATA FOR SEQUENCEs now
-    def loaddata(self, datafile, imsize, numchans):
-        pass
-
     def formatdata(self, seqofimgs, seqoflabels):
         '''
         To Do Formatting:
@@ -338,6 +334,18 @@ class TrainSeq(BaseTrain):
                                                  np.argmax(ylabels, axis=1))
         self.class_weight = class_weight
 
+    # load test data
+    def loadtestdata(self):
+        X_test = []
+        y_test = []
+        # for datafile in self.testfilepaths:
+
+        pass
+
+    # To Do: LOAD DATA FOR SEQUENCEs now
+    def loaddata(self):
+        pass
+
     def train(self):
         class_weight = self.class_weight
         callbacks = self.callbacks
@@ -345,9 +353,10 @@ class TrainSeq(BaseTrain):
         numtimesteps = self.numtimesteps
 
         print('Using real-time data augmentation.')
-        HH = dnnmodel.fit_generator(self.generator.flow_from_directory(X_train, y_train, batch_size=self.batch_size),
-                                    num_timesteps=numtimesteps,
-                                    steps_per_epoch=X_train.shape[0] // self.batch_size,
+        HH = dnnmodel.fit_generator(self.generator.flow_from_directory(batch_size=self.batch_size,
+                                    num_timesteps=numtimesteps),
+                                    # steps_per_epoch=X_train.shape[0] // self.batch_size,
+                                    steps_per_epoch=100 // self.batch_size,
                                     epochs=self.NUM_EPOCHS,
                                     validation_data=(X_test, y_test),
                                     shuffle=True,

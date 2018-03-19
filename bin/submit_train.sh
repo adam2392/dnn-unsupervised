@@ -25,6 +25,11 @@ tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/fft_real/id008/'
 outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/fft_real/train_v8/id008/'
 traindatadir='/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/'
 
+tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/fragilityaux/train_v1/'
+outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/fragilityaux/train_v1/'
+traindatadir='/scratch/users/ali39@jhu.edu/data/output/'
+rawdatadir='/scratch/users/ali39@jhu.edu/data/converted/'
+
 # /scratch/users/ali39@jhu.edu
 printf "\nThis is the data directories: \n"
 printf "Temp datadir: $tempdatadir \n"
@@ -63,7 +68,8 @@ walltime=5:45:0
 # create export commands
 exvars="tempdatadir=${tempdatadir},\
 outputdatadir=${outputdatadir},\
-traindatadir=${traindatadir} "
+traindatadir=${traindatadir},\
+rawdatadir=${rawdatadir} "
 
 # build basic sbatch command with all params parametrized
 sbatcomm="sbatch \

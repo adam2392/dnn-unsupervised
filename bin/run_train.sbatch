@@ -29,6 +29,7 @@ cd /scratch/users/$USER/dnn-unsupervised/bin/
 echo "Temp data dir is : ${tempdatadir}"
 echo "Output data dir is: ${outputdatadir}"
 echo "Train data dir is: ${traindatadir}"
+echo "Raw data dir is: ${rawdatadir}"
 echo ${CUDA_VISIBLE_DEVICES}
 
 ################### SETUP SINGULARITY CONTAINER  ####################
@@ -46,7 +47,7 @@ printf "Running training model"
 # singularity  exec -B /scratch/ --nv ../tensorflow.simg python ./trainbasecnn/main.py ${outputdatadir} ${tempdatadir} ${traindatadir}
 
 # for training cnn-lstm
-singularity  exec -B /scratch/ --nv ../tensorflow.simg python ./traincnnlstm/main.py ${outputdatadir} ${tempdatadir} ${traindatadir}
+singularity  exec -B /scratch/ --nv ../tensorflow.simg python ./traincnnlstm/main.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${rawdatadir}
 
 
 exit
