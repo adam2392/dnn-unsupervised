@@ -20,9 +20,11 @@ from sklearn.metrics import precision_score, \
     f1_score, roc_auc_score
 
 if __name__ == '__main__':
-    outputdatadir = str(sys.argv[1])
-    tempdatadir = str(sys.argv[2])
-    traindatadir = str(sys.argv[3])
+    outputdatadir = str(sys.argv[1])            # output for data dir
+    tempdatadir = str(sys.argv[2])              # the temp data dire
+    traindatadir = str(sys.argv[3])             # the training data directory
+    testdatadir = str(sys.argv[4])              # the test data directory
+
     if not os.path.exists(outputdatadir):
         os.makedirs(outputdatadir)
     if not os.path.exists(tempdatadir):
@@ -34,14 +36,20 @@ if __name__ == '__main__':
     listofpats_train = [
                     'id001',
                     'id002', 
-                    # 'id008', 
+                    'id008', 
                     'id010', 
                     'id011', 
                     'id012', 
                     'id013'
                 ]
     listofpats_test = [
-                    'id010'
+                    # 'id001',
+                    # 'id002', 
+                    'id008', 
+                    # 'id010', 
+                    # 'id011', 
+                    # 'id012', 
+                    'id013'
                 ]
     ##################### PARAMETERS FOR NN - CREATE NN ####################
     imsize=32
@@ -75,7 +83,9 @@ if __name__ == '__main__':
     # configure, load generator and load training/testing data
     cnn_trainer.configure(tempdatadir)
     cnn_trainer.loadgenerator()
-    cnn_trainer.loaddirofdata(traindatadir, listofpats_train, LOAD=True)
+    cnn_trainer.loaddata(traindatadir, testdatadir, listofpats_train, listofpats_test)
+    cnn_trainer.loadtrainingdata()
+    cnn_trainer.loadtestdata()
     cnn_trainer.train()
 
     # print out summary info for the model and the training

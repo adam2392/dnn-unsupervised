@@ -35,7 +35,6 @@ if __name__ == '__main__':
     modelfile = os.path.join(outputdatadir, 'fragcnn_model.json')
 
     modelname = '2dfragnet'
-    pattraindir = os.path.join(traindatadir, 'realtng')
 
     # imsize=30    # the size of the PCA that you perform on the rest of the fragility map
     n_colors=1

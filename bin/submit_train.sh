@@ -29,11 +29,12 @@ echo "Begin analysis." # print beginning statement
 tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/fftsim_full/id008/'
 outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/fftsim_full/id008/'
 traindatadir='/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/expfull/'
+testdatadir='/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/'
 
 # For training and modeling with real fragility data 
 # tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/fragilityaux/train_v1/'
 # outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/fragilityaux/train_v1/'
-# traindatadir='/scratch/users/ali39@jhu.edu/data/output/'
+# traindatadir='/scratch/users/ali39@jhu.edu/data/output/pert/'
 # rawdatadir='/scratch/users/ali39@jhu.edu/data/converted/'
 
 # /scratch/users/ali39@jhu.edu

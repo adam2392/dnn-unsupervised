@@ -84,7 +84,7 @@ class TrainCNN(BaseTrain):
         # save model
         if not os.path.exists(modeljsonfile):
             # serialize model to JSON
-            model_json = currmodel.to_json()
+            model_json = self.dnnmodel.to_json()
             with open(modeljsonfile, "w") as json_file:
                 json_file.write(model_json)
             print("Saved model to disk")
@@ -104,24 +104,6 @@ class TrainCNN(BaseTrain):
             'class_weight': self.class_weight
         }
         pprint.pprint(summary)
-
-    def testoutput(self):
-        y_test = self.y_test
-
-        prob_predicted = self.dnnmodel.predict(self.X_test)
-        ytrue = np.argmax(y_test, axis=1)
-        y_pred = currmodel.predict_classes(self.X_test)
-
-        print(prob_predicted.shape)
-        print(ytrue.shape)
-        print(y_pred.shape)
-        print("ROC_AUC_SCORES: ", roc_auc_score(y_test, prob_predicted))
-        print('Mean accuracy score: ', accuracy_score(ytrue, y_pred))
-        print('F1 score:', f1_score(ytrue, y_pred))
-        print('Recall:', recall_score(ytrue, y_pred))
-        print('Precision:', precision_score(ytrue, y_pred))
-        print('\n clasification report:\n', classification_report(ytrue, y_pred))
-        print('\n confusion matrix:\n',confusion_matrix(ytrue, y_pred))
 
     def configure(self, tempdatadir):
         # initialize loss function, SGD optimizer and metrics
@@ -149,49 +131,26 @@ class TrainCNN(BaseTrain):
         testcheck = TestCallback()
         self.callbacks = [checkpoint, reduce_lr, testcheck]
 
-    def loaddata(self, datafile, imsize, numchans):
-        ''' Get all data '''
-        ##################### INPUT DATA FOR NN ####################
-        data = np.load(alldatafile)
-        images = data['image_tensor']   # load image
-        ylabels = data['ylabels']       # load ylabels
+    def loaddata(self, traindatadir, testdatadir, listofpats_train, listofpats_test):
+        ''' Get list of file paths '''
+        self.testfilepaths = []
+        for root, dirs, files in os.walk(testdatadir):
+            for file in files:
+                if any(pat in file for pat in listofpats_test):
+                    self.testfilepaths.append(os.path.join(root, file))
+        self.testfilepaths.append(os.path.join(root,file))
 
-        # reshape
-        images = images.reshape((-1, numchans, imsize, imsize))
-        images = images.swapaxes(1,3)
+        print('training pats: ', listofpats_train)
+        print('testing pats: ', listofpats_test)
+        print("testing data is found in: ", root)
 
-        # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
-        invert_y = 1 - ylabels
-        ylabels = np.concatenate((invert_y, ylabels),axis=1)
-
-        # ERROR CHECK assert the shape of the images #
-        sys.stdout.write("\n\n Images and ylabels shapes are: \n\n")
-        sys.stdout.write(images.shape)
-        sys.stdout.write(ylabels.shape)
-        sys.stdout.write("\n\n") 
-
-        assert images.shape[2] == images.shape[1]
-        assert images.shape[2] == imsize
-        assert images.shape[3] == numfreqs
-
-        # lower sample by casting to 32 bits
-        images = images.astype("float32")
-
-        self.images = images
-        self.ylabels = ylabels
-
-        # format the data correctly 
-        X_train, X_test, y_train, y_test = train_test_split(images, ylabels, test_size=0.33, random_state=42)
-    
-        class_weight = sklearn.utils.compute_class_weight('balanced', 
-                                                 np.unique(ylabels).astype(int),
-                                                 np.argmax(ylabels, axis=1))
-
-        self.X_train = X_train
-        self.X_test = X_test
-        self.y_train = y_train
-        self.y_test = y_test
-        self.class_weight = class_weight
+        ''' Get list of file paths '''
+        self.filepaths = []
+        for root, dirs, files in os.walk(traindatadir):
+            for file in files:
+                if any(pat in file for pat in listofpats_train):
+                    self.filepaths.append(os.path.join(root, file))
+        print("training data is found in: ", root)
 
     def formatdata(self, images):
         images = images.swapaxes(1,3)
@@ -201,64 +160,55 @@ class TrainCNN(BaseTrain):
         # lower sample by casting to 32 bits
         images = images.astype("float32")
         return images
-    def loaddirofdata(self, traindatadir, listofpats, LOAD):
-        ''' Get list of file paths '''
-        self.filepaths = []
-        self.testfilepaths = []
-        for root, dirs, files in os.walk(traindatadir):
-            for file in files:
-                if any(pat in file for pat in listofpats):
-                    self.filepaths.append(os.path.join(root, file))
-                else:
-                    self.testfilepaths.append(os.path.join(root,file))
-        self.samples = len(self.filepaths)
 
-        if LOAD:
-            '''     LOAD TRAINING DATA      '''
-            for idx, datafile in enumerate(self.filepaths):                    
-                imagedata = np.load(datafile)
-                image_tensor = imagedata['image_tensor']
-                metadata = imagedata['metadata'].item()
-                
-                if idx == 0:
-                    image_tensors = image_tensor
-                    ylabels = metadata['ylabels']
-                else:
-                    image_tensors = np.append(image_tensors, image_tensor, axis=0)
-                    ylabels = np.append(ylabels, metadata['ylabels'], axis=0)
-
-            # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
-            invert_y = 1 - ylabels
-            ylabels = np.concatenate((invert_y, ylabels),axis=1)  
-            # format the data correctly 
-            class_weight = sklearn.utils.compute_class_weight('balanced', 
-                                                     np.unique(ylabels).astype(int),
-                                                     np.argmax(ylabels, axis=1))
+    def loadtestdata(self):
+        '''     LOAD TESTING DATA      '''
+        for idx, datafile in enumerate(self.testfilepaths):
+            imagedata = np.load(datafile)
+            image_tensor = imagedata['image_tensor']
+            metadata = imagedata['metadata'].item()
             
-            image_tensors = self.formatdata(image_tensors)
-            self.X_train = image_tensors
-            self.y_train = ylabels
+            if idx == 0:
+                image_tensors = image_tensor
+                ylabels = metadata['ylabels']
+            else:
+                image_tensors = np.append(image_tensors, image_tensor, axis=0)
+                ylabels = np.append(ylabels, metadata['ylabels'], axis=0)
+        # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
+        invert_y = 1 - ylabels
+        ylabels = np.concatenate((invert_y, ylabels),axis=1)  
 
-            '''     LOAD TESTING DATA      '''
-            for idx, datafile in enumerate(self.testfilepaths):
-                imagedata = np.load(datafile)
-                image_tensor = imagedata['image_tensor']
-                metadata = imagedata['metadata'].item()
-                
-                if idx == 0:
-                    image_tensors = image_tensor
-                    ylabels = metadata['ylabels']
-                else:
-                    image_tensors = np.append(image_tensors, image_tensor, axis=0)
-                    ylabels = np.append(ylabels, metadata['ylabels'], axis=0)
-            # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
-            invert_y = 1 - ylabels
-            ylabels = np.concatenate((invert_y, ylabels),axis=1)  
+        image_tensors = self.formatdata(image_tensors)
+        self.X_test = image_tensors
+        self.y_test = ylabels
+        
 
-            image_tensors = self.formatdata(image_tensors)
-            self.X_test = image_tensors
-            self.y_test = ylabels
-            self.class_weight = class_weight
+    def loadtrainingdata(self):
+        '''     LOAD TRAINING DATA      '''
+        for idx, datafile in enumerate(self.filepaths):                    
+            imagedata = np.load(datafile)
+            image_tensor = imagedata['image_tensor']
+            metadata = imagedata['metadata'].item()
+            
+            if idx == 0:
+                image_tensors = image_tensor
+                ylabels = metadata['ylabels']
+            else:
+                image_tensors = np.append(image_tensors, image_tensor, axis=0)
+                ylabels = np.append(ylabels, metadata['ylabels'], axis=0)
+
+        # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
+        invert_y = 1 - ylabels
+        ylabels = np.concatenate((invert_y, ylabels),axis=1)  
+        # format the data correctly 
+        class_weight = sklearn.utils.compute_class_weight('balanced', 
+                                                 np.unique(ylabels).astype(int),
+                                                 np.argmax(ylabels, axis=1))
+        
+        image_tensors = self.formatdata(image_tensors)
+        self.X_train = image_tensors
+        self.y_train = ylabels
+        self.class_weight = class_weight
 
     def train(self):
         X_train = self.X_train
@@ -268,6 +218,9 @@ class TrainCNN(BaseTrain):
         class_weight = self.class_weight
         callbacks = self.callbacks
         dnnmodel = self.dnnmodel
+
+        print("Training data: ", X_train.shape, y_train.shape)
+        print("Testing data: ", X_test.shape, y_test.shape)
 
         # augment data, or not and then trian the model!
         if not self.AUGMENT:
