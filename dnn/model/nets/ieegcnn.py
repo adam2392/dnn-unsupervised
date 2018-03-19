@@ -72,12 +72,13 @@ class iEEGCNN(BaseNet):
     #                                             optimizer=optimizer,
     #                                             metrics=metrics)
 
-    def buildmodel(self):
+    def buildmodel(self, output=True):
         w_init = None                       # weight initialization
         n_layers = (4,2,1)                  # number of convolutions per layer
         numfilters = 32                     # number of filters in first layer of each new layer
         poolsize = ((2,)*self.modeldim)      # pool size   
         filter_size = ((3,)*self.modeldim)   # filter size
+        size_fc = 1024
 
         self.w_init = w_init
         self.n_layers = n_layers
@@ -106,9 +107,10 @@ class iEEGCNN(BaseNet):
         else:
             raise ValueError('Model dimension besides (1,2,3) not implemented!')
 
+        if output:
+            self.buildoutput(size_fc)
 
-    def buildoutput(self):
-        size_fc = 1024
+    def buildoutput(self, size_fc):
         self._build_seq_output(size_fc=size_fc)
 
     def _build_1dcnn(self, w_init= None, n_layers = (4,2,1), poolsize = (2), n_filters_first=32, filter_size=(3)):    

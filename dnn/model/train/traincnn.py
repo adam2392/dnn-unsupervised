@@ -131,7 +131,7 @@ class TrainCNN(BaseTrain):
         testcheck = TestCallback()
         self.callbacks = [checkpoint, reduce_lr, testcheck]
 
-    def loaddata(self, traindatadir, testdatadir, listofpats_train, listofpats_test):
+    def loaddirs(self, traindatadir, testdatadir, listofpats_train, listofpats_test):
         ''' Get list of file paths '''
         self.testfilepaths = []
         for root, dirs, files in os.walk(testdatadir):
@@ -158,11 +158,8 @@ class TrainCNN(BaseTrain):
                     self.filepaths.append(os.path.join(root, file))
         print("training data is found in: ", root)
 
-    def formatdata(self, images):
+    def _formatdata(self, images):
         images = images.swapaxes(1,3)
-
-        print(images.shape)
-        
         # lower sample by casting to 32 bits
         images = images.astype("float32")
         return images
@@ -183,11 +180,10 @@ class TrainCNN(BaseTrain):
         # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
         invert_y = 1 - ylabels
         ylabels = np.concatenate((invert_y, ylabels),axis=1)  
-
-        image_tensors = self.formatdata(image_tensors)
+        # format the image tensor correctly
+        image_tensors = self._formatdata(image_tensors)
         self.X_test = image_tensors
         self.y_test = ylabels
-        
 
     def loadtrainingdata(self):
         '''     LOAD TRAINING DATA      '''
@@ -210,13 +206,14 @@ class TrainCNN(BaseTrain):
         class_weight = sklearn.utils.compute_class_weight('balanced', 
                                                  np.unique(ylabels).astype(int),
                                                  np.argmax(ylabels, axis=1))
-        
-        image_tensors = self.formatdata(image_tensors)
+        image_tensors = self._formatdata(image_tensors)
         self.X_train = image_tensors
         self.y_train = ylabels
         self.class_weight = class_weight
 
     def train(self):
+        self._loadgenerator()
+
         X_train = self.X_train
         X_test = self.X_test
         y_train = self.y_train
@@ -227,7 +224,8 @@ class TrainCNN(BaseTrain):
 
         print("Training data: ", X_train.shape, y_train.shape)
         print("Testing data: ", X_test.shape, y_test.shape)
-
+        print("Class weights are: ", class_weight)
+        
         # augment data, or not and then trian the model!
         if not self.AUGMENT:
             print('Not using data augmentation. Implement Solution still!')
@@ -252,7 +250,7 @@ class TrainCNN(BaseTrain):
 
         self.HH = HH
 
-    def loadgenerator(self):
+    def _loadgenerator(self):
         # This will do preprocessing and realtime data augmentation:
         self.generator = ImageDataGenerator(
                     # featurewise_center=True,  # set input mean to 0 over the dataset
