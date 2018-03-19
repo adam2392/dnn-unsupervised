@@ -47,8 +47,7 @@ if __name__ == '__main__':
     NUM_EPOCHS = 100
     AUGMENT = True
     batch_size = 16
-    trainer = traincnnaux.TrainFragAux(cnn.model, numwins, batch_size, NUM_EPOCHS, AUGMENT)
-
+    
     listofpats = [
         'jh105',
         'pt1', 'pt2', 'pt3',
@@ -66,7 +65,7 @@ if __name__ == '__main__':
     #     'ummc001', 'ummc007', 'ummc009'
     ]
 
-    # initialize a munger class to help format the data
+    # 01: initialize a munger class to help format the data
     datamunger = SplitData(pcsize, numwins, rawdatadir) # feed in PCA size
     datamunger.loaddirofdata(traindatadir, listofpats) # load all the data based on patients
     datamunger.formatdata()   # 
@@ -80,7 +79,7 @@ if __name__ == '__main__':
     print(len(datamunger.aux_data))
     print(len(datamunger.main_data))
 
-    # initialize the convolutional auxiliary network
+    # 02: initialize the convolutional auxiliary network
     cnn = CNNFragility(numwins=numwins, 
                        imsize=imsize,
                   n_colors=n_colors, 
@@ -90,6 +89,9 @@ if __name__ == '__main__':
     cnn.buildmodel()
     cnn.summaryinfo()
     print(cnn.model.input_shape)
+
+    # 03: initialize the trainer
+    trainer = traincnnaux.TrainFragAux(cnn.model, numwins, batch_size, NUM_EPOCHS, AUGMENT)
 
     # load the data into the trainer and then begin training
     class_weight = datamunger.class_weight
