@@ -5,7 +5,7 @@ from sklearn.decomposition import PCA
 
 sys.path.append('/Users/adam2392/Documents/fragility_analysis/')
 sys.path.append('/home-1/ali39@jhu.edu/work/fragility_analysis')
-from datainterface.loadpatient import LoadPat
+from .loadpatient import LoadPat
 import sklearn
 from sklearn.model_selection import train_test_split
 
