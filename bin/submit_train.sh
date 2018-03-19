@@ -21,9 +21,9 @@ echo "Begin analysis." # print beginning statement
 # NEED TO RUN FOR EZ=0,1,2,3 and varying PZ all once
 
 # Pause before running to check
-tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/fft_real/id008/'
-outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/fft_real/train_v8/id008/'
-traindatadir='/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/'
+# tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/fft_real/id008/'
+# outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/fft_real/train_v8/id008/'
+# traindatadir='/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/'
 
 tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/fragilityaux/train_v1/'
 outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/fragilityaux/train_v1/'
@@ -63,7 +63,7 @@ echo $gpu
 # set jobname
 jobname="submit_trainpy.log"
 ## job reqs
-walltime=5:45:0
+walltime=1:00:0
 
 # create export commands
 exvars="tempdatadir=${tempdatadir},\

@@ -47,7 +47,9 @@ printf "Running training model"
 # singularity  exec -B /scratch/ --nv ../tensorflow.simg python ./trainbasecnn/main.py ${outputdatadir} ${tempdatadir} ${traindatadir}
 
 # for training cnn-lstm
-singularity  exec -B /scratch/ --nv ../tensorflow.simg python ./traincnnlstm/main.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${rawdatadir}
+# singularity  exec -B /scratch/ --nv ../tensorflow.simg python ./traincnnlstm/main.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${rawdatadir}
+
+singularity  exec -B /scratch/ --nv ../tensorflow.simg python ./trainfragaux/main.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${rawdatadir}
 
 
 exit
