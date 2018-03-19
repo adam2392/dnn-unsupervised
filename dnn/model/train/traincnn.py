@@ -201,11 +201,11 @@ class TrainCNN(BaseTrain):
         # lower sample by casting to 32 bits
         images = images.astype("float32")
         return images
-    def loaddirofdata(self, datadir, listofpats, LOAD):
+    def loaddirofdata(self, traindatadir, listofpats, LOAD):
         ''' Get list of file paths '''
         self.filepaths = []
         self.testfilepaths = []
-        for root, dirs, files in os.walk(datadir):
+        for root, dirs, files in os.walk(traindatadir):
             for file in files:
                 if any(pat in file for pat in listofpats):
                     self.filepaths.append(os.path.join(root, file))
