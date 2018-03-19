@@ -126,5 +126,5 @@ if __name__ == '__main__':
         os.makedirs(tempdatadir)
 
     dnnmodel = mainmodel()
-    trainer = maintrain(outputdatadir, tempdatadir, traindatadir, testdatadir)
+    trainer = maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir)
     maintest(dnnmodel, trainer)
