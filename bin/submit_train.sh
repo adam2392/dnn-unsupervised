@@ -20,15 +20,21 @@ source activate dnn
 echo "Begin analysis." # print beginning statement
 # NEED TO RUN FOR EZ=0,1,2,3 and varying PZ all once
 
-# Pause before running to check
+# For training and modeling with the real data
 # tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/fft_real/id008/'
 # outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/fft_real/train_v8/id008/'
-# traindatadir='/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/'
+# traindatadir='/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/'
 
-tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/fragilityaux/train_v1/'
-outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/fragilityaux/train_v1/'
-traindatadir='/scratch/users/ali39@jhu.edu/data/output/'
-rawdatadir='/scratch/users/ali39@jhu.edu/data/converted/'
+# For training and modeling with the simulated data
+tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/fftsim_full/id008/'
+outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/fftsim_full/id008/'
+traindatadir='/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/full/'
+
+# For training and modeling with real fragility data 
+# tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/fragilityaux/train_v1/'
+# outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/fragilityaux/train_v1/'
+# traindatadir='/scratch/users/ali39@jhu.edu/data/output/'
+# rawdatadir='/scratch/users/ali39@jhu.edu/data/converted/'
 
 # /scratch/users/ali39@jhu.edu
 printf "\nThis is the data directories: \n"
@@ -63,7 +69,7 @@ echo $gpu
 # set jobname
 jobname="submit_trainpy.log"
 ## job reqs
-walltime=1:00:0
+walltime=2:00:0
 
 # create export commands
 exvars="tempdatadir=${tempdatadir},\

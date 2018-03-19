@@ -30,7 +30,6 @@ if __name__ == '__main__':
 
     # data dirs for training
     modelname = '2dcnn'
-    pattraindir = os.path.join(traindatadir, 'realtng')
     # list of patients to train on
     listofpats_train = [
                     'id001',
@@ -76,7 +75,7 @@ if __name__ == '__main__':
     # configure, load generator and load training/testing data
     cnn_trainer.configure(tempdatadir)
     cnn_trainer.loadgenerator()
-    cnn_trainer.loaddirofdata(pattraindir, listofpats_train, LOAD=True)
+    cnn_trainer.loaddirofdata(traindatadir, listofpats_train, LOAD=True)
     cnn_trainer.train()
 
     # print out summary info for the model and the training
