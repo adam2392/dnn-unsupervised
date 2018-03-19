@@ -128,7 +128,7 @@ if __name__ == '__main__':
     if not os.path.exists(tempdatadir):
         os.makedirs(tempdatadir)
 
-    dnnmodel, datamunger = mainmodel(traindatadir, testdatadir)
+    dnnmodel, datamunger = mainmodel(traindatadir, rawdatadir)
     trainer = maintrain(dnnmodel, datamunger, outputdatadir, tempdatadir)
     maintest(dnnmodel, trainer)
     
