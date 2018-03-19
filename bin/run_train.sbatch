@@ -44,7 +44,7 @@ printf "Running training model"
 # -B = bind path /scratch /work /data
 
 # for cnn
-singularity  exec -B /scratch/ --nv ../tensorflow.simg python ./trainbasecnn/main.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${testdatadir}
+singularity  exec -B /scratch/ --nv ../tensorflow.simg python ./trainbasecnn/main_refactored.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${testdatadir}
 
 # for training cnn-lstm
 # singularity  exec -B /scratch/ --nv ../tensorflow.simg python ./traincnnlstm/main.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${rawdatadir}
