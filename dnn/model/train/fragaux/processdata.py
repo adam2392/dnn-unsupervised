@@ -42,6 +42,7 @@ class SplitData(object):
     def __init__(self, imsize, numwins, rawdatadir):
         self.imsize = imsize # pc components
         self.numwins = numwins
+        self.rawdatadir = rawdatadir
 
     def loaddirofdata(self, datadir, listofpats):
         self.datafilepaths = []
