@@ -76,7 +76,8 @@ walltime=2:00:0
 exvars="tempdatadir=${tempdatadir},\
 outputdatadir=${outputdatadir},\
 traindatadir=${traindatadir},\
-rawdatadir=${rawdatadir} "
+rawdatadir=${rawdatadir},\
+testdatadir=${testdatadir} "
 
 # build basic sbatch command with all params parametrized
 sbatcomm="sbatch \
