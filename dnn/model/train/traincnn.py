@@ -108,11 +108,11 @@ class TrainCNN(BaseTrain):
     def configure(self, tempdatadir):
         # initialize loss function, SGD optimizer and metrics
         loss = 'binary_crossentropy'
-        optimizer = Adam(lr=1e-4, 
-                                        beta_1=0.9, 
-                                        beta_2=0.999,
-                                        epsilon=1e-08,
-                                        decay=0.0)
+        optimizer = Adam(lr=1e-5, 
+                        beta_1=0.9, 
+                        beta_2=0.99,
+                        epsilon=1e-08,
+                        decay=0.0)
         metrics = ['accuracy']
         self.modelconfig = self.dnnmodel.compile(loss=loss, 
                                                 optimizer=optimizer,
