@@ -172,7 +172,7 @@ class SplitData(object):
             allinds, ezinds = self.getinds(chanlabels, ezchans)
 
             # loop through all channels and separate into datasets
-            for ichan in range(0, len(chanlabels)):
+            for ichan in range(0, len(allinds)):
                 # get the other indices
                 otherinds = [i for i in range(len(allinds)) if i != ichan]
 
