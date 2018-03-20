@@ -9,16 +9,11 @@
 # Author: Adam Li (ali39@jhu.edu).
 # Created on 2017-10-31. 
 #---------------------------------------------------------------------
-# SLURM job script to run Singularity Keras/Tflow Training
+# SLURM job script to run if access to CUDA is allowed
 #---------------------------------------------------------------------
 ############################# LOAD IN MODULES AND UNLOAD #############
-module unload git
-ml anaconda-python/3.6
-ml python/3.6.0
-ml cuda/9.0
-ml singularity 
-
 # activate our conda environment
+. /soft/miniconda3/activate
 source activate dnn
 
 # cd to the scratch location 
@@ -34,7 +29,7 @@ echo ${CUDA_VISIBLE_DEVICES}
 
 ################### SETUP SINGULARITY CONTAINER  ####################
 # redefine SINGULARITY_HOME to mount current working directory to base $HOME
-export SINGULARITY_HOME=$PWD:/home/$USER
+# export SINGULARITY_HOME=$PWD:/home/$USER
 
 echo $PWD
 printf "Running training model"
@@ -44,13 +39,12 @@ printf "Running training model"
 # -B = bind path /scratch /work /data
 
 # for cnn
-singularity exec -vvvv -d -B /scratch/ --nv ../tensorflow.simg python ./trainbasecnn/main_refactored.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${testdatadir}
+python ../trainbasecnn/main_refactored.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${testdatadir}
 
 # for training cnn-lstm
-# singularity exec -B /scratch/ --nv ../tensorflow.simg python ./traincnnlstm/main.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${rawdatadir}
+# python ./traincnnlstm/main.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${rawdatadir}
 
 # for training fragnet
-# singularity exec -B /scratch/ --nv ../tensorflow.simg python ./trainfragaux/main_refactored.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${rawdatadir}
-
+# python ./trainfragaux/main_refactored.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${rawdatadir}
 
 exit
