@@ -50,7 +50,9 @@ class SplitData(object):
             for file in files:
                 # datafilepaths.append(os.path.join(root, file))
                 # if any(pat in file for pat in patstoignore):
-                if any(pat in file for pat in listofpats):
+                if any(pat in file for pat in listofpats) and 'inter' not in file \
+                                                                and 'aw' not in file \
+                                                                and 'aslp' not in file:
                     # print('ignoring ', file)
                     self.datafilepaths.append(os.path.join(root,file))
                 else:
@@ -172,10 +174,10 @@ class SplitData(object):
             allinds, ezinds = self.getinds(chanlabels, ezchans)
 
             print(datafile)
-            print(len(allinds))
-            print(len(chanlabels))
-            print(ezchans)
-            print(ezinds)
+            # print(len(allinds))
+            # print(len(chanlabels))
+            # print(ezchans)
+            # print(ezinds)
 
             # loop through all channels and separate into datasets
             for ichan in range(0, len(allinds)):
