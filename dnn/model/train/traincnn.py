@@ -261,8 +261,8 @@ class TrainCNN(BaseTrain):
                     rotation_range=5,         # randomly rotate images in the range (degrees, 0 to 180)
                     width_shift_range=0.2,    # randomly shift images horizontally (fraction of total width)
                     height_shift_range=0.2,   # randomly shift images vertically (fraction of total height)
-                    horizontal_flip=False,    # randomly flip images
-                    vertical_flip=False,      # randomly flip images
+                    horizontal_flip=True,    # randomly flip images
+                    vertical_flip=True,      # randomly flip images
                     channel_shift_range=4,
                     fill_mode='nearest',
                     preprocessing_function=preprocess_imgwithnoise)  
