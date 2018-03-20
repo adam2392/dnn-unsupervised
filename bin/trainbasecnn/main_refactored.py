@@ -64,8 +64,8 @@ def maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir):
                     # 'id012', 
                     'id013']
     ##################### PARAMETERS FOR TRAINING - CREATE TRAINER ####################
-    batch_size = 32
-    NUM_EPOCHS = 100
+    batch_size = 64
+    NUM_EPOCHS = 300
     AUGMENT = True
 
     cnn_trainer = traincnn.TrainCNN(dnnmodel, batch_size, NUM_EPOCHS, AUGMENT)

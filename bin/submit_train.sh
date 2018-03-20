@@ -70,7 +70,7 @@ echo $gpu
 # set jobname
 jobname="submit_trainpy.log"
 ## job reqs
-walltime=2:00:0
+walltime=3:00:0
 
 # create export commands
 exvars="tempdatadir=${tempdatadir},\
