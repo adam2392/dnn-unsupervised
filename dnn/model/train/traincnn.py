@@ -226,7 +226,7 @@ class TrainCNN(BaseTrain):
         print("Testing data: ", X_test.shape, y_test.shape)
         print("Class weights are: ", class_weight)
 
-        test = np.argmax(ylabels, axis=1)
+        test = np.argmax(y_train, axis=1)
         print("class imbalance: ", np.sum(test), len(test))
         
         # augment data, or not and then trian the model!
