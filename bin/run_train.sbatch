@@ -32,6 +32,9 @@ echo "Train data dir is: ${traindatadir}"
 echo "Raw data dir is: ${rawdatadir}"
 echo ${CUDA_VISIBLE_DEVICES}
 
+nvidia-smi
+
+
 ################### SETUP SINGULARITY CONTAINER  ####################
 # redefine SINGULARITY_HOME to mount current working directory to base $HOME
 export SINGULARITY_HOME=$PWD:/home/$USER

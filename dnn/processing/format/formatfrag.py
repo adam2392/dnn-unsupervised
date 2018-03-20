@@ -27,13 +27,14 @@ import ntpath
 from sklearn.decomposition import PCA
 from shutil import copyfile
 
+from .base import BaseFormat
+
 def path_leaf(path):
     head, tail = ntpath.split(path)
     return tail or ntpath.basename(head)
 
-class FormatFFT(object):
+class FormatFragility(BaseFormat):
     def __init__(self, rawdatadir, metadatadir, outputdatadir):
-        pass
         # establish frequency bands
         freqbands = {
                 'dalpha':[0,15],
@@ -53,27 +54,6 @@ class FormatFFT(object):
         self.outputdatadir = outputdatadir
         if not os.path.exists(self.outputdatadir):
             os.makedirs(self.outputdatadir)
-
-    def loaddatafiles(self, fftdatadir)
-        # get all datafiles for the fft maps
-        # fftdatadir = '/Volumes/ADAM LI/pydata/output/outputfft/tng/'
-        # Get ALL datafiles from all downstream files
-        self.datafiles = []
-        for root, dirs, files in os.walk(fftdatadir):
-            for file in files:
-                if '.DS' not in file:
-                    self.datafiles.append(os.path.join(root, file))
-    def decodebytes(self, metadata):
-        def convert(data):
-            if isinstance(data, bytes):  return data.decode('ascii')
-            if isinstance(data, dict):   return dict(map(convert, data.items()))
-            if isinstance(data, tuple):  return map(convert, data)
-            return data
-        # try:
-        metadata = {k.decode("utf-8"): (v.decode("utf-8") if isinstance(v, bytes) else v) for k,v in metadata.items()}
-        for key in metadata.keys():
-            metadata[key] = convert(metadata[key])
-        return metadata
 
     def renamefiles(self, project_dir):
         ####### Initialize files needed to 
