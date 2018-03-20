@@ -23,10 +23,10 @@ echo "Begin analysis." # print beginning statement
 # traindatadir='/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/'
 
 # For training and modeling with the simulated data
-tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/fftsim_full/id008/'
-outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/fftsim_full/id008/'
-traindatadir='/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/expfull/'
-testdatadir='/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/'
+tempdatadir='/home/adamli/data/dnn/temp/fftsim_full/id008/'
+outputdatadir='/home/adamli/data/dnn/output/fftsim_full/id008/'
+traindatadir='/home/adamli/data/dnn/traindata_fft/expfull/'
+testdatadir='/home/adamli/data/dnn/traindata_fft/realtng/'
 
 # For training and modeling with real fragility data 
 # tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/fragilityaux/train_v1/'
@@ -63,6 +63,7 @@ partition=gpu 	# debug, shared, unlimited, parallel, gpu, lrgmem, scavenger
 numgpus=1
 # gpu="gpu:$numgpus"
 # echo $gpu
+nodelist="n29"
 
 # set jobname
 jobname="submit_trainpy.log"
@@ -86,7 +87,8 @@ sbatcomm="sbatch \
  --nodes=${NUM_NODES} \
  --cpus-per-task=${NUM_CPUPERTASK} \
  --job-name=${jobname} \
- --ntasks-per-node=${NUM_PROCSPERNODE} "
+ --ntasks-per-node=${NUM_PROCSPERNODE} \
+ --nodelist=${nodelist} "
 
 # build a scavenger job, gpu job, or other job
 printf "Sbatch should run now\n"
