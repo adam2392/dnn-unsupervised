@@ -4,6 +4,8 @@ sys.path.append('../dnn/')
 import os
 import numpy as np
 
+print(sys.path)
+
 # Custom Built libraries
 from model.nets.ieegcnn import iEEGCNN
 from model.train import traincnn
