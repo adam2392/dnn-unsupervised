@@ -54,8 +54,8 @@ def maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir):
                     'id008', 
                     'id010', 
                     'id011', 
-                    # 'id012', 
-                    'id013'
+                    'id012', 
+                    # 'id013'
                     ]
     listofpats_test = [
                     # 'id001',
@@ -63,8 +63,8 @@ def maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir):
                     # 'id008', 
                     # 'id010', 
                     # 'id011', 
-                    'id012', 
-                    # 'id013'
+                    # 'id012', 
+                    'id013'
                     ]
     ##################### PARAMETERS FOR TRAINING - CREATE TRAINER ####################
     batch_size = 32
