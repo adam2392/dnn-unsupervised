@@ -24,8 +24,8 @@ echo "Begin analysis." # print beginning statement
 patient="${patient:-id001_ac}"
 
 # For training and modeling with the real data
-tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/exp001/${patient}/'
-outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/exp001/${patient}/'
+tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/exp001/$patient/'
+outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/exp001/$patient/'
 traindatadir='/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/'
 testdatadir='/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/'
 
