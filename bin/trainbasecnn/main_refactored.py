@@ -48,21 +48,24 @@ def mainmodel():
 def maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir):
     modelname = '2dcnn'
     # list of patients to train on
-    listofpats_train = [# 'id001',
-                    # 'id002', 
-                    'id008', 
-                    # 'id010', 
-                    # 'id011', 
-                    # 'id012', 
-                    'id013']
-    listofpats_test = [
+    listofpats_train = [
                     # 'id001',
-                    # 'id002', 
+                    'id002', 
                     'id008', 
+                    'id010', 
+                    'id011', 
+                    'id012', 
+                    'id013'
+                    ]
+    listofpats_test = [
+                    'id001',
+                    # 'id002', 
+                    # 'id008', 
                     # 'id010', 
                     # 'id011', 
                     # 'id012', 
-                    'id013']
+                    # 'id013'
+                    ]
     ##################### PARAMETERS FOR TRAINING - CREATE TRAINER ####################
     batch_size = 32
     NUM_EPOCHS = 300

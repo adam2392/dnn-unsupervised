@@ -36,6 +36,11 @@ class BaseFormat(object):
                     self.datafiles.append(os.path.join(root, file))
 
 	def renamefiles(self, project_dir):
+		'''
+		Function used for renaming the seeg.xyz and gain-inv-square files
+		into txt files for easy reading by python.
+		'''
+
         ####### Initialize files needed to 
         # convert seeg.xyz to seeg.txt file
         sensorsfile = os.path.join(project_dir, "seeg.xyz")
@@ -55,4 +60,7 @@ class BaseFormat(object):
             print("Already renamed gain_inv-square.mat possibly!")
 
 	def formatdata(self):
+		'''
+		An abstract function for any child class to inherit and implement
+		'''
 		raise NotImplementedError('Each formatter for our deep nn needs a formatdata function!')
