@@ -52,8 +52,8 @@ def maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir):
                     'id001',
                     'id002', 
                     'id008', 
-                    # 'id010', 
-                    'id011', 
+                    'id010', 
+                    # 'id011', 
                     'id012', 
                     'id013'
                     ]
@@ -61,8 +61,8 @@ def maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir):
                     # 'id001',
                     # 'id002', 
                     # 'id008', 
-                    'id010', 
-                    # 'id011', 
+                    # 'id010', 
+                    'id011', 
                     # 'id012', 
                     # 'id013'
                     ]
