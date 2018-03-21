@@ -46,7 +46,7 @@ def mainmodel(traindatadir, rawdatadir):
 
     # 02: initialize the convolutional auxiliary network
     cnn = CNNFragility(numwins=numwins, 
-                       imsize=imsize,
+                       imsize=pcsize,
                       n_colors=n_colors, 
                       num_classes=num_classes, 
                       num_timesteps=num_timesteps,
