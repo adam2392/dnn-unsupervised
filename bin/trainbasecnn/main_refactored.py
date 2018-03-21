@@ -50,8 +50,8 @@ def maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir):
     # list of patients to train on
     listofpats_train = [
                     'id001',
-                    # 'id002', 
-                    'id008', 
+                    'id002', 
+                    # 'id008', 
                     'id010', 
                     'id011', 
                     'id012', 
@@ -59,8 +59,8 @@ def maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir):
                     ]
     listofpats_test = [
                     # 'id001',
-                    'id002', 
-                    # 'id008', 
+                    # 'id002', 
+                    'id008', 
                     # 'id010', 
                     # 'id011', 
                     # 'id012', 
