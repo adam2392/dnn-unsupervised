@@ -3,7 +3,7 @@ class BaseFormat(object):
 	A base formatter for deep neural networks.
 
 	We will be able to make sure that data computations are invariant to the version of python/numpy.
-	This can be done by making sure the metadata is saved according to unicode strings always.
+	This can be done by making sure the metadata is saved according to unicode strings always.`
 	'''
 	def __init__(self):
 		pass
@@ -34,3 +34,25 @@ class BaseFormat(object):
             for file in files:
                 if '.DS' not in file:
                     self.datafiles.append(os.path.join(root, file))
+
+	def renamefiles(self, project_dir):
+        ####### Initialize files needed to 
+        # convert seeg.xyz to seeg.txt file
+        sensorsfile = os.path.join(project_dir, "seeg.xyz")
+        newsensorsfile = os.path.join(project_dir, "seeg.txt")
+        
+        try:
+            os.rename(sensorsfile, newsensorsfile)
+        except:
+            print("Already renamed seeg.xyz possibly!")
+
+        # convert gain_inv-square.mat file into gain_inv-square.txt file
+        gainmatfile = os.path.join(project_dir, "gain_inv-square.mat")
+        newgainmatfile = os.path.join(project_dir, "gain_inv-square.txt")
+        try:
+            os.rename(gainmatfile, newgainmatfile)
+        except:
+            print("Already renamed gain_inv-square.mat possibly!")
+
+	def formatdata(self):
+		raise NotImplementedError('Each formatter for our deep nn needs a formatdata function!')

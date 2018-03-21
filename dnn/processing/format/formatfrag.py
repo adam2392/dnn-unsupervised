@@ -55,25 +55,6 @@ class FormatFragility(BaseFormat):
         if not os.path.exists(self.outputdatadir):
             os.makedirs(self.outputdatadir)
 
-    def renamefiles(self, project_dir):
-        ####### Initialize files needed to 
-        # convert seeg.xyz to seeg.txt file
-        sensorsfile = os.path.join(project_dir, "seeg.xyz")
-        newsensorsfile = os.path.join(project_dir, "seeg.txt")
-        
-        try:
-            os.rename(sensorsfile, newsensorsfile)
-        except:
-            print("Already renamed seeg.xyz possibly!")
-
-        # convert gain_inv-square.mat file into gain_inv-square.txt file
-        gainmatfile = os.path.join(project_dir, "gain_inv-square.mat")
-        newgainmatfile = os.path.join(project_dir, "gain_inv-square.txt")
-        try:
-            os.rename(gainmatfile, newgainmatfile)
-        except:
-            print("Already renamed gain_inv-square.mat possibly!")
-
     def formatdata(self):
         # rawdatadir = '/Volumes/ADAM LI/pydata/convertedtng/'
         checkrawdata = lambda patient: os.path.join(self.rawdatadir, patient)

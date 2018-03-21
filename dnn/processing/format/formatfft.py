@@ -55,35 +55,6 @@ class FormatFFT(BaseFormat):
         if not os.path.exists(self.outputdatadir):
             os.makedirs(self.outputdatadir)
 
-    def loaddatafiles(self, fftdatadir)
-        # get all datafiles for the fft maps
-        # fftdatadir = '/Volumes/ADAM LI/pydata/output/outputfft/tng/'
-        # Get ALL datafiles from all downstream files
-        self.datafiles = []
-        for root, dirs, files in os.walk(fftdatadir):
-            for file in files:
-                if '.DS' not in file:
-                    self.datafiles.append(os.path.join(root, file))
-
-    def renamefiles(self, project_dir):
-        ####### Initialize files needed to 
-        # convert seeg.xyz to seeg.txt file
-        sensorsfile = os.path.join(project_dir, "seeg.xyz")
-        newsensorsfile = os.path.join(project_dir, "seeg.txt")
-        
-        try:
-            os.rename(sensorsfile, newsensorsfile)
-        except:
-            print("Already renamed seeg.xyz possibly!")
-
-        # convert gain_inv-square.mat file into gain_inv-square.txt file
-        gainmatfile = os.path.join(project_dir, "gain_inv-square.mat")
-        newgainmatfile = os.path.join(project_dir, "gain_inv-square.txt")
-        try:
-            os.rename(gainmatfile, newgainmatfile)
-        except:
-            print("Already renamed gain_inv-square.mat possibly!")
-
     def formatdata(self):
         # rawdatadir = '/Volumes/ADAM LI/pydata/convertedtng/'
         checkrawdata = lambda patient: os.path.join(self.rawdatadir, patient)
