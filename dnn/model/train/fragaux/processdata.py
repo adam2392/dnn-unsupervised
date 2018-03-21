@@ -50,9 +50,13 @@ class SplitData(object):
             for file in files:
                 # datafilepaths.append(os.path.join(root, file))
                 # if any(pat in file for pat in patstoignore):
+
+
+                # adding clause to ignore la01_ictal_2 for now:
                 if any(pat in file for pat in listofpats) and 'inter' not in file \
-                                                                and 'aw' not in file \
-                                                                and 'aslp' not in file:
+                                        and 'aw' not in file \
+                                        and 'aslp' not in file \
+                                        and 'la01_ictal_2' not in file::
                     # print('ignoring ', file)
                     self.datafilepaths.append(os.path.join(root,file))
                 else:
