@@ -24,7 +24,7 @@ from keras.layers.embeddings import Embedding
 import pprint
 
 class CNNFragility(BaseNet):
-    def __init__(self, numwins, imsize=30, n_colors=1, num_classes=2, num_timesteps=150, DROPOUT=True):
+    def __init__(self, numwins, imsize=30, n_colors=1, num_classes=2, DROPOUT=True):
         '''
         To build an auxiliary type network with a 1D CNN going over the channel of interest,
         while a 2D CNN analyzes the PCA of the fragility network.
@@ -40,7 +40,6 @@ class CNNFragility(BaseNet):
         self.n_colors = n_colors
         self.num_classes = num_classes
         self.DROPOUT = DROPOUT
-        self.num_timesteps = num_timesteps
 
         # start off with a relatively simple sequential model
         self.model = Sequential() 

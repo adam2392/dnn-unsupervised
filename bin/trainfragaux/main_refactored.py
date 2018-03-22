@@ -49,7 +49,6 @@ def mainmodel(traindatadir, rawdatadir):
                        imsize=pcsize,
                       n_colors=n_colors, 
                       num_classes=num_classes, 
-                      num_timesteps=num_timesteps,
                       DROPOUT=DROPOUT)
     cnn.buildmodel()
     cnn.summaryinfo()

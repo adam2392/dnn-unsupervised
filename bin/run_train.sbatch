@@ -30,6 +30,7 @@ echo "Temp data dir is : ${tempdatadir}"
 echo "Output data dir is: ${outputdatadir}"
 echo "Train data dir is: ${traindatadir}"
 echo "Raw data dir is: ${rawdatadir}"
+echo "Patient to analyze is: ${patient}"
 echo ${CUDA_VISIBLE_DEVICES}
 
 nvidia-smi
@@ -47,13 +48,13 @@ printf "Running training model"
 # -B = bind path /scratch /work /data
 
 # for cnn
-# singularity exec -B /scratch/ --nv ../tensorflow.simg python ./trainbasecnn/main_refactored.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${testdatadir}
+singularity exec -B /scratch/ --nv ../tensorflow.simg python ./trainbasecnn/main_refactored.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${testdatadir} ${patient}
 
 # for training cnn-lstm
 # singularity exec -B /scratch/ --nv ../tensorflow.simg python ./traincnnlstm/main.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${rawdatadir}
 
 # for training fragnet
-singularity exec -B /scratch/ --nv ../tensorflow.simg python ./trainfragaux/main_refactored.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${rawdatadir}
+# singularity exec -B /scratch/ --nv ../tensorflow.simg python ./trainfragaux/main_refactored.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${rawdatadir}
 
 
 exit

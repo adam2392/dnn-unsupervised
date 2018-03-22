@@ -33,27 +33,25 @@ def path_leaf(path):
     head, tail = ntpath.split(path)
     return tail or ntpath.basename(head)
 
+'''
+TO DO: STILL NEEDS TO BE FINISHED 
+
+'''
+
 class FormatFragility(BaseFormat):
     def __init__(self, rawdatadir, metadatadir, outputdatadir):
         # establish frequency bands
-        freqbands = {
-                'dalpha':[0,15],
-                'beta':[15,30],
-                'gamma':[30,90],
-                'high':[90,200],
-            }
-        postprocessfft = processing.preprocessfft.PreProcess(freqbands=freqbands)
-
-        self.winsizems = 500
-        self.stepsizems = 250
-        self.typetransform = 'fourier'
-        self.mtbandwidth = 4
-        self.mtfreqs = []
+        self.winsizems = 250
+        self.stepsizems = 125
         self.rawdatadir = rawdatadir
         self.metadatadir = metadatadir
         self.outputdatadir = outputdatadir
         if not os.path.exists(self.outputdatadir):
             os.makedirs(self.outputdatadir)
+
+    def loadchancoords(self, seeg_labels, seeg_xyz):
+        self.seeg_labels = seeg_labels
+        self.seeg_xyz = seeg_xyz
 
     def formatdata(self):
         # rawdatadir = '/Volumes/ADAM LI/pydata/convertedtng/'
@@ -68,13 +66,12 @@ class FormatFragility(BaseFormat):
             # perform file identification
             dirname = os.path.dirname(datafile)
             filename = path_leaf(datafile)
-            fileid = filename.split('_fftmodel')[0]
+            fileid = filename.split('_pertmodel')[0]
             patient = '_'.join(fileid.split('_')[0:2])
             
             # load in the data for this fft computation
-            fftdata = np.load(datafile, encoding='bytes')
-            power = fftdata['power']
-            freqs = fftdata['freqs']
+            fragdata = np.load(datafile, encoding='bytes')
+            fragmat = fftdata['power']
             timepoints = fftdata['timepoints']
             metadata = fftdata['metadata'].item()
             
@@ -86,26 +83,20 @@ class FormatFragility(BaseFormat):
             seeg_xyz = metadata['seeg_xyz']
             samplerate = metadata['samplerate']
             
-            # get indices of channels that we have seeg_xyz for
-            power = np.abs(power)
-            
             # get overlapping indices on seeg with xyz
             xyzinds = [i for i,x in enumerate(seeg_labels) if any(thing==x for thing in seeg_labels)]
             seeg_xyz = seeg_xyz[xyzinds,:]
             
             print("Patient is: ", patient)
             print("file id is: ", fileid)
-            assert power.shape[0] == seeg_xyz.shape[0]
-            assert power.shape[0] == len(seeg_labels)
-            
-            # postprocess fft into bins
-            power = postprocessfft.binFrequencyValues(power, freqs)
+            assert fragmat.shape[0] == seeg_xyz.shape[0]
+            assert fragmat.shape[0] == len(seeg_labels)
 
             # project xyz data
             seeg_xyz = pca.fit_transform(seeg_xyz)
             
             # Tensor of size [samples, freqbands, W, H] containing generated images.
-            image_tensor = datahandler.gen_images(seeg_xyz, power, 
+            image_tensor = datahandler.gen_images(seeg_xyz, fragmat, 
                                     n_gridpoints=32, normalize=False, augment=False, 
                                     pca=False, std_mult=0., edgeless=False)
             

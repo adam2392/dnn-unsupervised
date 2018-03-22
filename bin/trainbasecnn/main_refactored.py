@@ -45,7 +45,7 @@ def mainmodel():
     print(dnnmodel.summary())
     return dnnmodel
     
-def maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir):
+def maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir, patient):
     modelname = '2dcnn'
     # list of patients to train on
     listofpats_train = [
@@ -55,17 +55,20 @@ def maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir):
                     'id010', 
                     'id011', 
                     'id012', 
-                    # 'id013'
-                    ]
-    listofpats_test = [
-                    # 'id001',
-                    # 'id002', 
-                    # 'id008', 
-                    # 'id010', 
-                    # 'id011', 
-                    # 'id012', 
                     'id013'
                     ]
+    listofpats_test = [
+                    'id001',
+                    'id002', 
+                    'id008', 
+                    'id010', 
+                    'id011', 
+                    'id012', 
+                    'id013'
+                    ]
+
+    listofpats_train = listofpats_train.remove(patient)
+    listofpats_test = [patient]
     ##################### PARAMETERS FOR TRAINING - CREATE TRAINER ####################
     batch_size = 32
     NUM_EPOCHS = 300
@@ -117,7 +120,7 @@ if __name__ == '__main__':
     tempdatadir = str(sys.argv[2])              # the temp data dire
     traindatadir = str(sys.argv[3])             # the training data directory
     testdatadir = str(sys.argv[4])              # the test data directory
-
+    patient = str(sys.argv[5])
     '''
     outputdatadir = ''
     tempdatadir = ''
@@ -131,5 +134,5 @@ if __name__ == '__main__':
         os.makedirs(tempdatadir)
 
     dnnmodel = mainmodel()
-    trainer = maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir)
+    trainer = maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir, patient)
     maintest(dnnmodel, trainer)
