@@ -67,7 +67,7 @@ def maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir, p
                     'id013_pg'
                     ]
 
-    listofpats_train = listofpats_train.remove(patient)
+    listofpats_train.remove(patient)
     listofpats_test = [patient]
     ##################### PARAMETERS FOR TRAINING - CREATE TRAINER ####################
     batch_size = 32
