@@ -81,7 +81,8 @@ exvars="tempdatadir=${tempdatadir},\
 outputdatadir=${outputdatadir},\
 traindatadir=${traindatadir},\
 rawdatadir=${rawdatadir},\
-testdatadir=${testdatadir} "
+testdatadir=${testdatadir},\
+patient=${patient} "
 
 # build basic sbatch command with all params parametrized
 sbatcomm="sbatch \

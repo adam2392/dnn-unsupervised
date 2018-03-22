@@ -49,22 +49,22 @@ def maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir, p
     modelname = '2dcnn'
     # list of patients to train on
     listofpats_train = [
-                    'id001',
-                    'id002', 
-                    'id008', 
-                    'id010', 
-                    'id011', 
-                    'id012', 
-                    'id013'
+                    'id001_ac',
+                    'id002_cj', 
+                    'id008_gc', 
+                    'id010_js', 
+                    'id011_ml', 
+                    'id012_pc', 
+                    'id013_pg'
                     ]
     listofpats_test = [
-                    'id001',
-                    'id002', 
-                    'id008', 
-                    'id010', 
-                    'id011', 
-                    'id012', 
-                    'id013'
+                    'id001_ac',
+                    'id002_cj', 
+                    'id008_gc', 
+                    'id010_js', 
+                    'id011_ml', 
+                    'id012_pc', 
+                    'id013_pg'
                     ]
 
     listofpats_train = listofpats_train.remove(patient)
