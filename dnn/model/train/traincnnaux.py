@@ -112,6 +112,10 @@ class TrainFragAux(BaseTrain):
         # Finally create generator
         gen_flow = self.gen_flow_for_two_inputs(self.Xmain_train, self.Xaux_train, self.y_train)
 
+        print("main data shape: ", self.Xmain_train.shape)
+        print("aux data shape: ", self.Xaux_train.shape)
+        print("y data shape: ", self.y_train.shape)
+
         # augment data, or not and then trian the model!
         if not self.AUGMENT:
             print('Not using data augmentation. Implement Solution still!')
