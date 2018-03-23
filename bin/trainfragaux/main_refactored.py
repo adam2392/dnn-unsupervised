@@ -78,6 +78,10 @@ def maintrain(dnnmodel, datamunger, outputdatadir, tempdatadir):
     Xmain_train = datamunger.Xmain_train
     Xaux_train = datamunger.Xaux_train
     y_train = datamunger.y_train
+    Xmain_test = datamunger.Xmain_test
+    Xaux_test = datamunger.Xaux_test
+    y_test = datamunger.y_test
+
     trainer.loadformatteddata(Xmain_train, Xmain_test, 
                               Xaux_train, Xaux_test, 
                               y_train, y_test, class_weight)
