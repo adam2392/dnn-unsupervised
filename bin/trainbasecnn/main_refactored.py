@@ -57,15 +57,15 @@ def maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir, p
                     'id012_pc', 
                     'id013_pg'
                     ]
-    listofpats_test = [
-                    'id001_ac',
-                    'id002_cj', 
-                    'id008_gc', 
-                    'id010_js', 
-                    'id011_ml', 
-                    'id012_pc', 
-                    'id013_pg'
-                    ]
+    # listofpats_test = [
+    #                 'id001_ac',
+    #                 'id002_cj', 
+    #                 'id008_gc', 
+    #                 'id010_js', 
+    #                 'id011_ml', 
+    #                 'id012_pc', 
+    #                 'id013_pg'
+    #                 ]
 
     # listofpats_train.remove(patient)
     listofpats_test = [patient]
