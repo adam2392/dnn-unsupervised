@@ -56,5 +56,4 @@ printf "Running training model"
 # for training fragnet
 singularity exec -B /scratch/ --nv ../tensorflow.simg python ./trainfragaux/main_refactored.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${rawdatadir}
 
-
 exit
