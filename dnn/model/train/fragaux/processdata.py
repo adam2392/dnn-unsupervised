@@ -135,7 +135,10 @@ class LabelData(object):
             endwin = self.numwins
 
         return int(beginwin), int(endwin)
-
+    def _converttimestowindow(self, timepoints, time):
+        timeindex = np.where(np.logical_and(timepoints[:,0] < time, 
+                                            timepoints[:,1] > time))[0][0]
+        return timeindex
     def formatdata(self):
         '''
         Function used to take the list of auxiliary and main
