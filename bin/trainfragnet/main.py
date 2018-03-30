@@ -29,7 +29,8 @@ def mainmodel(traindatadir, rawdatadir):
     n_colors = 1
     num_classes = 2       # dimension of output predictions
     DROPOUT = True
-    modeldim = 1              # (optional): dim of model (1,2,3)
+    modeldim = 1   # (optional): dim of model (1,2,3)
+    imsize = 1     # since this is a 1D cnn?
     numwins = 500  # use 500 windows for a fragility
 
     # list of patients to train on
@@ -56,7 +57,7 @@ def mainmodel(traindatadir, rawdatadir):
 
     # 02: initialize the convolutional auxiliary network
     # build the baseline CNN model
-    cnn = iEEGCNN(imsize=imsize,
+    cnn = iEEGCNN(imsize=numwins,
                   n_colors=n_colors,
                   num_classes=num_classes,
                   modeldim=modeldim,
@@ -72,7 +73,6 @@ def mainmodel(traindatadir, rawdatadir):
     sys.stdout.write(datamunger.datafilepaths[0])
     sys.stdout.write(numwins)
     sys.stdout.write(len(datamunger.ylabels))
-    sys.stdout.write(len(datamunger.aux_data))
     sys.stdout.write(len(datamunger.main_data))
     return dnnmodel, datamunger
 
