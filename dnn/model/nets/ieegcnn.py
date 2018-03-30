@@ -152,7 +152,7 @@ class iEEGCNN(BaseNet):
                 # increment counter to the next weight initializer
                 count += 1
             # create a network at the end with a max pooling
-            self.model.add(MaxPooling2D(pool_size=poolsize))
+            self.model.add(MaxPooling1D(pool_size=poolsize))
 
     def _build_2dcnn(self, w_init=None, n_layers=(4, 2, 1), poolsize=(2, 2), n_filters_first=32, filter_size=(3, 3)):
         '''
