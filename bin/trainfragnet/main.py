@@ -29,7 +29,7 @@ def mainmodel(traindatadir, rawdatadir):
     num_classes = 2       # dimension of output predictions
     DROPOUT = True
     modeldim = 1              # (optional): dim of model (1,2,3)
-    imsize = 500  # use 500 windows for a fragility
+    numwins = 500  # use 500 windows for a fragility
 
     # list of patients to train on
     listofpats = [
