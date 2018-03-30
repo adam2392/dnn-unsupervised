@@ -2,10 +2,12 @@ import numpy
 import zipfile
 import scipy.io
 
+
 class FileReader(object):
     """
     Read one or multiple numpy arrays from a text/bz2 file.
     """
+
     def __init__(self, file_path):
         self.file_path = file_path
         self.file_stream = file_path
@@ -27,14 +29,14 @@ class FileReader(object):
             return self._read_matlab(self.file_stream, matlab_data_name)
 
         except Exception:
-            raise ReaderException("Could not read from %s file" % self.file_path)
-
+            raise ReaderException(
+                "Could not read from %s file" % self.file_path)
 
     def _read_text(self, file_stream, dtype, skip_rows, use_cols):
 
-        array_result = numpy.loadtxt(file_stream, dtype=dtype, skiprows=skip_rows, usecols=use_cols)
+        array_result = numpy.loadtxt(
+            file_stream, dtype=dtype, skiprows=skip_rows, usecols=use_cols)
         return array_result
-
 
     def _read_matlab(self, file_stream, matlab_data_name=None):
 
@@ -45,21 +47,23 @@ class FileReader(object):
             matlab_data = scipy_io.matlab.loadmat(file_stream)
             return matlab_data[matlab_data_name]
 
-
     def read_gain_from_brainstorm(self):
 
         if not self.file_path.endswith('.mat'):
-            raise ReaderException("Brainstorm format is expected in a Matlab file not %s" % self.file_path)
+            raise ReaderException(
+                "Brainstorm format is expected in a Matlab file not %s" % self.file_path)
 
         mat = scipy_io.loadmat(self.file_stream)
         expected_fields = ['Gain', 'GridLoc', 'GridOrient']
 
         for field in expected_fields:
             if field not in mat.keys():
-                raise ReaderException("Brainstorm format is expecting field %s" % field)
+                raise ReaderException(
+                    "Brainstorm format is expecting field %s" % field)
 
         gain, loc, ori = (mat[field] for field in expected_fields)
         return (gain.reshape((gain.shape[0], -1, 3)) * ori).sum(axis=-1)
+
 
 class ZipReader(object):
     """
@@ -85,14 +89,14 @@ class ZipReader(object):
         if matching_file_name.endswith(".bz2"):
             temp_file = copy_zip_entry_into_temp(zip_entry, matching_file_name)
             file_reader = FileReader(temp_file)
-            result = file_reader.read_array(dtype, skip_rows, use_cols, matlab_data_name)
+            result = file_reader.read_array(
+                dtype, skip_rows, use_cols, matlab_data_name)
             os.remove(temp_file)
             return result
 
         file_reader = FileReader(matching_file_name)
         file_reader.file_stream = zip_entry
         return file_reader.read_array(dtype, skip_rows, use_cols, matlab_data_name)
-
 
     def read_optional_array_from_file(self, file_name, dtype=numpy.float64, skip_rows=0,
                                       use_cols=None, matlab_data_name=None):

@@ -1,4 +1,4 @@
-from .basetrain import BaseTrain 
+from .basetrain import BaseTrain
 import numpy as np
 import os
 from sklearn.model_selection import train_test_split
@@ -18,6 +18,8 @@ from sklearn.metrics import precision_score, \
     f1_score, roc_auc_score
 
 import pprint
+
+
 class TestCallback(Callback):
     def __init__(self):
         # self.test_data = test_data
@@ -29,7 +31,6 @@ class TestCallback(Callback):
         # y = self.model.validation_data[1]
         x = self.validation_data[0]
         y = self.validation_data[1]
-
 
         loss, acc = self.model.evaluate(x, y, verbose=0)
         print('\nTesting loss: {}, acc: {}\n'.format(loss, acc))
@@ -43,8 +44,10 @@ class TestCallback(Callback):
         print('F1 score:', f1_score(ytrue, predicted))
         print('Recall:', recall_score(ytrue, predicted))
         print('Precision:', precision_score(ytrue, predicted))
-        print('\n clasification report:\n', classification_report(ytrue, predicted))
-        print('\n confusion matrix:\n',confusion_matrix(ytrue, predicted))
+        print('\n clasification report:\n',
+              classification_report(ytrue, predicted))
+        print('\n confusion matrix:\n', confusion_matrix(ytrue, predicted))
+
 
 def preprocess_imgwithnoise(image_tensor):
     # preprocessing_function: function that will be implied on each input.
@@ -53,13 +56,15 @@ def preprocess_imgwithnoise(image_tensor):
     #         one image (Numpy tensor with rank 3),
     #         and should output a Numpy tensor with the same shape.
     assert image_tensor.shape[0] == image_tensor.shape[1]
-    stdmult=0.1
+    stdmult = 0.1
     imsize = image_tensor.shape[0]
     numchans = image_tensor.shape[2]
     for i in range(numchans):
-        feat = image_tensor[...,i]
-        image_tensor[...,i] = image_tensor[...,i] + np.random.normal(scale=stdmult*np.std(feat), size=feat.size).reshape(imsize,imsize)
+        feat = image_tensor[..., i]
+        image_tensor[..., i] = image_tensor[..., i] + np.random.normal(
+            scale=stdmult*np.std(feat), size=feat.size).reshape(imsize, imsize)
     return image_tensor
+
 
 class TrainFragAux(BaseTrain):
     def __init__(self, dnnmodel, batch_size, NUM_EPOCHS, AUGMENT):
@@ -71,30 +76,31 @@ class TrainFragAux(BaseTrain):
     def configure(self, tempdatadir):
         # initialize loss function, SGD optimizer and metrics
         loss = 'binary_crossentropy'
-        optimizer = Adam(lr=1e-4, 
-                        beta_1=0.9, 
-                        beta_2=0.999,
-                        epsilon=1e-08,
-                        decay=0.0)
+        optimizer = Adam(lr=1e-4,
+                         beta_1=0.9,
+                         beta_2=0.999,
+                         epsilon=1e-08,
+                         decay=0.0)
         metrics = ['accuracy']
-        self.modelconfig = self.dnnmodel.compile(loss=loss, 
-                                                optimizer=optimizer,
-                                                metrics=metrics)
+        self.modelconfig = self.dnnmodel.compile(loss=loss,
+                                                 optimizer=optimizer,
+                                                 metrics=metrics)
 
-        tempfilepath = os.path.join(tempdatadir,"weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5")
+        tempfilepath = os.path.join(
+            tempdatadir, "weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5")
         # callbacks availabble
-        checkpoint = ModelCheckpoint(tempfilepath, 
-                                    monitor='val_acc', 
-                                    verbose=1, 
-                                    save_best_only=True, 
-                                    mode='max')
+        checkpoint = ModelCheckpoint(tempfilepath,
+                                     monitor='val_acc',
+                                     verbose=1,
+                                     save_best_only=True,
+                                     mode='max')
         reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5,
-                              patience=10, min_lr=1e-8)
+                                      patience=10, min_lr=1e-8)
         testcheck = TestCallback()
         self.callbacks = [checkpoint, reduce_lr, testcheck]
 
-    def loadformatteddata(self, Xmain_train, Xmain_test, 
-                    Xaux_train, Xaux_test, y_train, y_test, class_weight):
+    def loadformatteddata(self, Xmain_train, Xmain_test,
+                          Xaux_train, Xaux_test, y_train, y_test, class_weight):
         self.Xmain_train = Xmain_train
         self.Xmain_test = Xmain_test
         self.Xaux_train = Xaux_train
@@ -110,7 +116,8 @@ class TrainFragAux(BaseTrain):
         class_weight = self.class_weight
 
         # Finally create generator
-        gen_flow = self.gen_flow_for_two_inputs(self.Xmain_train, self.Xaux_train, self.y_train)
+        gen_flow = self.gen_flow_for_two_inputs(
+            self.Xmain_train, self.Xaux_train, self.y_train)
 
         print("main data shape: ", self.Xmain_train.shape)
         print("aux data shape: ", self.Xaux_train.shape)
@@ -131,47 +138,56 @@ class TrainFragAux(BaseTrain):
             print('Using real-time data augmentation.')
             self.generator.fit(self.Xaux_train)
             HH = dnnmodel.fit_generator(gen_flow,
-                        steps_per_epoch=self.y_train.shape[0] // self.batch_size,
-                        epochs=self.NUM_EPOCHS,
-                        validation_data=(self.Xmain_test, self.Xaux_test, self.y_test),
-                        shuffle=True,
-                        class_weight=class_weight,
-                        callbacks=callbacks, verbose=2)
+                                        steps_per_epoch=self.y_train.shape[0] // self.batch_size,
+                                        epochs=self.NUM_EPOCHS,
+                                        validation_data=(
+                                            self.Xmain_test, self.Xaux_test, self.y_test),
+                                        shuffle=True,
+                                        class_weight=class_weight,
+                                        callbacks=callbacks, verbose=2)
         self.HH = HH
 
     def loadgenerator(self):
         # This will do preprocessing and realtime data augmentation:
         self.generator = ImageDataGenerator(
-                    # featurewise_center=True,  # set input mean to 0 over the dataset
-                    samplewise_center=True,  # set each sample mean to 0
-                    # featurewise_std_normalization=True,  # divide inputs by std of the dataset
-                    samplewise_std_normalization=True,  # divide each input by its std
-                    zca_whitening=False,      # apply ZCA whitening
-                    rotation_range=5,         # randomly rotate images in the range (degrees, 0 to 180)
-                    width_shift_range=0.2,    # randomly shift images horizontally (fraction of total width)
-                    height_shift_range=0.2,   # randomly shift images vertically (fraction of total height)
-                    horizontal_flip=False,    # randomly flip images
-                    vertical_flip=False,      # randomly flip images
-                    channel_shift_range=4,
-                    fill_mode='nearest',
-                    preprocessing_function=preprocess_imgwithnoise)  
+            # featurewise_center=True,  # set input mean to 0 over the dataset
+            samplewise_center=True,  # set each sample mean to 0
+            # featurewise_std_normalization=True,  # divide inputs by std of the dataset
+            samplewise_std_normalization=True,  # divide each input by its std
+            zca_whitening=False,      # apply ZCA whitening
+            # randomly rotate images in the range (degrees, 0 to 180)
+            rotation_range=5,
+            # randomly shift images horizontally (fraction of total width)
+            width_shift_range=0.2,
+            # randomly shift images vertically (fraction of total height)
+            height_shift_range=0.2,
+            horizontal_flip=False,    # randomly flip images
+            vertical_flip=False,      # randomly flip images
+            channel_shift_range=4,
+            fill_mode='nearest',
+            preprocessing_function=preprocess_imgwithnoise)
 
     # Here is the function that merges our two generators
     # We use the exact same generator with the same random seed for both the y and angle arrays
     def gen_flow_for_two_inputs(self, X1, X2, y):
-        genX1 = self.generator.flow(X1,y, batch_size=self.batch_size, seed=666)
-        genX2 = self.generator.flow(X2,y, batch_size=self.batch_size, seed=666)
-                    
+        genX1 = self.generator.flow(
+            X1, y, batch_size=self.batch_size, seed=666)
+        genX2 = self.generator.flow(
+            X2, y, batch_size=self.batch_size, seed=666)
+
         while True:
-                X1i = genX1.next()
-                X2i = genX2.next()
-                #Assert arrays are equal - this was for peace of mind, but slows down training
-                #np.testing.assert_array_equal(X1i[0],X2i[0])
-                yield [X1i[0], X2i[0]], X1i[1]
+            X1i = genX1.next()
+            X2i = genX2.next()
+            # Assert arrays are equal - this was for peace of mind, but slows down training
+            # np.testing.assert_array_equal(X1i[0],X2i[0])
+            yield [X1i[0], X2i[0]], X1i[1]
+
     def saveoutput(self, modelname, outputdatadir):
         modeljsonfile = os.path.join(outputdatadir, modelname + "_model.json")
-        historyfile = os.path.join(outputdatadir,  modelname + '_history'+ '.pkl')
-        finalweightsfile = os.path.join(outputdatadir, modelname + '_final_weights' + '.h5')
+        historyfile = os.path.join(
+            outputdatadir,  modelname + '_history' + '.pkl')
+        finalweightsfile = os.path.join(
+            outputdatadir, modelname + '_final_weights' + '.h5')
 
         # save model
         if not os.path.exists(modeljsonfile):
@@ -187,4 +203,3 @@ class TrainFragAux(BaseTrain):
 
         # save final weights
         self.dnnmodel.save(finalweightsfile)
-    

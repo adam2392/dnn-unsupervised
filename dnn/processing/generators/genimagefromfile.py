@@ -14,13 +14,14 @@ import keras
 
 # import all image transformation utility functions
 from .util import random_rotation, random_shift,\
-            random_shear, random_zoom, random_channel_shift,\
-            transform_matrix_offset_center, apply_transform, flip_axis
+    random_shear, random_zoom, random_channel_shift,\
+    transform_matrix_offset_center, apply_transform, flip_axis
 from .basegen import Iterator
+
 
 class DataDirGenerator(object):
     """Generate minibatches of image data with real-time data augmentation.
-    
+
     Modified from Keras ImageDataGenerator
 
     # Arguments
@@ -61,6 +62,7 @@ class DataDirGenerator(object):
             Keras config file at `~/.keras/keras.json`.
             If you never set it, then it will be "channels_last".
     """
+
     def __init__(self,
                  featurewise_center=False,
                  samplewise_center=False,
@@ -144,19 +146,19 @@ class DataDirGenerator(object):
                               'which overrides setting of '
                               '`samplewise_center`.')
 
-    def flow_from_directory(self, 
+    def flow_from_directory(self,
                             directory,
-                            batch_size=32, 
+                            batch_size=32,
                             num_classes=2,
                             numchannels=3,
                             imsize=32,
-                            shuffle=True, 
+                            shuffle=True,
                             seed=None,
                             interpolation='nearest'):
         ''' Returns an iterator through the files we have '''
         return DirectoryIterator(
             directory, self,
-            batch_size=batch_size, 
+            batch_size=batch_size,
             num_classes=num_classes,
             numchannels=numchannels,
             imsize=imsize,
@@ -186,33 +188,38 @@ class DataDirGenerator(object):
         # use composition of homographies
         # to generate final transform that needs to be applied
         if self.rotation_range:
-            theta = np.deg2rad(np.random.uniform(-self.rotation_range, self.rotation_range))
+            theta = np.deg2rad(
+                np.random.uniform(-self.rotation_range, self.rotation_range))
         else:
             theta = 0
 
         if self.height_shift_range:
-            tx = np.random.uniform(-self.height_shift_range, self.height_shift_range)
+            tx = np.random.uniform(-self.height_shift_range,
+                                   self.height_shift_range)
             if self.height_shift_range < 1:
                 tx *= x.shape[img_row_axis]
         else:
             tx = 0
 
         if self.width_shift_range:
-            ty = np.random.uniform(-self.width_shift_range, self.width_shift_range)
+            ty = np.random.uniform(-self.width_shift_range,
+                                   self.width_shift_range)
             if self.width_shift_range < 1:
                 ty *= x.shape[img_col_axis]
         else:
             ty = 0
 
         if self.shear_range:
-            shear = np.deg2rad(np.random.uniform(-self.shear_range, self.shear_range))
+            shear = np.deg2rad(
+                np.random.uniform(-self.shear_range, self.shear_range))
         else:
             shear = 0
 
         if self.zoom_range[0] == 1 and self.zoom_range[1] == 1:
             zx, zy = 1, 1
         else:
-            zx, zy = np.random.uniform(self.zoom_range[0], self.zoom_range[1], 2)
+            zx, zy = np.random.uniform(
+                self.zoom_range[0], self.zoom_range[1], 2)
 
         transform_matrix = None
         if theta != 0:
@@ -225,23 +232,27 @@ class DataDirGenerator(object):
             shift_matrix = np.array([[1, 0, tx],
                                      [0, 1, ty],
                                      [0, 0, 1]])
-            transform_matrix = shift_matrix if transform_matrix is None else np.dot(transform_matrix, shift_matrix)
+            transform_matrix = shift_matrix if transform_matrix is None else np.dot(
+                transform_matrix, shift_matrix)
 
         if shear != 0:
             shear_matrix = np.array([[1, -np.sin(shear), 0],
-                                    [0, np.cos(shear), 0],
-                                    [0, 0, 1]])
-            transform_matrix = shear_matrix if transform_matrix is None else np.dot(transform_matrix, shear_matrix)
+                                     [0, np.cos(shear), 0],
+                                     [0, 0, 1]])
+            transform_matrix = shear_matrix if transform_matrix is None else np.dot(
+                transform_matrix, shear_matrix)
 
         if zx != 1 or zy != 1:
             zoom_matrix = np.array([[zx, 0, 0],
                                     [0, zy, 0],
                                     [0, 0, 1]])
-            transform_matrix = zoom_matrix if transform_matrix is None else np.dot(transform_matrix, zoom_matrix)
+            transform_matrix = zoom_matrix if transform_matrix is None else np.dot(
+                transform_matrix, zoom_matrix)
 
         if transform_matrix is not None:
             h, w = x.shape[img_row_axis], x.shape[img_col_axis]
-            transform_matrix = transform_matrix_offset_center(transform_matrix, h, w)
+            transform_matrix = transform_matrix_offset_center(
+                transform_matrix, h, w)
             x = apply_transform(x, transform_matrix, img_channel_axis,
                                 fill_mode=self.fill_mode, cval=self.cval)
 
@@ -288,7 +299,8 @@ class DataDirGenerator(object):
             warnings.warn(
                 'Expected input to be images (as Numpy array) '
                 '(channels on axis ' + str(self.channel_axis) + '), i.e. expected '
-                'either 1, 3 or 4 channels on axis ' + str(self.channel_axis) + '. '
+                'either 1, 3 or 4 channels on axis ' +
+                str(self.channel_axis) + '. '
                 'However, it was passed an array with shape ' + str(x.shape) +
                 ' (' + str(x.shape[self.channel_axis]) + ' channels).')
 
@@ -297,7 +309,8 @@ class DataDirGenerator(object):
 
         x = np.copy(x)
         if augment:
-            ax = np.zeros(tuple([rounds * x.shape[0]] + list(x.shape)[1:]), dtype=K.floatx())
+            ax = np.zeros(tuple([rounds * x.shape[0]] +
+                                list(x.shape)[1:]), dtype=K.floatx())
             for r in range(rounds):
                 for i in range(x.shape[0]):
                     ax[i + r * x.shape[0]] = self.random_transform(x[i])
@@ -318,12 +331,14 @@ class DataDirGenerator(object):
             x /= (self.std + K.epsilon())
 
         if self.zca_whitening:
-            flat_x = np.reshape(x, (x.shape[0], x.shape[1] * x.shape[2] * x.shape[3]))
+            flat_x = np.reshape(
+                x, (x.shape[0], x.shape[1] * x.shape[2] * x.shape[3]))
             num_examples = flat_x.shape[0]
             _, s, vt = linalg.svd(flat_x / np.sqrt(num_examples))
             s_expand = np.hstack((s, np.zeros(vt.shape[0] - num_examples,
                                               dtype=flat_x.dtype)))
-            self.principal_components = (vt.T / np.sqrt(s_expand ** 2 + self.zca_epsilon)).dot(vt)
+            self.principal_components = (
+                vt.T / np.sqrt(s_expand ** 2 + self.zca_epsilon)).dot(vt)
 
     def standardize(self, x):
         """Apply the normalization configuration to a batch of inputs.
@@ -354,6 +369,7 @@ class DataDirGenerator(object):
                               'been fit on any training data. Fit it '
                               'first by calling `.fit(numpy_data)`.')
         return x
+
 
 class DirectoryIterator(Iterator):
     """Iterator capable of reading images from a directory on disk.
@@ -398,14 +414,14 @@ class DirectoryIterator(Iterator):
             "hamming" are also supported. By default, "nearest" is used.
     """
 
-    def __init__(self, 
-                 directory, 
+    def __init__(self,
+                 directory,
                  image_data_generator,
-                 batch_size=32, 
+                 batch_size=32,
                  num_classes=2,
                  numchannels=3,
                  imsize=32,
-                 shuffle=True, 
+                 shuffle=True,
                  seed=None,
                  data_format=None,
                  interpolation='nearest'):
@@ -430,33 +446,35 @@ class DirectoryIterator(Iterator):
         self.samples = len(self.filepaths)
 
         print('Found %d image files.' % (self.samples))
-        super(DirectoryIterator, self).__init__(self.samples, batch_size, shuffle, seed)
+        super(DirectoryIterator, self).__init__(
+            self.samples, batch_size, shuffle, seed)
 
     def _get_batches_of_transformed_samples(self, index_array):
         # build batch of image data
         for i, index in enumerate(index_array):
             fpath = self.filepaths[index]
-            
+
             # load in a certain file and randomly sample the image
             imgdata = np.load(fpath)
             images = imgdata['image_tensor']
             metadata = imgdata['metadata'].item()
             y = metadata['ylabels']
             invert_y = 1 - y
-            y = np.concatenate((y, invert_y),axis=1)
+            y = np.concatenate((y, invert_y), axis=1)
 
             # transform the images if necessary
             # reshape
-            images = images.reshape((-1, self.numchannels, self.imsize, self.imsize))
-            images = images.swapaxes(1,3)
+            images = images.reshape(
+                (-1, self.numchannels, self.imsize, self.imsize))
+            images = images.swapaxes(1, 3)
 
             # get the random index in this dataset
             numsamples = y.shape[0]
-            N = 1 # number of samples to get from this dataset | Todo change into higher number
+            N = 1  # number of samples to get from this dataset | Todo change into higher number
             assert numsamples == images.shape[0]
             randind = random.sample(range(numsamples), k=N)
-            x = images[randind,...].squeeze()
-            y = y[randind,...].squeeze()
+            x = images[randind, ...].squeeze()
+            y = y[randind, ...].squeeze()
 
             # apply transforms and standardize
             x = self.image_data_generator.random_transform(x)
@@ -464,8 +482,10 @@ class DirectoryIterator(Iterator):
 
             if i == 0:
                 # init batch of X and Y
-                batch_x = np.zeros((len(index_array),) + x.shape, dtype=K.floatx())
-                batch_y = np.zeros((len(index_array),) + y.shape, dtype=K.floatx())
+                batch_x = np.zeros((len(index_array),) +
+                                   x.shape, dtype=K.floatx())
+                batch_y = np.zeros((len(index_array),) +
+                                   y.shape, dtype=K.floatx())
 
             batch_x[i] = x
             batch_y[i] = y
@@ -483,4 +503,3 @@ class DirectoryIterator(Iterator):
         # The transformation of images is not under thread lock
         # so it can be done in parallel
         return self._get_batches_of_transformed_samples(index_array)
-

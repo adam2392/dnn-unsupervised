@@ -26,6 +26,8 @@ import json
 import pickle
 
 from keras.callbacks import Callback
+
+
 class TestCallback(Callback):
     def __init__(self):
         # self.test_data = test_data
@@ -48,31 +50,33 @@ class TestCallback(Callback):
         print('F1 score:', f1_score(ytrue, predicted))
         print('Recall:', recall_score(ytrue, predicted))
         print('Precision:', precision_score(ytrue, predicted))
-        print('\n clasification report:\n', classification_report(ytrue, predicted))
-        print('\n confusion matrix:\n',confusion_matrix(ytrue, predicted))
+        print('\n clasification report:\n',
+              classification_report(ytrue, predicted))
+        print('\n confusion matrix:\n', confusion_matrix(ytrue, predicted))
 # class Histories(keras.callbacks.Callback):
 #     def on_train_begin(self, logs={}):
 #         self.aucs = []
 #         self.losses = []
- 
+
 #     def on_train_end(self, logs={}):
 #         return
- 
+
 #     def on_epoch_begin(self, epoch, logs={}):
 #         return
- 
+
 #     def on_epoch_end(self, epoch, logs={}):
 #         self.losses.append(logs.get('loss'))
 #         y_pred = self.model.predict(self.model.validation_data[0])
 #         self.aucs.append(roc_auc_score(self.model.validation_data[1], y_pred))
 #         return
- 
+
 #     def on_batch_begin(self, batch, logs={}):
 #         return
- 
+
 #     def on_batch_end(self, batch, logs={}):
 #         return
-    
+
+
 def path_leaf(path):
     head, tail = ntpath.split(path)
     return tail or ntpath.basename(head)
@@ -89,13 +93,13 @@ def poly_decay(epoch, NUM_EPOCHS, INIT_LR):
     # return the new learning rate
     return alpha
 
+
 def loadmodel(ieegdnn, **kwargs):
-    if model=='cnn':
+    if model == 'cnn':
         # VGG-12 style later
-        vggcnn = ieegdnn._build_2dcnn(w_init=w_init, n_layers=n_layers, 
+        vggcnn = ieegdnn._build_2dcnn(w_init=w_init, n_layers=n_layers,
                                       poolsize=poolsize, filter_size=filtersize)
         vggcnn = ieegdnn._build_seq_output(vggcnn, size_fc, DROPOUT)
-
 
 
 if __name__ == '__main__':
@@ -110,42 +114,42 @@ if __name__ == '__main__':
     historyfile = os.path.join(outputdatadir, 'history_2dcnn.pkl')
     ##################### PARAMETERS FOR NN ####################
     # image parameters #
-    imsize=32
+    imsize = 32
     numfreqs = 1
-    numclasses = 2 
+    numclasses = 2
 
     # layer parameters #
     w_init = None       # weight intializers for all layers
-    n_layers = (4,2,1)  # num of convolutional layers in sequence
-    poolsize = (2,2)    # maxpooling size
-    filtersize = (3,3)  # filter size
+    n_layers = (4, 2, 1)  # num of convolutional layers in sequence
+    poolsize = (2, 2)    # maxpooling size
+    filtersize = (3, 3)  # filter size
 
     # fully connected output #
     size_fc = 512       # size of fully connected layers
     DROPOUT = True     # should we use Hinton Dropout method?
 
     # define number of epochs and batch size
-    NUM_EPOCHS = 10 # per dataset
-    batch_size = 24 # or 64... or 24
+    NUM_EPOCHS = 10  # per dataset
+    batch_size = 24  # or 64... or 24
     data_augmentation = True
 
-    ieegdnn = model.ieeg_cnn_rnn.IEEGdnn(imsize=imsize, 
-                                        n_colors=numfreqs,
-                                        num_classes=numclasses)
+    ieegdnn = model.ieeg_cnn_rnn.IEEGdnn(imsize=imsize,
+                                         n_colors=numfreqs,
+                                         num_classes=numclasses)
     sys.stdout.write('\n\n')
     sys.stdout.write(os.getcwd())
 
     ##################### TRAINING FOR NN ####################
     # VGG-12 style later
-    currmodel = ieegdnn._build_2dcnn(w_init=w_init, n_layers=n_layers, 
-                                  poolsize=poolsize, filter_size=filtersize)
+    currmodel = ieegdnn._build_2dcnn(w_init=w_init, n_layers=n_layers,
+                                     poolsize=poolsize, filter_size=filtersize)
     currmodel = ieegdnn._build_seq_output(currmodel, size_fc, DROPOUT)
     sys.stdout.write("Created VGG12 Style CNN")
 
     # VGG-12 style 3D CNN
     # poolsize = (2,2,2)    # maxpooling size
     # filtersize = (3,3,3)  # filter size
-    # currmodel = ieegdnn._build_3dcnn(w_init=w_init, n_layers=n_layers, 
+    # currmodel = ieegdnn._build_3dcnn(w_init=w_init, n_layers=n_layers,
     #                               poolsize=poolsize, filter_size=filtersize)
     # currmodel = ieegdnn._build_seq_output(currmodel, size_fc, DROPOUT)
     # sys.stdout.write("Created VGG12 Style 3D CNN")
@@ -167,96 +171,102 @@ if __name__ == '__main__':
 
     # initialize loss function, SGD optimizer and metrics
     loss = 'binary_crossentropy'
-    optimizer = keras.optimizers.Adam(lr=0.00005, 
-                                    beta_1=0.9, 
-                                    beta_2=0.999,
-                                    epsilon=1e-08,
-                                    decay=0.0)
+    optimizer = keras.optimizers.Adam(lr=0.00005,
+                                      beta_1=0.9,
+                                      beta_2=0.999,
+                                      epsilon=1e-08,
+                                      decay=0.0)
     metrics = ['accuracy']
 
-    modelconfig = currmodel.compile(loss=loss, optimizer=optimizer, metrics=metrics)
+    modelconfig = currmodel.compile(
+        loss=loss, optimizer=optimizer, metrics=metrics)
     print(modelconfig)
     print("model input shape is: ", currmodel.input_shape)
 
-
     # This will do preprocessing and realtime data augmentation:
     datagen = keras.preprocessing.image.ImageDataGenerator(
-                    featurewise_center=False,  # set input mean to 0 over the dataset
-                    samplewise_center=True,  # set each sample mean to 0
-                    featurewise_std_normalization=False,  # divide inputs by std of the dataset
-                    samplewise_std_normalization=True,  # divide each input by its std
-                    zca_whitening=False,      # apply ZCA whitening
-                    rotation_range=5,         # randomly rotate images in the range (degrees, 0 to 180)
-                    width_shift_range=0.02,    # randomly shift images horizontally (fraction of total width)
-                    height_shift_range=0.02,   # randomly shift images vertically (fraction of total height)
-                    horizontal_flip=False,    # randomly flip images
-                    vertical_flip=False,      # randomly flip images
-                    fill_mode='nearest')  
+        featurewise_center=False,  # set input mean to 0 over the dataset
+        samplewise_center=True,  # set each sample mean to 0
+        featurewise_std_normalization=False,  # divide inputs by std of the dataset
+        samplewise_std_normalization=True,  # divide each input by its std
+        zca_whitening=False,      # apply ZCA whitening
+        # randomly rotate images in the range (degrees, 0 to 180)
+        rotation_range=5,
+        # randomly shift images horizontally (fraction of total width)
+        width_shift_range=0.02,
+        # randomly shift images vertically (fraction of total height)
+        height_shift_range=0.02,
+        horizontal_flip=False,    # randomly flip images
+        vertical_flip=False,      # randomly flip images
+        fill_mode='nearest')
 
     # checkpoint
-    filepath=os.path.join(tempdatadir,"weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5")
-    checkpoint = ModelCheckpoint(filepath, 
-                                    monitor='val_acc', 
-                                    verbose=1, 
-                                    save_best_only=True, 
-                                    mode='max')
-    callbacks = [checkpoint] #, poly_decay]
+    filepath = os.path.join(
+        tempdatadir, "weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5")
+    checkpoint = ModelCheckpoint(filepath,
+                                 monitor='val_acc',
+                                 verbose=1,
+                                 save_best_only=True,
+                                 mode='max')
+    callbacks = [checkpoint]  # , poly_decay]
     # INIT_LR = 5e-3
-    G=1
+    G = 1
 
     ##################### TEST DATA FOR NN ####################
-    alldatafile = os.path.join(traindatadir, 'testdata', 'id001_ac_sz2_testimages.npz')
+    alldatafile = os.path.join(
+        traindatadir, 'testdata', 'id001_ac_sz2_testimages.npz')
     data = np.load(alldatafile)
     print(data.keys())
     testimages = data['image_tensor']
     metadata = data['metadata'].item()
     # reshape
     testimages = testimages.reshape((-1, numfreqs, imsize, imsize))
-    testimages = testimages.swapaxes(1,3)
+    testimages = testimages.swapaxes(1, 3)
     testimages = testimages.astype("float32")
 
     # load the ylabeled data
     testlabels = metadata['ylabels']
     invert_y = 1 - testlabels
-    testlabels = np.concatenate((testlabels, invert_y),axis=1)
+    testlabels = np.concatenate((testlabels, invert_y), axis=1)
 
     ##################### INPUT DATA FOR NN ####################
-    alldatafile = os.path.join(traindatadir, 'finaldata', 'allimages_fragility2d.npz')
+    alldatafile = os.path.join(
+        traindatadir, 'finaldata', 'allimages_fragility2d.npz')
     data = np.load(alldatafile)
     images = data['images']
 
     # reshape
     images = images.reshape((-1, numfreqs, imsize, imsize))
-    images = images.swapaxes(1,3)
+    images = images.swapaxes(1, 3)
 
     # load the ylabeled data
     ylabels = data['labels']
     invert_y = 1 - ylabels
-    ylabels = np.concatenate((ylabels, invert_y),axis=1)
+    ylabels = np.concatenate((ylabels, invert_y), axis=1)
     sys.stdout.write("\n\n Images and ylabels shapes are: \n\n")
     print(images.shape)
     print(ylabels.shape)
-    sys.stdout.write("\n\n") 
+    sys.stdout.write("\n\n")
 
     # assert the shape of the images
     assert images.shape[2] == images.shape[1]
     assert images.shape[2] == imsize
     assert images.shape[3] == numfreqs
-    
+
     print(images.shape)
     images = images.astype("float32")
-    # format the data correctly 
+    # format the data correctly
     # X_train, X_test, y_train, y_test = train_test_split(images, ylabels, test_size=0.33, random_state=42)
-   
+
     # augment data, or not and then trian the model!
     if not data_augmentation:
         print('Not using data augmentation. Implement Solution still!')
         HH = currmodel.fit(X_train, y_train,
-                  batch_size=batch_size,
-                  epochs=NUM_EPOCHS,
-                  validation_data=(X_test, y_test),
-                  shuffle=False,
-                  callbacks=callbacks)
+                           batch_size=batch_size,
+                           epochs=NUM_EPOCHS,
+                           validation_data=(X_test, y_test),
+                           shuffle=False,
+                           callbacks=callbacks)
     else:
         print('Using real-time data augmentation.')
         # datagen.fit(X_train)
@@ -301,18 +311,18 @@ if __name__ == '__main__':
 
         # # Fit the model on the batches generated by datagen.flow().
         HH = currmodel.fit_generator(
-                    datagen.flow(images, ylabels, batch_size=batch_size),
-                            steps_per_epoch=images.shape[0] // batch_size,
-                            epochs=NUM_EPOCHS,
-                            validation_data=(testimages, testlabels),
-                            shuffle=True,
-                            callbacks=callbacks, verbose=2)
+            datagen.flow(images, ylabels, batch_size=batch_size),
+            steps_per_epoch=images.shape[0] // batch_size,
+            epochs=NUM_EPOCHS,
+            validation_data=(testimages, testlabels),
+            shuffle=True,
+            callbacks=callbacks, verbose=2)
 
     with open(historyfile, 'wb') as file_pi:
         pickle.dump(HH.history, file_pi)
     # save final history object
-    currmodel.save(os.path.join(outputdatadir, 
-                    'final_weights' + '.h5'))
+    currmodel.save(os.path.join(outputdatadir,
+                                'final_weights' + '.h5'))
 
     # if running on test dataset of images
     predicted = currmodel.predict_classes(testimages)
@@ -332,6 +342,4 @@ if __name__ == '__main__':
     print('Recall:', recall_score(ytrue, predicted))
     print('Precision:', precision_score(ytrue, predicted))
     print('\n clasification report:\n', classification_report(ytrue, predicted))
-    print('\n confusion matrix:\n',confusion_matrix(ytrue, predicted))
-
-
+    print('\n confusion matrix:\n', confusion_matrix(ytrue, predicted))

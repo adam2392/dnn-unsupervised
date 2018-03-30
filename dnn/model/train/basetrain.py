@@ -1,6 +1,8 @@
 from abc import ABCMeta
-import numpy as np 
+import numpy as np
 import pprint
+
+
 class BaseTrain(metaclass=ABCMeta):
     requiredAttributes = ['NUM_EPOCHS', 'batch_size', 'AUGMENT']
 

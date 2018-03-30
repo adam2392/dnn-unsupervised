@@ -1,4 +1,4 @@
-from .basetrain import BaseTrain 
+from .basetrain import BaseTrain
 import numpy as np
 import os
 from sklearn.model_selection import train_test_split
@@ -26,6 +26,7 @@ from sklearn.metrics import precision_score, \
 
 import pprint
 
+
 def preprocess_imgwithnoise(image_tensor):
     # preprocessing_function: function that will be implied on each input.
     #         The function will run before any other modification on it.
@@ -33,13 +34,15 @@ def preprocess_imgwithnoise(image_tensor):
     #         one image (Numpy tensor with rank 3),
     #         and should output a Numpy tensor with the same shape.
     assert image_tensor.shape[0] == image_tensor.shape[1]
-    stdmult=0.1
+    stdmult = 0.1
     imsize = image_tensor.shape[0]
     numchans = image_tensor.shape[2]
     for i in range(numchans):
-        feat = image_tensor[...,i]
-        image_tensor[...,i] = image_tensor[...,i] + np.random.normal(scale=stdmult*np.std(feat), size=feat.size).reshape(imsize,imsize)
+        feat = image_tensor[..., i]
+        image_tensor[..., i] = image_tensor[..., i] + np.random.normal(
+            scale=stdmult*np.std(feat), size=feat.size).reshape(imsize, imsize)
     return image_tensor
+
 
 class TestCallback(Callback):
     def __init__(self):
@@ -53,7 +56,6 @@ class TestCallback(Callback):
         x = self.validation_data[0]
         y = self.validation_data[1]
 
-
         loss, acc = self.model.evaluate(x, y, verbose=0)
         print('\nTesting loss: {}, acc: {}\n'.format(loss, acc))
 
@@ -66,8 +68,10 @@ class TestCallback(Callback):
         print('F1 score:', f1_score(ytrue, predicted))
         print('Recall:', recall_score(ytrue, predicted))
         print('Precision:', precision_score(ytrue, predicted))
-        print('\n clasification report:\n', classification_report(ytrue, predicted))
-        print('\n confusion matrix:\n',confusion_matrix(ytrue, predicted))
+        print('\n clasification report:\n',
+              classification_report(ytrue, predicted))
+        print('\n confusion matrix:\n', confusion_matrix(ytrue, predicted))
+
 
 class TrainCNN(BaseTrain):
     def __init__(self, dnnmodel, batch_size, NUM_EPOCHS, AUGMENT):
@@ -78,8 +82,10 @@ class TrainCNN(BaseTrain):
 
     def saveoutput(self, modelname, outputdatadir):
         modeljsonfile = os.path.join(outputdatadir, modelname + "_model.json")
-        historyfile = os.path.join(outputdatadir,  modelname + '_history'+ '.pkl')
-        finalweightsfile = os.path.join(outputdatadir, modelname + '_final_weights' + '.h5')
+        historyfile = os.path.join(
+            outputdatadir,  modelname + '_history' + '.pkl')
+        finalweightsfile = os.path.join(
+            outputdatadir, modelname + '_final_weights' + '.h5')
 
         # save model
         if not os.path.exists(modeljsonfile):
@@ -108,26 +114,27 @@ class TrainCNN(BaseTrain):
     def configure(self, tempdatadir):
         # initialize loss function, SGD optimizer and metrics
         loss = 'binary_crossentropy'
-        optimizer = Adam(lr=1e-5, 
-                        beta_1=0.9, 
-                        beta_2=0.99,
-                        epsilon=1e-08,
-                        decay=0.0)
+        optimizer = Adam(lr=1e-5,
+                         beta_1=0.9,
+                         beta_2=0.99,
+                         epsilon=1e-08,
+                         decay=0.0)
         metrics = ['accuracy']
-        self.modelconfig = self.dnnmodel.compile(loss=loss, 
-                                                optimizer=optimizer,
-                                                metrics=metrics)
+        self.modelconfig = self.dnnmodel.compile(loss=loss,
+                                                 optimizer=optimizer,
+                                                 metrics=metrics)
 
-        tempfilepath = os.path.join(tempdatadir,"weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5")
-        
+        tempfilepath = os.path.join(
+            tempdatadir, "weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5")
+
         # callbacks availabble
-        checkpoint = ModelCheckpoint(tempfilepath, 
-                                    monitor='val_acc', 
-                                    verbose=1, 
-                                    save_best_only=True, 
-                                    mode='max')
+        checkpoint = ModelCheckpoint(tempfilepath,
+                                     monitor='val_acc',
+                                     verbose=1,
+                                     save_best_only=True,
+                                     mode='max')
         reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5,
-                              patience=10, min_lr=1e-8)
+                                      patience=10, min_lr=1e-8)
         testcheck = TestCallback()
         self.callbacks = [checkpoint, testcheck]
 
@@ -138,7 +145,7 @@ class TrainCNN(BaseTrain):
             for file in files:
                 if any(pat in file for pat in listofpats_test):
                     self.testfilepaths.append(os.path.join(root, file))
-        self.testfilepaths.append(os.path.join(root,file))
+        self.testfilepaths.append(os.path.join(root, file))
 
         ''' Get list of file paths '''
         self.filepaths = []
@@ -161,7 +168,7 @@ class TrainCNN(BaseTrain):
         print("training data is found in: ", root)
 
     def _formatdata(self, images):
-        images = images.swapaxes(1,3)
+        images = images.swapaxes(1, 3)
         # lower sample by casting to 32 bits
         images = images.astype("float32")
         return images
@@ -172,7 +179,7 @@ class TrainCNN(BaseTrain):
             imagedata = np.load(datafile)
             image_tensor = imagedata['image_tensor']
             metadata = imagedata['metadata'].item()
-            
+
             if idx == 0:
                 image_tensors = image_tensor
                 ylabels = metadata['ylabels']
@@ -181,7 +188,7 @@ class TrainCNN(BaseTrain):
                 ylabels = np.append(ylabels, metadata['ylabels'], axis=0)
         # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
         invert_y = 1 - ylabels
-        ylabels = np.concatenate((invert_y, ylabels),axis=1)  
+        ylabels = np.concatenate((invert_y, ylabels), axis=1)
         # format the image tensor correctly
         image_tensors = self._formatdata(image_tensors)
         self.X_test = image_tensors
@@ -189,11 +196,11 @@ class TrainCNN(BaseTrain):
 
     def loadtrainingdata(self):
         '''     LOAD TRAINING DATA      '''
-        for idx, datafile in enumerate(self.filepaths):                    
+        for idx, datafile in enumerate(self.filepaths):
             imagedata = np.load(datafile)
             image_tensor = imagedata['image_tensor']
             metadata = imagedata['metadata'].item()
-            
+
             if idx == 0:
                 image_tensors = image_tensor
                 ylabels = metadata['ylabels']
@@ -203,11 +210,12 @@ class TrainCNN(BaseTrain):
 
         # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
         invert_y = 1 - ylabels
-        ylabels = np.concatenate((invert_y, ylabels),axis=1)  
-        # format the data correctly 
-        class_weight = sklearn.utils.compute_class_weight('balanced', 
-                                                 np.unique(ylabels).astype(int),
-                                                 np.argmax(ylabels, axis=1))
+        ylabels = np.concatenate((invert_y, ylabels), axis=1)
+        # format the data correctly
+        class_weight = sklearn.utils.compute_class_weight('balanced',
+                                                          np.unique(
+                                                              ylabels).astype(int),
+                                                          np.argmax(ylabels, axis=1))
         image_tensors = self._formatdata(image_tensors)
         self.X_train = image_tensors
         self.y_train = ylabels
@@ -230,44 +238,57 @@ class TrainCNN(BaseTrain):
 
         test = np.argmax(y_train, axis=1)
         print("class imbalance: ", np.sum(test), len(test))
-        
+
         # augment data, or not and then trian the model!
         if not self.AUGMENT:
             print('Not using data augmentation. Implement Solution still!')
             HH = dnnmodel.fit(X_train, y_train,
-                                steps_per_epoch=X_train.shape[0] // batch_size,
-                                batch_size=self.batch_size,
-                                epochs=self.NUM_EPOCHS,
-                                validation_data=(X_test, y_test),
-                                shuffle=True,
-                                class_weight=class_weight,
-                                callbacks=callbacks)
+                              steps_per_epoch=X_train.shape[0] // batch_size,
+                              batch_size=self.batch_size,
+                              epochs=self.NUM_EPOCHS,
+                              validation_data=(X_test, y_test),
+                              shuffle=True,
+                              class_weight=class_weight,
+                              callbacks=callbacks)
         else:
             print('Using real-time data augmentation.')
             self.generator.fit(X_train)
             HH = dnnmodel.fit_generator(self.generator.flow(X_train, y_train, batch_size=self.batch_size),
-                                                steps_per_epoch=X_train.shape[0] // self.batch_size,
-                                                epochs=self.NUM_EPOCHS,
-                                                validation_data=(X_test, y_test),
-                                                shuffle=True,
-                                                class_weight=class_weight,
-                                                callbacks=callbacks, verbose=2)
+                                        steps_per_epoch=X_train.shape[0] // self.batch_size,
+                                        epochs=self.NUM_EPOCHS,
+                                        validation_data=(X_test, y_test),
+                                        shuffle=True,
+                                        class_weight=class_weight,
+                                        callbacks=callbacks, verbose=2)
 
         self.HH = HH
+    
+    '''
+    These two functions for directly loading in the test/train datasets
+    '''
+    def loadtrainingdata_vars(Xmain_train, y_train):
+        self.Xmain_train = Xmain_train
+        self.y_train = y_train
+    def loadtestingdata_vars(Xmain_test, y_test):
+        self.Xmain_test = Xmain_test
+        self.y_test = y_test
 
     def _loadgenerator(self):
         # This will do preprocessing and realtime data augmentation:
         self.generator = ImageDataGenerator(
-                    featurewise_center=True,  # set input mean to 0 over the dataset
-                    # samplewise_center=True,  # set each sample mean to 0
-                    featurewise_std_normalization=True,  # divide inputs by std of the dataset
-                    # samplewise_std_normalization=True,  # divide each input by its std
-                    zca_whitening=False,      # apply ZCA whitening
-                    rotation_range=5,         # randomly rotate images in the range (degrees, 0 to 180)
-                    width_shift_range=0.2,    # randomly shift images horizontally (fraction of total width)
-                    height_shift_range=0.2,   # randomly shift images vertically (fraction of total height)
-                    horizontal_flip=True,    # randomly flip images
-                    vertical_flip=True,      # randomly flip images
-                    channel_shift_range=4,
-                    fill_mode='nearest',
-                    preprocessing_function=preprocess_imgwithnoise)  
+            featurewise_center=True,  # set input mean to 0 over the dataset
+            # samplewise_center=True,  # set each sample mean to 0
+            featurewise_std_normalization=True,  # divide inputs by std of the dataset
+            # samplewise_std_normalization=True,  # divide each input by its std
+            zca_whitening=False,      # apply ZCA whitening
+            # randomly rotate images in the range (degrees, 0 to 180)
+            rotation_range=5,
+            # randomly shift images horizontally (fraction of total width)
+            width_shift_range=0.2,
+            # randomly shift images vertically (fraction of total height)
+            height_shift_range=0.2,
+            horizontal_flip=True,    # randomly flip images
+            vertical_flip=True,      # randomly flip images
+            channel_shift_range=4,
+            fill_mode='nearest',
+            preprocessing_function=preprocess_imgwithnoise)

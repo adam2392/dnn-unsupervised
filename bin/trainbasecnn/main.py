@@ -34,34 +34,34 @@ if __name__ == '__main__':
     modelname = '2dcnn'
     # list of patients to train on
     listofpats_train = [
-                    # 'id001',
-                    # 'id002', 
-                    'id008', 
-                    # 'id010', 
-                    # 'id011', 
-                    # 'id012', 
-                    'id013'
-                ]
+        # 'id001',
+        # 'id002',
+        'id008',
+        # 'id010',
+        # 'id011',
+        # 'id012',
+        'id013'
+    ]
     listofpats_test = [
-                    # 'id001',
-                    # 'id002', 
-                    'id008', 
-                    # 'id010', 
-                    # 'id011', 
-                    # 'id012', 
-                    'id013'
-                ]
+        # 'id001',
+        # 'id002',
+        'id008',
+        # 'id010',
+        # 'id011',
+        # 'id012',
+        'id013'
+    ]
     ##################### PARAMETERS FOR NN - CREATE NN ####################
-    imsize=32
-    n_colors =4
-    num_classes=2
-    modeldim=2
-    DROPOUT=True
+    imsize = 32
+    n_colors = 4
+    num_classes = 2
+    modeldim = 2
+    DROPOUT = True
 
     cnn = iEEGCNN(imsize=imsize,
-                  n_colors=n_colors, 
-                  num_classes=num_classes, 
-                  modeldim=modeldim, 
+                  n_colors=n_colors,
+                  num_classes=num_classes,
+                  modeldim=modeldim,
                   DROPOUT=DROPOUT)
     cnn.buildmodel()
     cnn.buildoutput()
@@ -83,7 +83,8 @@ if __name__ == '__main__':
     # configure, load generator and load training/testing data
     cnn_trainer.configure(tempdatadir)
     cnn_trainer.loadgenerator()
-    cnn_trainer.loaddata(traindatadir, testdatadir, listofpats_train, listofpats_test)
+    cnn_trainer.loaddata(traindatadir, testdatadir,
+                         listofpats_train, listofpats_test)
     cnn_trainer.loadtrainingdata()
     cnn_trainer.loadtestdata()
     cnn_trainer.train()
@@ -117,4 +118,4 @@ if __name__ == '__main__':
     print('Recall:', recall_score(ytrue, y_pred))
     print('Precision:', precision_score(ytrue, y_pred))
     print('\n clasification report:\n', classification_report(ytrue, y_pred))
-    print('\n confusion matrix:\n',confusion_matrix(ytrue, y_pred))
+    print('\n confusion matrix:\n', confusion_matrix(ytrue, y_pred))

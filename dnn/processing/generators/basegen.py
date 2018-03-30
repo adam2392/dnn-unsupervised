@@ -10,6 +10,7 @@ Borrowed code and class structure from keras imagedatagenerator
 
 '''
 
+
 class Sequence(object):
     """Base object for fitting to a sequence of data, such as a dataset.
 
@@ -79,6 +80,7 @@ class Sequence(object):
         """
         pass
 
+
 class Iterator(Sequence):
     """Base class for image data iterators.
 
@@ -99,7 +101,8 @@ class Iterator(Sequence):
         self.shuffle = shuffle
         self.batch_index = 0
         self.total_batches_seen = 0
-        self.lock = threading.Lock() # used to lock this iterator that can be unlocked by any thread
+        # used to lock this iterator that can be unlocked by any thread
+        self.lock = threading.Lock()
         self.index_array = None
         self.index_generator = self._flow_index()
 

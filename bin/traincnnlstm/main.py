@@ -36,43 +36,43 @@ if __name__ == '__main__':
 
     # list of patients to train on
     listofpats_train = [
-                    'id001',
-                    'id002', 
-                    'id008', 
-                    # 'id010', 
-                    'id011', 
-                    'id012', 
-                    'id013'
-                ]
+        'id001',
+        'id002',
+        'id008',
+        # 'id010',
+        'id011',
+        'id012',
+        'id013'
+    ]
     listofpats_test = [
-                    'id010'
-                ]
+        'id010'
+    ]
     ##################### PARAMETERS FOR NN ####################
     # CNN PARAMS
-    imsize=32
-    n_colors =3 
-    num_classes=2
-    modeldim=2
-    DROPOUT=True
+    imsize = 32
+    n_colors = 3
+    num_classes = 2
+    modeldim = 2
+    DROPOUT = True
 
     # LSTM PARAMS
     name = 'MIX'
     name = 'SAME'
-    num_timewins=5
-    DROPOUT=True
-    BIDIRECT=False
+    num_timewins = 5
+    DROPOUT = True
+    BIDIRECT = False
     cnnseq = iEEGSeq(name=name,
-                    num_classes=num_classes,
-                    num_timewins=num_timewins,
-                    DROPOUT=DROPOUT,
-                    BIDIRECT=BIDIRECT)
+                     num_classes=num_classes,
+                     num_timewins=num_timewins,
+                     DROPOUT=DROPOUT,
+                     BIDIRECT=BIDIRECT)
     LOAD = False
     if not LOAD:
         cnn = iEEGCNN(imsize=imsize,
-              n_colors=n_colors, 
-              num_classes=num_classes, 
-              modeldim=modeldim, 
-              DROPOUT=DROPOUT)
+                      n_colors=n_colors,
+                      num_classes=num_classes,
+                      modeldim=modeldim,
+                      DROPOUT=DROPOUT)
         cnn.buildmodel()
         cnn.summaryinfo()
 
@@ -101,7 +101,8 @@ if __name__ == '__main__':
     NUM_EPOCHS = 200
     AUGMENT = True
 
-    seq_trainer = trainseq.TrainSeq(fixed_cnn_model, batch_size, numtimesteps, NUM_EPOCHS, AUGMENT)
+    seq_trainer = trainseq.TrainSeq(
+        fixed_cnn_model, batch_size, numtimesteps, NUM_EPOCHS, AUGMENT)
 
     # configure, load generator
     seq_trainer.configure(tempdatadir)
@@ -110,7 +111,7 @@ if __name__ == '__main__':
     seq_trainer.loaddirofdata(pattraindir, listofpats_train)
     # use the training data and loop through once to compute the class weights
     seq_trainer.compute_classweights()
-    
+
     # run training
     seq_trainer.train()
 
@@ -123,4 +124,3 @@ if __name__ == '__main__':
     # get the history object as a result of training
     HH = seq_trainer.HH
     dnnmodel = cnn_trainer.dnnmodel
-

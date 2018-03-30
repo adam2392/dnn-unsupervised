@@ -8,7 +8,7 @@ from sklearn.preprocessing import scale
 
 
 class DataGenerator(object):
-    def __init__(self, dim_x = 32, dim_y = 32, dim_z = 32, batch_size = 32, shuffle = True):
+    def __init__(self, dim_x=32, dim_y=32, dim_z=32, batch_size=32, shuffle=True):
         import keras
 
         'Initialization'
@@ -23,11 +23,11 @@ class DataGenerator(object):
         # Find exploration order
         indexes = np.arange(len(list_IDs))
         if self.shuffle == True:
-          np.random.shuffle(indexes)
+            np.random.shuffle(indexes)
         return indexes
 
     # def __data_generation(self, labels, list_IDs_temp):
-    #     'Generates data of batch_size samples' 
+    #     'Generates data of batch_size samples'
     #     # X : (n_samples, v_size, v_size, v_size, n_channels)
     #     # Initialization
     #     X = np.empty((self.batch_size, self.dim_x, self.dim_y, self.dim_z, 1))
@@ -51,14 +51,14 @@ class DataGenerator(object):
         # load the ylabeled data
         ylabels = metadata['ylabels']
         invert_y = 1 - ylabels
-        y = np.concatenate((ylabels, invert_y),axis=1)
+        y = np.concatenate((ylabels, invert_y), axis=1)
 
         # images = normalizeimages(images) # normalize the images for each frequency band
         # assert the shape of the images
         assert images.shape[2] == images.shape[3]
         assert images.shape[2] == self.dim_x
         assert images.shape[1] == self.dim_z
-        images = images.swapaxes(1,3)
+        images = images.swapaxes(1, 3)
         X = images.astype("float32")
         return X, y
 
@@ -97,8 +97,9 @@ class DataGenerator(object):
                 imax = int(len(y)/self.batch_size)
                 data_indices = self.__get_exploration_order(range(len(y)))
                 for j in range(imax):
-                    # Find list of indices through the data 
-                    indices = data_indices[j*self.batch_size:(j+1)*self.batch_size]
+                    # Find list of indices through the data
+                    indices = data_indices[j *
+                                           self.batch_size:(j+1)*self.batch_size]
 
                     batchX = X[indices, ...]
                     batchy = y[indices]
@@ -134,6 +135,7 @@ class DataGenerator(object):
                               'been fit on any training data. Fit it '
                               'first by calling `.fit(numpy_data)`.')
         return x
+
     def fit(self, x,
             augment=False,
             rounds=1,
@@ -159,7 +161,8 @@ class DataGenerator(object):
 
         x = np.copy(x)
         if augment:
-            ax = np.zeros(tuple([rounds * x.shape[0]] + list(x.shape)[1:]), dtype=K.floatx())
+            ax = np.zeros(tuple([rounds * x.shape[0]] +
+                                list(x.shape)[1:]), dtype=K.floatx())
             for r in range(rounds):
                 for i in range(x.shape[0]):
                     ax[i + r * x.shape[0]] = self.random_transform(x[i])
@@ -179,10 +182,12 @@ class DataGenerator(object):
             self.std = np.reshape(self.std, broadcast_shape)
             x /= (self.std + K.epsilon())
 
+
 '''
 A Suite of utility functions for preprocessing wrapped within
 a class
 '''
+
 
 class DataHandler(object):
     def __init__(self, data=None, labels=None):
@@ -207,7 +212,8 @@ class DataHandler(object):
         '''
         # get train and test indices
         trainIndices = indices[0][len(indices[1]):].astype(np.int32)
-        validIndices = indices[0][:len(indices[1])].astype(np.int32) # use part of training for validation
+        validIndices = indices[0][:len(indices[1])].astype(
+            np.int32)  # use part of training for validation
         testIndices = indices[1].astype(np.int32)
 
         # gets train, valid, test labels as int32
@@ -248,8 +254,10 @@ class DataHandler(object):
 
         dataMat = scipy.io.loadmat(data_file, mat_dtype=True)
 
-        print("Data loading complete. Shape is %r" % (dataMat['featMat'].shape,))
-        return dataMat['features'][:, :-1], dataMat['features'][:, -1] - 1   # Sequential indices
+        print("Data loading complete. Shape is %r" %
+              (dataMat['featMat'].shape,))
+        # Sequential indices
+        return dataMat['features'][:, :-1], dataMat['features'][:, -1] - 1
 
     def load_mat_locs(self, datafile: str):
         # '../Sample data/Neuroscan_locs_orig.mat'
@@ -259,7 +267,7 @@ class DataHandler(object):
     def cart2sph(self, x: float, y: float, z: float):
         '''
         Transform Cartesian coordinates to spherical
-        
+
         Paramters:
         x           (float) X coordinate
         y           (float) Y coordinate
@@ -320,17 +328,21 @@ class DataHandler(object):
             pca.fit(data)
             components = pca.components_
             variances = pca.explained_variance_ratio_
-            coeffs = np.random.normal(scale=stdMult, size=pca.n_components) * variances
+            coeffs = np.random.normal(
+                scale=stdMult, size=pca.n_components) * variances
             for s, sample in enumerate(data):
-                augData[s, :] = sample + (components * coeffs.reshape((n_components, -1))).sum(axis=0)
+                augData[s, :] = sample + \
+                    (components * coeffs.reshape((n_components, -1))).sum(axis=0)
         else:
             # Add Gaussian noise with std determined by weighted std of each feature
             for f, feat in enumerate(data.transpose()):
-                augData[:, f] = feat + np.random.normal(scale=stdMult*np.std(feat), size=feat.size)
+                augData[:, f] = feat + \
+                    np.random.normal(
+                        scale=stdMult*np.std(feat), size=feat.size)
         return augData
 
-    def gen_images(self, locs: np.ndarray, feature_tensor: np.ndarray, n_gridpoints: int=32, normalize: bool=True, 
-                augment: bool=False, pca: bool=False, std_mult: float=0.1, n_components: int=2, edgeless: bool=False):
+    def gen_images(self, locs: np.ndarray, feature_tensor: np.ndarray, n_gridpoints: int=32, normalize: bool=True,
+                   augment: bool=False, pca: bool=False, std_mult: float=0.1, n_components: int=2, edgeless: bool=False):
         '''
         Generates EEG images given electrode locations in 2D space and multiple feature values for each electrode
 
@@ -360,63 +372,67 @@ class DataHandler(object):
         numcontacts = feature_tensor.shape[0]     # Number of electrodes
         n_colors = feature_tensor.shape[1]
         # n_colors = 4
-        numsamples = feature_tensor.shape[2]    
+        numsamples = feature_tensor.shape[2]
 
         # Interpolate the values into a grid of x/y coords
         grid_x, grid_y = np.mgrid[min(locs[:, 0]):max(locs[:, 0]):n_gridpoints*1j,
-                                 min(locs[:, 1]):max(locs[:, 1]):n_gridpoints*1j]
+                                  min(locs[:, 1]):max(locs[:, 1]):n_gridpoints*1j]
 
         # loop through each color
         for c in range(n_colors):
             # build feature array from [ncontacts, 1 freq band, nsamples] squeezed and swapped axes
-            feat_array_temp.append(feature_tensor[:,c,:].squeeze().swapaxes(0,1))
-            
+            feat_array_temp.append(
+                feature_tensor[:, c, :].squeeze().swapaxes(0, 1))
+
             if c == 0:
                 print(feat_array_temp[0].shape)
-            
-            if augment: # add data augmentation -> either pca or not
-                feat_array_temp[c] = self.augment_EEG(feat_array_temp[c], std_mult, pca=pca, n_components=n_components)
 
-            # build temporary interpolator matrix    
-            temp_interp.append(np.zeros([numsamples, n_gridpoints, n_gridpoints]))
+            if augment:  # add data augmentation -> either pca or not
+                feat_array_temp[c] = self.augment_EEG(
+                    feat_array_temp[c], std_mult, pca=pca, n_components=n_components)
+
+            # build temporary interpolator matrix
+            temp_interp.append(
+                np.zeros([numsamples, n_gridpoints, n_gridpoints]))
         # Generate edgeless images -> add 4 locations (minx,miny),...,(maxx,maxy)
         if edgeless:
             min_x, min_y = np.min(locs, axis=0)
             max_x, max_y = np.max(locs, axis=0)
-            locs = np.append(locs, np.array([[min_x, min_y], 
+            locs = np.append(locs, np.array([[min_x, min_y],
                                              [min_x, max_y],
                                              [max_x, min_y],
                                              [max_x, max_y]]), axis=0)
             for c in range(n_colors):
-                feat_array_temp[c] = np.append(feat_array_temp[c], np.zeros((numsamples, 4)), axis=1)
+                feat_array_temp[c] = np.append(
+                    feat_array_temp[c], np.zeros((numsamples, 4)), axis=1)
 
        # Interpolating for all samples across all features
         for i in range(numsamples):
             for c in range(n_colors):
-                temp_interp[c][i, :, :] = griddata(points=locs, 
-                                            values=feat_array_temp[c][i, :], 
-                                            xi=(grid_x, grid_y),
-                                            method='cubic', 
-                                            fill_value=np.nan)
+                temp_interp[c][i, :, :] = griddata(points=locs,
+                                                   values=feat_array_temp[c][i, :],
+                                                   xi=(grid_x, grid_y),
+                                                   method='cubic',
+                                                   fill_value=np.nan)
             print('Interpolating {0}/{1}\r'.format(i+1, numsamples), end='\r')
 
         # Normalize every color (freq band) range of values
         for c in range(n_colors):
             if normalize:
-                temp_interp[c][~np.isnan(temp_interp[c])] = scale(X = temp_interp[c][~np.isnan(temp_interp[c])])
+                temp_interp[c][~np.isnan(temp_interp[c])] = scale(
+                    X=temp_interp[c][~np.isnan(temp_interp[c])])
             # convert all nans to 0
             temp_interp[c] = np.nan_to_num(temp_interp[c])
 
         # swap axes to have [samples, colors, W, H]
-        return np.swapaxes(np.asarray(temp_interp), 0, 1)     
+        return np.swapaxes(np.asarray(temp_interp), 0, 1)
 
-
-    def gen_images3d(self, locs: np.ndarray, 
-                     feature_tensor: np.ndarray, 
-                     n_gridpoints: int=32, 
-                     normalize: bool=True, 
-                     augment: bool=False, 
-                     std_mult: float=0.1, 
+    def gen_images3d(self, locs: np.ndarray,
+                     feature_tensor: np.ndarray,
+                     n_gridpoints: int=32,
+                     normalize: bool=True,
+                     augment: bool=False,
+                     std_mult: float=0.1,
                      edgeless: bool=False):
         '''
         Generates EEG images given electrode locations in 2D space and multiple feature values for each electrode
@@ -445,89 +461,98 @@ class DataHandler(object):
         numcontacts, n_colors, numsamples = feature_tensor.shape     # Number of electrodes
 
         # Interpolate the values into a grid of x/y coords
-        grid_x, grid_y, grid_z = np.mgrid[min(locs[:, 0]):max(locs[:, 0]):n_gridpoints*1j, # x
-                                          min(locs[:, 1]):max(locs[:, 1]):n_gridpoints*1j, # y
-                                          min(locs[:, 2]):max(locs[:, 2]):n_gridpoints*1j, # z
-                                         ]
+        grid_x, grid_y, grid_z = np.mgrid[min(locs[:, 0]):max(locs[:, 0]):n_gridpoints*1j,  # x
+                                          # y
+                                          min(locs[:, 1]):max(locs[:, 1]):n_gridpoints*1j,
+                                          # z
+                                          min(locs[:, 2]):max(locs[:, 2]):n_gridpoints*1j,
+                                          ]
 
         # loop through each color
         for c in range(n_colors):
             # build feature array from [ncontacts, 1 freq band, nsamples] squeezed and swapped axes
-            feat_array_temp.append(feature_tensor[:,c,:].squeeze().swapaxes(0,1))
+            feat_array_temp.append(
+                feature_tensor[:, c, :].squeeze().swapaxes(0, 1))
 
             if c == 0:
                 print(feat_array_temp[0].shape)
 
-            if augment: # add data augmentation -> either pca or not
-                feat_array_temp[c] = self.augment_EEG(feat_array_temp[c], std_mult, n_components=n_components)
+            if augment:  # add data augmentation -> either pca or not
+                feat_array_temp[c] = self.augment_EEG(
+                    feat_array_temp[c], std_mult, n_components=n_components)
 
-            # build temporary interpolator matrix    
-            temp_interp.append(np.zeros([numsamples, n_gridpoints, n_gridpoints, n_gridpoints]))
+            # build temporary interpolator matrix
+            temp_interp.append(
+                np.zeros([numsamples, n_gridpoints, n_gridpoints, n_gridpoints]))
         # Generate edgeless images -> add 4 locations (minx,miny),...,(maxx,maxy)
         if edgeless:
             min_x, min_y, min_z = np.min(locs, axis=0)
             max_x, max_y, max_z = np.max(locs, axis=0)
-            locs = np.append(locs, np.array([[min_x, min_y, min_z], 
+            locs = np.append(locs, np.array([[min_x, min_y, min_z],
                                              [min_x, max_y, min_z],
                                              [max_x, min_y, min_z],
                                              [max_x, max_y, min_z],
-                                             [min_x, min_y, max_z], 
+                                             [min_x, min_y, max_z],
                                              [min_x, max_y, max_z],
                                              [max_x, min_y, max_z],
                                              [max_x, max_y, max_z]]), axis=0)
             for c in range(n_colors):
-                feat_array_temp[c] = np.append(feat_array_temp[c], np.zeros((numsamples, 4)), axis=1)
+                feat_array_temp[c] = np.append(
+                    feat_array_temp[c], np.zeros((numsamples, 4)), axis=1)
 
        # Interpolating for all samples across all features
         for i in range(numsamples):
             for c in range(n_colors):
-                temp_interp[c][i, :, :, :] = griddata(points=locs, 
-                                            values=feat_array_temp[c][i, :], 
-                                            xi=(grid_x, grid_y, grid_z),
-                                            method='linear', 
-                                            fill_value=np.nan)
+                temp_interp[c][i, :, :, :] = griddata(points=locs,
+                                                      values=feat_array_temp[c][i, :],
+                                                      xi=(grid_x, grid_y,
+                                                          grid_z),
+                                                      method='linear',
+                                                      fill_value=np.nan)
             print('Interpolating {0}/{1}\r'.format(i+1, numsamples), end='\r')
 
         # Normalize every color (freq band) range of values
         for c in range(n_colors):
             if normalize:
-                temp_interp[c][~np.isnan(temp_interp[c])] = scale(X = temp_interp[c][~np.isnan(temp_interp[c])])
+                temp_interp[c][~np.isnan(temp_interp[c])] = scale(
+                    X=temp_interp[c][~np.isnan(temp_interp[c])])
             # convert all nans to 0
             temp_interp[c] = np.nan_to_num(temp_interp[c])
 
         # swap axes to have [samples, colors, W, H]
-        return np.swapaxes(np.asarray(temp_interp), 0, 1)  
+        return np.swapaxes(np.asarray(temp_interp), 0, 1)
 
     def computelabels(self, seizonsets, seizoffsets, timepoints):
         if not isinstance(seizonsets, list) and not isinstance(seizonsets, np.ndarray):
             seizonsets = np.array([seizonsets])
         if not isinstance(seizoffsets, list) and not isinstance(seizoffsets, np.ndarray):
-            seizoffsets = np.array([seizoffsets])    
+            seizoffsets = np.array([seizoffsets])
 
-        ylabels = np.zeros((timepoints.shape[0],1))
+        ylabels = np.zeros((timepoints.shape[0], 1))
 
         if len(seizonsets) == 0 or seizonsets[0] == np.nan:
             print('no seizure times in <computelabels>!')
             return -1
         if len(seizoffsets) == 0:
             # Determine the starting window point of the seiztimes
-            start_position = np.where(timepoints[:,1]>seizonsets[0])[0][0]
+            start_position = np.where(timepoints[:, 1] > seizonsets[0])[0][0]
             ylabels[start_position:] = 1
             return ylabels
 
         for idx in range(len(seizoffsets)):
             # Determine the starting window point of the seiztimes
-            start_position = np.where(timepoints[:,1]>seizonsets[idx])[0][0]
-            
+            start_position = np.where(timepoints[:, 1] > seizonsets[idx])[0][0]
+
             # Determine the starting window point of the seiztimes
-            end_position = np.where(timepoints[:,1]>seizoffsets[idx])[0][0]
+            end_position = np.where(timepoints[:, 1] > seizoffsets[idx])[0][0]
 
             # print(start_position, end_position)
             ylabels[start_position:end_position] = 1
 
         if len(seizonsets) > idx + 1:
             # Determine the starting window point of the seiztimes
-            start_position = np.where(timepoints[:,1]>seizonsets[idx+1])[0][0]
+            start_position = np.where(
+                timepoints[:, 1] > seizonsets[idx+1])[0][0]
             ylabels[start_position:] = 1
 
         return ylabels

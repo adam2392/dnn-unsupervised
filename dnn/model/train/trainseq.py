@@ -1,4 +1,4 @@
-from .basetrain import BaseTrain 
+from .basetrain import BaseTrain
 import numpy as np
 import os
 
@@ -27,9 +27,11 @@ from sklearn.metrics import precision_score, \
 # for smart splitting of lists
 import pprint
 
+
 def path_leaf(path):
     head, tail = ntpath.split(path)
     return tail or ntpath.basename(head)
+
 
 def windowed(seq, n, fillvalue=None, step=1):
     """Return a sliding window of width *n* over the given iterable.
@@ -82,6 +84,7 @@ def windowed(seq, n, fillvalue=None, step=1):
             append(fillvalue)
         yield tuple(window)
 
+
 class TestCallback(Callback):
     def __init__(self):
         # self.test_data = test_data
@@ -106,8 +109,10 @@ class TestCallback(Callback):
         print('F1 score:', f1_score(ytrue, predicted))
         print('Recall:', recall_score(ytrue, predicted))
         print('Precision:', precision_score(ytrue, predicted))
-        print('\n clasification report:\n', classification_report(ytrue, predicted))
-        print('\n confusion matrix:\n',confusion_matrix(ytrue, predicted))
+        print('\n clasification report:\n',
+              classification_report(ytrue, predicted))
+        print('\n confusion matrix:\n', confusion_matrix(ytrue, predicted))
+
 
 def preprocess_imgwithnoise(image_tensor):
     # preprocessing_function: function that will be implied on each input.
@@ -116,22 +121,24 @@ def preprocess_imgwithnoise(image_tensor):
     #         one image (Numpy tensor with rank 3),
     #         and should output a Numpy tensor with the same shape.
     assert image_tensor.shape[0] == image_tensor.shape[1]
-    stdmult=0.1
+    stdmult = 0.1
     imsize = image_tensor.shape[0]
     numchans = image_tensor.shape[2]
     for i in range(numchans):
-        feat = image_tensor[...,i]
-        image_tensor[...,i] = image_tensor[...,i] + np.random.normal(scale=stdmult*np.std(feat), size=feat.size).reshape(imsize,imsize)
+        feat = image_tensor[..., i]
+        image_tensor[..., i] = image_tensor[..., i] + np.random.normal(
+            scale=stdmult*np.std(feat), size=feat.size).reshape(imsize, imsize)
     return image_tensor
+
 
 class TrainSeq(BaseTrain):
     def __init__(self, dnnmodel, batch_size, numtimesteps, NUM_EPOCHS, AUGMENT):
         self.dnnmodel = dnnmodel                # the dnn model we will use to train
         self.batch_size = batch_size            # the batch size per training epoch
-        self.numtimesteps = numtimesteps        # the number of time steps in our sequence data
+        # the number of time steps in our sequence data
+        self.numtimesteps = numtimesteps
         self.NUM_EPOCHS = NUM_EPOCHS            # epochs to train on
         self.AUGMENT = AUGMENT                  # augment data or not?
-
 
         self.imsize = None
         self.numchans = None
@@ -147,8 +154,10 @@ class TrainSeq(BaseTrain):
 
     def saveoutput(self, modelname, outputdatadir):
         modeljsonfile = os.path.join(outputdatadir, modelname + "_model.json")
-        historyfile = os.path.join(outputdatadir,  modelname + '_history'+ '.pkl')
-        finalweightsfile = os.path.join(outputdatadir, modelname + '_final_weights' + '.h5')
+        historyfile = os.path.join(
+            outputdatadir,  modelname + '_history' + '.pkl')
+        finalweightsfile = os.path.join(
+            outputdatadir, modelname + '_final_weights' + '.h5')
 
         # save model
         if not os.path.exists(modeljsonfile):
@@ -180,30 +189,32 @@ class TrainSeq(BaseTrain):
         print('F1 score:', f1_score(ytrue, y_pred))
         print('Recall:', recall_score(ytrue, y_pred))
         print('Precision:', precision_score(ytrue, y_pred))
-        print('\n clasification report:\n', classification_report(ytrue, y_pred))
-        print('\n confusion matrix:\n',confusion_matrix(ytrue, y_pred))
+        print('\n clasification report:\n',
+              classification_report(ytrue, y_pred))
+        print('\n confusion matrix:\n', confusion_matrix(ytrue, y_pred))
 
     def configure(self, tempdatadir):
         # initialize loss function, SGD optimizer and metrics
         loss = 'binary_crossentropy'
-        optimizer = RMSprop(lr=1e-4, 
-                        rho=0.9, 
-                        epsilon=1e-08,
-                        decay=0.0)
+        optimizer = RMSprop(lr=1e-4,
+                            rho=0.9,
+                            epsilon=1e-08,
+                            decay=0.0)
         metrics = ['accuracy']
-        self.modelconfig = self.dnnmodel.compile(loss=loss, 
-                                                optimizer=optimizer,
-                                                metrics=metrics)
+        self.modelconfig = self.dnnmodel.compile(loss=loss,
+                                                 optimizer=optimizer,
+                                                 metrics=metrics)
 
-        tempfilepath = os.path.join(tempdatadir,"weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5")
+        tempfilepath = os.path.join(
+            tempdatadir, "weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5")
         # callbacks availabble
-        checkpoint = ModelCheckpoint(tempfilepath, 
-                                    monitor='val_acc', 
-                                    verbose=1, 
-                                    save_best_only=True, 
-                                    mode='max')
+        checkpoint = ModelCheckpoint(tempfilepath,
+                                     monitor='val_acc',
+                                     verbose=1,
+                                     save_best_only=True,
+                                     mode='max')
         reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5,
-                              patience=10, min_lr=1e-8)
+                                      patience=10, min_lr=1e-8)
         testcheck = TestCallback()
         self.callbacks = [checkpoint, reduce_lr, testcheck]
 
@@ -227,7 +238,7 @@ class TrainSeq(BaseTrain):
         To Do Formatting:
         1. Stateful training: this means that each training depends on the previous.
             Can try batch_size == 1, if so, or not...
-            
+
             However, training samples need to be in order for lstm to make sense of data
             from previous training.... -> train per patient
         2. Many to many: Each Sequence of LSTM predicts all the windows as "seizure or not"
@@ -237,41 +248,41 @@ class TrainSeq(BaseTrain):
 
         '''
         numsamps, imsize, _, numchans = seqofimgs.shape
-        assert seqofimgs.ndim == 4 # (samples, imsize, imsize, channel)
+        assert seqofimgs.ndim == 4  # (samples, imsize, imsize, channel)
         assert imsize == self.imsize
         assert numchans == self.numchans
 
         # what is our desired shape for the sequence data
-        desired_shape = (self.numtimesteps, self.imsize, self.imsize, self.numchans)
+        desired_shape = (self.numtimesteps, self.imsize,
+                         self.imsize, self.numchans)
         img_shape = (self.imsize, self.imsize, self.numchans)
 
         formatted_X = []
         formatted_Y = []
 
         # Option 1: use numpy array split to split along the channels
-        # formatted_X = list(mit.windowed(seqofimgs, 
-        #                                 n=self.numtimesteps, 
+        # formatted_X = list(mit.windowed(seqofimgs,
+        #                                 n=self.numtimesteps,
         #                                 step=self.numtimesteps//2))
-        # formatted_Y = list(mit.windowed(seqoflabbels, 
-        #                                 n=self.numtimesteps, 
+        # formatted_Y = list(mit.windowed(seqoflabbels,
+        #                                 n=self.numtimesteps,
         #                                 step=self.numtimesteps//2))
-        formatted_X = list(windowed(seqofimgs, 
-                                        n=self.numtimesteps, 
-                                        step=self.numtimesteps//2))
-        formatted_Y = list(windowed(seqoflabbels, 
-                                        n=self.numtimesteps, 
-                                        step=self.numtimesteps//2))
-
-
-
+        formatted_X = list(windowed(seqofimgs,
+                                    n=self.numtimesteps,
+                                    step=self.numtimesteps//2))
+        formatted_Y = list(windowed(seqoflabbels,
+                                    n=self.numtimesteps,
+                                    step=self.numtimesteps//2))
 
         # use list comprehension to supposedly get the same answer
         size = self.numtimesteps
-        step = self.numtimesteps //2
-        formatted_X = [seqofimgs[i : i + size, ...] for i in range(0, numsamps, step)]
-        formatted_Y = [seqoflabels[i : i + size, ...] for i in range(0, numsamps, step)]
+        step = self.numtimesteps // 2
+        formatted_X = [seqofimgs[i: i + size, ...]
+                       for i in range(0, numsamps, step)]
+        formatted_Y = [seqoflabels[i: i + size, ...]
+                       for i in range(0, numsamps, step)]
 
-        # Option 2: randomly choose index 
+        # Option 2: randomly choose index
         randind = np.random.choice(numsamps)
         part_data = seqofimgs[randind:randind+self.numtimesteps, ...]
         part_y = seqoflabbels[randind:randind+self.numtimesteps]
@@ -312,12 +323,12 @@ class TrainSeq(BaseTrain):
                 if any(pat in file for pat in listofpats):
                     self.filepaths.append(os.path.join(root, file))
                 else:
-                    self.testfilepaths.append(os.path.join(root,file))
+                    self.testfilepaths.append(os.path.join(root, file))
         self.samples = len(self.filepaths)
 
     def compute_classweights(self):
         '''     LOAD TRAINING DATA -> COMPUTE CLASS WEIGHTS     '''
-        for idx, datafile in enumerate(self.filepaths):                    
+        for idx, datafile in enumerate(self.filepaths):
             imagedata = np.load(datafile)
             metadata = imagedata['metadata'].item()
             if idx == 0:
@@ -327,11 +338,12 @@ class TrainSeq(BaseTrain):
 
         # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
         invert_y = 1 - ylabels
-        ylabels = np.concatenate((invert_y, ylabels),axis=1)  
-        # format the data correctly 
-        class_weight = sklearn.utils.compute_class_weight('balanced', 
-                                                 np.unique(ylabels).astype(int),
-                                                 np.argmax(ylabels, axis=1))
+        ylabels = np.concatenate((invert_y, ylabels), axis=1)
+        # format the data correctly
+        class_weight = sklearn.utils.compute_class_weight('balanced',
+                                                          np.unique(
+                                                              ylabels).astype(int),
+                                                          np.argmax(ylabels, axis=1))
         self.class_weight = class_weight
 
     # load test data
@@ -354,7 +366,7 @@ class TrainSeq(BaseTrain):
 
         print('Using real-time data augmentation.')
         HH = dnnmodel.fit_generator(self.generator.flow_from_directory(batch_size=self.batch_size,
-                                    num_timesteps=numtimesteps),
+                                                                       num_timesteps=numtimesteps),
                                     # steps_per_epoch=X_train.shape[0] // self.batch_size,
                                     steps_per_epoch=100 // self.batch_size,
                                     epochs=self.NUM_EPOCHS,
@@ -368,20 +380,20 @@ class TrainSeq(BaseTrain):
     def loadgenerator(self):
         # This will do preprocessing and realtime data augmentation:
         self.generator = imagegen = genseqfromfile.DataDirGenerator(
-                                featurewise_center=False,  # set input mean to 0 over the dataset
-                                samplewise_center=True,  # set each sample mean to 0
-                                featurewise_std_normalization=False,  # divide inputs by std of the dataset
-                                samplewise_std_normalization=True,  # divide each input by its std
-                                rotation_range=5,         # randomly rotate images in the range (degrees, 0 to 180)
-                                width_shift_range=0.02,    # randomly shift images horizontally (fraction of total width)
-                                height_shift_range=0.02,   # randomly shift images vertically (fraction of total height)
-                                horizontal_flip=False,    # randomly flip images
-                                vertical_flip=False,      # randomly flip images
-                                shear_range=0.,
-                                zoom_range=0.,
-                                channel_shift_range=4.,
-                                fill_mode='nearest',
-                                preprocessing_function=preprocess_imgwithnoise) 
-
-
-
+            featurewise_center=False,  # set input mean to 0 over the dataset
+            samplewise_center=True,  # set each sample mean to 0
+            featurewise_std_normalization=False,  # divide inputs by std of the dataset
+            samplewise_std_normalization=True,  # divide each input by its std
+            # randomly rotate images in the range (degrees, 0 to 180)
+            rotation_range=5,
+            # randomly shift images horizontally (fraction of total width)
+            width_shift_range=0.02,
+            # randomly shift images vertically (fraction of total height)
+            height_shift_range=0.02,
+            horizontal_flip=False,    # randomly flip images
+            vertical_flip=False,      # randomly flip images
+            shear_range=0.,
+            zoom_range=0.,
+            channel_shift_range=4.,
+            fill_mode='nearest',
+            preprocessing_function=preprocess_imgwithnoise)

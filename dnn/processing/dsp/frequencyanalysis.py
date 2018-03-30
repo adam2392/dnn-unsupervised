@@ -2,7 +2,7 @@ import numpy as np
 import scipy
 import spectrum
 from .helper import *
-from .basefreqmodel import BaseFreqModel 
+from .basefreqmodel import BaseFreqModel
 import math
 
 '''
@@ -11,8 +11,11 @@ then we need to adapt the buffer function in fftchan.
 
 Needs to slice through data correctly
 '''
-def next_greater_power_of_2(x):  
+
+
+def next_greater_power_of_2(x):
     return 2**(x - 1).bit_length() if x != 0 else 1
+
 
 class MultiTaperFFT(BaseFreqModel):
     def __init__(self, winsizems, stepsizems, samplerate, timewidth, method=None):
@@ -20,11 +23,12 @@ class MultiTaperFFT(BaseFreqModel):
 
         # multitaper FFT using welch's method
         self.timewidth = timewidth
-        # possible values of method are 'eigen', 'hann', 
+        # possible values of method are 'eigen', 'hann',
         if not method:
             self.method = 'eigen'
             print('Default method of tapering is eigen')
-        self.freqsfft = np.linspace(0, self.samplerate//2, (self.winsize*self.samplerate/1000)//2+1)
+        self.freqsfft = np.linspace(
+            0, self.samplerate//2, (self.winsize*self.samplerate/1000)//2+1)
 
     def loadrawdata(self, rawdata):
         assert rawdata.shape[0] < rawdata.shape[1]
@@ -46,9 +50,11 @@ class MultiTaperFFT(BaseFreqModel):
         eegwin = self.buffer(datawin, numsamps, overlapsamps, opt='nodelay')
         detrendedeeg = scipy.signal.detrend(eegwin, axis=0)
         # need to adapt to repmat of matlab
-        eegwin = np.repeat(detrendedeeg[:,:,np.newaxis], repeats=numtapers, axis=2)
+        eegwin = np.repeat(
+            detrendedeeg[:, :, np.newaxis], repeats=numtapers, axis=2)
         windows = eegwin.shape[1]
-        wpermuted = np.transpose(np.repeat(w[:,:,np.newaxis], axis=2, repeats=windows), [0, 2, 1])
+        wpermuted = np.transpose(
+            np.repeat(w[:, :, np.newaxis], axis=2, repeats=windows), [0, 2, 1])
 
         print(eegwin.shape)
         # get coefficients, power and phases
@@ -56,25 +62,26 @@ class MultiTaperFFT(BaseFreqModel):
 
         print(fx.shape)
         # only get the frequencies we weant
-        fx = fx[0:len(self.freqsfft),:,:] / np.sqrt(numsamps)
+        fx = fx[0:len(self.freqsfft), :, :] / np.sqrt(numsamps)
 
         # freq/window/taper to get the power
-        fxpow = np.multiply(fx,np.conj(fx))
-        fxpow = np.concatenate((fxpow[0,:,:][np.newaxis,:,:], 
-                                2*fxpow[1:int(numsamps/2),:,:], 
-                                fxpow[-1, :, :][np.newaxis,:,:]), 
+        fxpow = np.multiply(fx, np.conj(fx))
+        fxpow = np.concatenate((fxpow[0, :, :][np.newaxis, :, :],
+                                2*fxpow[1:int(numsamps/2), :, :],
+                                fxpow[-1, :, :][np.newaxis, :, :]),
                                axis=0)
         fxphase = np.angle(fxpow)
         # assert 1==0
         # average over tapers, weighted by eigenvalues
         timefreqmat = np.mean(fxpow*vweights, axis=2)
-        
+
         return timefreqmat, fxphase
+
     def mtwelch(self):
         # get dimensions of raw data
         numchans, numeegsamps = self.rawdata.shape
 
-        ###### could BE A BUG FROM HARD CODING
+        # could BE A BUG FROM HARD CODING
         # get num samples for each FFT window and the freqs to get fft at
         numsamps = int(self.winsamps)
         overlapsamps = int(self.stepsamps)
@@ -91,11 +98,12 @@ class MultiTaperFFT(BaseFreqModel):
         # get discrete tapering windows
         w, eigens = dpss_windows(numsamps, self.timewidth, numtapers)
         # get the weighted eigenvalues
-        vweights = np.ones((1,1,len(eigens)))
-        vweights[0,0,:] = eigens / np.sum(eigens)
-        w = w.T # transpose to make Freq X tapers
+        vweights = np.ones((1, 1, len(eigens)))
+        vweights[0, 0, :] = eigens / np.sum(eigens)
+        w = w.T  # transpose to make Freq X tapers
 
-        powermultitaper = np.zeros((numchans, len(self.freqsfft), numwins), dtype=complex)
+        powermultitaper = np.zeros(
+            (numchans, len(self.freqsfft), numwins), dtype=complex)
         phasemultitaper = np.zeros((numchans, len(self.freqsfft), numwins))
 
         # print(numsamps)
@@ -105,20 +113,21 @@ class MultiTaperFFT(BaseFreqModel):
         # print(vweights.shape)
         # print(numtapers)
         for ichan in range(0, numchans):
-            eegwin = self.rawdata[ichan,:]
+            eegwin = self.rawdata[ichan, :]
             timefreqmat, fxphase = self.fftchan(eegwin, numsamps, overlapsamps,
-                                                 numtapers, w, vweights)
+                                                numtapers, w, vweights)
             # average over windows and scale amplitude
-            timefreqmat = timefreqmat * taperpownorm **2
+            timefreqmat = timefreqmat * taperpownorm ** 2
             # save time freq data
             powermultitaper[ichan, :, :] = timefreqmat
             # save phase data - only of first taper -> can test complex average
-            phasemultitaper[ichan, :, :] = fxphase[:,:,0]
+            phasemultitaper[ichan, :, :] = fxphase[:, :, 0]
 
             return timefreqmat
         # make it log based power
         powermultitaper = np.log10(powermultitaper)
         return powermultitaper, self.freqsfft, self.timepoints, phasemultitaper
+
 
 class MorletWavelet(BaseFreqModel):
     def __init__(self, winsizems, stepsizems, samplerate, waveletfreqs, waveletwidth):
@@ -130,18 +139,18 @@ class MorletWavelet(BaseFreqModel):
         assert rawdata.shape[0] < rawdata.shape[1]
         numchans = rawdata.shape[0]
         # buffer region of 1 second (milliseconds)
-        self.bufferms = 1000 * self.samplerate/1000; 
+        self.bufferms = 1000 * self.samplerate/1000
         rawdata = np.concatenate((np.zeros((numchans, self.bufferms)),
-                                    rawdata,
-                                    np.zeros((numchans,self.bufferms))), axis=1)
+                                  rawdata,
+                                  np.zeros((numchans, self.bufferms))), axis=1)
         numsignals = rawdata.shape[1]
         self.compute_samplepoints(numsignals)
         self.compute_timepoints(numsignals)
         self.rawdata = rawdata
         print("Loaded raw data in Morlet Transform!")
-    
+
     def multiphasevec(self):
-        # implement the multiphase vec 
+        # implement the multiphase vec
         nfreqs = len(self.waveletfreqs)
         nChans = self.rawdata.shape[0]
         nSamples = self.rawdata.shape[1]
@@ -158,26 +167,27 @@ class MorletWavelet(BaseFreqModel):
         currwaves = []
         lencurrwaves = []
         # get the morlet's wavelet for each frequency
-        currwave_fun = lambda i: self.morlet(self.waveletfreqs[i], 
-                                np.arange(-3.5*st[i], 3.5*st[i], dt))
+
+        def currwave_fun(i): return self.morlet(self.waveletfreqs[i],
+                                                np.arange(-3.5*st[i], 3.5*st[i], dt))
         for i in range(0, nfreqs):
             # get the morlet wave, which will be uneven lengths
             currwave = currwave_fun(i)
             currwaves.append(currwave)
             lencurrwaves.append(len(currwave))
         lencurrwaves = np.array(lencurrwaves)
-        
+
         # length of convolution of S and curwaves[i]
         lys = nSamples + lencurrwaves - 1
-        lys2 = np.zeros((len(lys),1))
+        lys2 = np.zeros((len(lys), 1))
         for i in range(0, len(lys)):
             lys2[i] = math.pow(2, spectrum.tools.nextpow2(lys[i]))
 
         # start index of signal after convolution and keep as int
         ind1 = np.ceil(lencurrwaves/2).astype(int)
-        
+
         # loop through and compute morlet transform for each frequency
-        for idx,ly2 in enumerate(lys2):
+        for idx, ly2 in enumerate(lys2):
             # convert to int, and get curwave
             ly2 = int(ly2.ravel())
             currwave = currwaves[idx]
@@ -191,13 +201,13 @@ class MorletWavelet(BaseFreqModel):
 
             # get the correct y slices and get phase and power
             ''' CHECK INDICES? ARE THEY CORRECT FROM MATLAB -> PYTHON '''
-            y1 = y1[:, ind1[idx]-1 : (ind1[idx]+nSamples-1)]
+            y1 = y1[:, ind1[idx]-1: (ind1[idx]+nSamples-1)]
             power[:, idx, :] = np.abs(y1**2)
             phase[:, idx, :] = np.angle(y1)
         # make it log based power
         power = np.log10(power)
-        power   = power[:,:,self.bufferms:-self.bufferms]
-        phase = phase[:,:,self.bufferms:-self.bufferms]
+        power = power[:, :, self.bufferms:-self.bufferms]
+        phase = phase[:, :, self.bufferms:-self.bufferms]
         return power, phase
 
     def morlet(self, freq, time):
@@ -219,6 +229,6 @@ class MorletWavelet(BaseFreqModel):
         sf = freq / self.waveletwidth
         st = 1 / (2 * np.pi * sf)
         A = 1 / np.sqrt(st * np.sqrt(np.pi))
-        y = A * np.multiply(np.exp(-time ** 2 / (2*st**2)), 
-                        np.exp(1j*2*np.pi*freq*time))
+        y = A * np.multiply(np.exp(-time ** 2 / (2*st**2)),
+                            np.exp(1j*2*np.pi*freq*time))
         return y

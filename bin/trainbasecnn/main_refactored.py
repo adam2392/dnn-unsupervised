@@ -21,20 +21,21 @@ from sklearn.metrics import precision_score, \
     recall_score, classification_report, \
     f1_score, roc_auc_score
 
+
 def mainmodel():
     ##################### PARAMETERS FOR NN - CREATE NN ####################
-    imsize=32               # the size of the square image
-    n_colors =4             # the #channels in convnet
-    num_classes=2           # output dimension
-    DROPOUT=True            # use DROPOUT?
+    imsize = 32               # the size of the square image
+    n_colors = 4             # the #channels in convnet
+    num_classes = 2           # output dimension
+    DROPOUT = True            # use DROPOUT?
 
-    modeldim=2              # (optional): dim of model (1,2,3)
+    modeldim = 2              # (optional): dim of model (1,2,3)
 
     # build the baseline CNN model
     cnn = iEEGCNN(imsize=imsize,
-                  n_colors=n_colors, 
-                  num_classes=num_classes, 
-                  modeldim=modeldim, 
+                  n_colors=n_colors,
+                  num_classes=num_classes,
+                  modeldim=modeldim,
                   DROPOUT=DROPOUT)
     cnn.buildmodel()
     # instantiate this current model
@@ -44,26 +45,27 @@ def mainmodel():
     print("Created VGG12 Style CNN")
     print(dnnmodel.summary())
     return dnnmodel
-    
+
+
 def maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir, patient):
     modelname = '2dcnn'
     # list of patients to train on
     listofpats_train = [
-                    'id001_ac',
-                    'id002_cj', 
-                    'id008_gc', 
-                    'id010_js', 
-                    'id011_ml', 
-                    'id012_pc', 
-                    'id013_pg'
-                    ]
+        'id001_ac',
+        'id002_cj',
+        'id008_gc',
+        'id010_js',
+        'id011_ml',
+        'id012_pc',
+        'id013_pg'
+    ]
     # listofpats_test = [
     #                 'id001_ac',
-    #                 'id002_cj', 
-    #                 'id008_gc', 
-    #                 'id010_js', 
-    #                 'id011_ml', 
-    #                 'id012_pc', 
+    #                 'id002_cj',
+    #                 'id008_gc',
+    #                 'id010_js',
+    #                 'id011_ml',
+    #                 'id012_pc',
     #                 'id013_pg'
     #                 ]
 
@@ -78,8 +80,8 @@ def maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir, p
 
     # configure, load generator and load training/testing data
     cnn_trainer.configure(tempdatadir)
-    cnn_trainer.loaddirs(traindatadir, testdatadir, 
-                        listofpats_train, listofpats_test)
+    cnn_trainer.loaddirs(traindatadir, testdatadir,
+                         listofpats_train, listofpats_test)
     cnn_trainer.loadtrainingdata()
     cnn_trainer.loadtestdata()
     cnn_trainer.train()
@@ -93,6 +95,7 @@ def maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir, p
     # get the history object as a result of training
     HH = cnn_trainer.HH
     return cnn_trainer
+
 
 def maintest(dnnmodel, cnn_trainer):
     # get the testing data to run a final summary output
@@ -113,7 +116,8 @@ def maintest(dnnmodel, cnn_trainer):
     print('Recall:', recall_score(ytrue, y_pred))
     print('Precision:', precision_score(ytrue, y_pred))
     print('\n clasification report:\n', classification_report(ytrue, y_pred))
-    print('\n confusion matrix:\n',confusion_matrix(ytrue, y_pred))
+    print('\n confusion matrix:\n', confusion_matrix(ytrue, y_pred))
+
 
 if __name__ == '__main__':
     outputdatadir = str(sys.argv[1])            # output for data dir
@@ -121,7 +125,7 @@ if __name__ == '__main__':
     traindatadir = str(sys.argv[3])             # the training data directory
     testdatadir = str(sys.argv[4])              # the test data directory
     patient = str(sys.argv[5])
-    
+
     '''
     outputdatadir = ''
     tempdatadir = ''
@@ -135,5 +139,6 @@ if __name__ == '__main__':
         os.makedirs(tempdatadir)
 
     dnnmodel = mainmodel()
-    trainer = maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir, patient)
+    trainer = maintrain(dnnmodel, outputdatadir, tempdatadir,
+                        traindatadir, testdatadir, patient)
     maintest(dnnmodel, trainer)

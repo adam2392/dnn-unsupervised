@@ -4,6 +4,7 @@ from keras.layers import TimeDistributed, Dense, Dropout, Flatten
 Base class neural network for our models that we build.
 '''
 
+
 class BaseNet(metaclass=ABCMeta):
     requiredAttributes = ['DROPOUT', 'num_classes']
     # @property
@@ -19,6 +20,7 @@ class BaseNet(metaclass=ABCMeta):
     def buildoutput(self):
         msg = "Base build model method is not implemented."
         raise NotImplementedError(msg)
+
     def buildmodel(self):
         msg = "Base build model method is not implemented."
         raise NotImplementedError(msg)
@@ -40,7 +42,8 @@ class BaseNet(metaclass=ABCMeta):
         self.output = Dense(size_fc, activation='relu')(finalmodel)
         if self.DROPOUT:
             self.output = Dropout(0.5)(self.output)
-        self.output = Dense(self.num_classes, activation='softmax')(self.output)
+        self.output = Dense(
+            self.num_classes, activation='softmax')(self.output)
         if self.DROPOUT:
             self.output = Dropout(0.5)(self.output)
 

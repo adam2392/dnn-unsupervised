@@ -1,3 +1,8 @@
+'''
+Script file for HPC for running a 1D fragnet.
+
+'''
+
 import sys
 sys.path.append('../../dnn/')
 sys.path.append('../dnn/')
@@ -7,7 +12,7 @@ import numpy as np
 # Custom Built libraries
 from model.nets.fragilityaux import CNNFragility
 from model.train import traincnnaux
-from model.train.fragaux.processdata import SplitData
+from model.train.fragaux.processdata import LabelData
 
 import keras
 # metrics for postprocessing of the results
@@ -19,12 +24,14 @@ from sklearn.metrics import precision_score, \
 
 
 def mainmodel(traindatadir, rawdatadir):
+    ##################### PARAMETERS FOR NN - CREATE NN ####################
     n_colors = 1
     num_classes = 2       # dimension of output predictions
     DROPOUT = True
-    pcsize = 40         # the size of the PCA that you perform on the rest of the fragility map
-    numwins = 500       # the dimension of time to use in windows
+    modeldim = 1              # (optional): dim of model (1,2,3)
+    imsize = 500  # use 500 windows for a fragility
 
+    # list of patients to train on
     listofpats = [
         'jh105',
         'pt1', 'pt2', 'pt3',
@@ -39,7 +46,7 @@ def mainmodel(traindatadir, rawdatadir):
     ]
 
     # 01: initialize a munger class to help format the data
-    datamunger = SplitData(pcsize, numwins, rawdatadir)  # feed in PCA size
+    datamunger = LabelData(numwins, rawdatadir)  # feed in PCA size
     # load all the data based on patients
     datamunger.loaddirofdata(traindatadir, listofpats)
     datamunger.formatdata()   #
@@ -47,75 +54,78 @@ def mainmodel(traindatadir, rawdatadir):
     datamunger.trainingscheme(scheme='rand')
 
     # 02: initialize the convolutional auxiliary network
-    cnn = CNNFragility(numwins=numwins,
-                       imsize=pcsize,
-                       n_colors=n_colors,
-                       num_classes=num_classes,
-                       DROPOUT=DROPOUT)
+    # build the baseline CNN model
+    cnn = iEEGCNN(imsize=imsize,
+                  n_colors=n_colors,
+                  num_classes=num_classes,
+                  modeldim=modeldim,
+                  DROPOUT=DROPOUT)
     cnn.buildmodel()
+    # instantiate this current model
     cnn.summaryinfo()
     dnnmodel = cnn.model
 
     # print some debugging outputs to allow user to see how model is being trained
-    print("Input of fragnet model is: ", cnn.model.input_shape)
-    print("We have %i datasets" % len(datamunger.datafilepaths))
-    print(datamunger.datafilepaths[0])
-    print(numwins)
-    print(len(datamunger.ylabels))
-    print(len(datamunger.aux_data))
-    print(len(datamunger.main_data))
+    sys.stdout.write("Input of fragnet model is: ", cnn.model.input_shape)
+    sys.stdout.write("We have %i datasets" % len(datamunger.datafilepaths))
+    sys.stdout.write(datamunger.datafilepaths[0])
+    sys.stdout.write(numwins)
+    sys.stdout.write(len(datamunger.ylabels))
+    sys.stdout.write(len(datamunger.aux_data))
+    sys.stdout.write(len(datamunger.main_data))
     return dnnmodel, datamunger
 
 
-def maintrain(dnnmodel, datamunger, outputdatadir, tempdatadir):
-    modelname = '2dfragnet'
-    NUM_EPOCHS = 100
+def maintrain(dnnmodel, datamunger, outputdatadir, tempdatadir, traindatadir, testdatadir, patient):
+    modelname = '1dcnn'
+    ##################### PARAMETERS FOR TRAINING - CREATE TRAINER ####################
+    batch_size = 32
+    NUM_EPOCHS = 300
     AUGMENT = True
-    batch_size = 16
 
-    # 03: initialize the trainer
-    trainer = traincnnaux.TrainFragAux(
-        dnnmodel, batch_size, NUM_EPOCHS, AUGMENT)
+    cnn_trainer = traincnn.TrainCNN(dnnmodel, batch_size, NUM_EPOCHS, AUGMENT)
 
     # load the data into the trainer and then begin training
     class_weight = datamunger.class_weight
     Xmain_train = datamunger.Xmain_train
-    Xaux_train = datamunger.Xaux_train
     y_train = datamunger.y_train
     Xmain_test = datamunger.Xmain_test
-    Xaux_test = datamunger.Xaux_test
     y_test = datamunger.y_test
 
-    trainer.loadformatteddata(Xmain_train, Xmain_test,
-                              Xaux_train, Xaux_test,
-                              y_train, y_test, class_weight)
-    trainer.configure(tempdatadir)
-    trainer.loadgenerator()
-    trainer.train()
+    # configure, load generator and load training/testing data
+    cnn_trainer.configure(tempdatadir)
+    # cnn_trainer.loaddirs(traindatadir, testdatadir,
+    #                      listofpats_train, listofpats_test)
+    cnn_trainer.loadtrainingdata_vars(Xmain_train, y_train)
+    cnn_trainer.loadtestdata_vars(Xmain_test, y_test)
+    cnn_trainer.train()
+
+    print(len(cnn_trainer.Xmain_train))
+    print(len(cnn_trainer.y_train))
 
     # print out summary info for the model and the training
-    trainer.summaryinfo()
+    cnn_trainer.summaryinfo()
 
     # save model, final weights and the history object
-    trainer.saveoutput(modelname=modelname, outputdatadir=outputdatadir)
+    cnn_trainer.saveoutput(modelname=modelname, outputdatadir=outputdatadir)
 
-    return trainer
-
+    # get the history object as a result of training
+    HH = cnn_trainer.HH
+    return cnn_trainer
 
 def maintest(dnnmodel, cnn_trainer):
     # get the testing data to run a final summary output
-    Xmain_test = cnn_trainer.Xmain_test
-    Xaux_test = cnn_trainer.Xaux_test
+    X_test = cnn_trainer.X_test
     y_test = cnn_trainer.y_test
 
     ##################### INPUT DATA FOR NN ####################
-    prob_predicted = dnnmodel.predict((Xmain_test, Xaux_test))
+    prob_predicted = dnnmodel.predict(X_test)
     ytrue = np.argmax(y_test, axis=1)
-    y_pred = dnnmodel.predict_classes((Xmain_test, Xaux_test))
+    y_pred = dnnmodel.predict_classes(X_test)
 
-    print(prob_predicted.shape)
-    print(ytrue.shape)
-    print(y_pred.shape)
+    sys.stdout.write(prob_predicted.shape)
+    sys.stdout.write(ytrue.shape)
+    sys.stdout.write(y_pred.shape)
     print("ROC_AUC_SCORES: ", roc_auc_score(y_test, prob_predicted))
     print('Mean accuracy score: ', accuracy_score(ytrue, y_pred))
     print('F1 score:', f1_score(ytrue, y_pred))
@@ -133,14 +143,18 @@ if __name__ == '__main__':
     tempdatadir = str(sys.argv[2])
     # the training data directory - storing fragility maps
     traindatadir = str(sys.argv[3])
-    # the datadir where the original raw data is
-    rawdatadir = str(sys.argv[4])
+    # the testing data direcotry - stores the fragility maps we want to use
+    testdatadir = str(sys.argv[4])
+    patient = str(sys.argv[5])
+
     # create the output and temporary saving directories
     if not os.path.exists(outputdatadir):
         os.makedirs(outputdatadir)
     if not os.path.exists(tempdatadir):
         os.makedirs(tempdatadir)
 
-    dnnmodel, datamunger = mainmodel(traindatadir, rawdatadir)
-    trainer = maintrain(dnnmodel, datamunger, outputdatadir, tempdatadir)
+    # create the dnn model and the data munger if necessary
+    dnnmodel = mainmodel()
+    trainer = maintrain(dnnmodel, outputdatadir, tempdatadir,
+                        traindatadir, testdatadir, patient)
     maintest(dnnmodel, trainer)

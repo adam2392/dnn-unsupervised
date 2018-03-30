@@ -10,17 +10,19 @@ can be stored.
 
 from dnn.processing.format import formatfft
 
+
 def main_formatfft(rawdatadir, metadatadir, outputdatadir):
-	formatter = formatfft.FormatFFT(rawdatadir, metadatadir, outputdatadir)
+    formatter = formatfft.FormatFFT(rawdatadir, metadatadir, outputdatadir)
 
-	# run computation to format all the data as images
-	formatter.formatdata()
+    # run computation to format all the data as images
+    formatter.formatdata()
 
-	return 1
-	
+    return 1
+
+
 if __name__ == '__main__':
-	rawdatadir = ''
-	metadatadir = ''
-	outputdatadir = ''
+    rawdatadir = ''
+    metadatadir = ''
+    outputdatadir = ''
 
-	main_formatfft(rawdatadir, metadatadir, outputdatadir)
+    main_formatfft(rawdatadir, metadatadir, outputdatadir)

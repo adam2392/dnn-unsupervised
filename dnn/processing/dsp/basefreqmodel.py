@@ -1,11 +1,13 @@
 from fragility.linearmodels.base.basemodel import BaseWindowModel
 import numpy as np
 
+
 class BaseFreqModel(BaseWindowModel):
     def __init__(self, winsizems, stepsizems, samplerate):
-        BaseWindowModel.__init__(self, winsizems=winsizems, 
-                                stepsizems=stepsizems, 
-                                samplerate=samplerate)
+        BaseWindowModel.__init__(self, winsizems=winsizems,
+                                 stepsizems=stepsizems,
+                                 samplerate=samplerate)
+
     def buffer(self, x, n, p=0, opt=None):
         '''Mimic MATLAB routine to generate buffer array
 
@@ -20,7 +22,7 @@ class BaseFreqModel(BaseWindowModel):
              to zero, while 'nodelay' begins filling the buffer immediately.
         '''
         if p >= n:
-            raise ValueError('p ({}) must be less than n ({}).'.format(p,n))
+            raise ValueError('p ({}) must be less than n ({}).'.format(p, n))
         assert isinstance(n, int)
         assert isinstance(p, int)
 
@@ -47,7 +49,7 @@ class BaseFreqModel(BaseWindowModel):
         for i in range(cols):
             # Set first column to n values from x, move to next iteration
             if i == 0 and opt == 'nodelay':
-                b[0:n,i] = x[0:n]
+                b[0:n, i] = x[0:n]
                 continue
             # set first values of row to last p values
             elif i != 0 and p != 0:
@@ -56,6 +58,6 @@ class BaseFreqModel(BaseWindowModel):
             else:
                 b[:p, i] = 0
             # Assign values to buffer array from x
-            b[p:,i] = x[p*(i+1):p*(i+2)]
+            b[p:, i] = x[p*(i+1):p*(i+2)]
 
         return b

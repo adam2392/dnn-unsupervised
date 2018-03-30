@@ -3,6 +3,7 @@ import scipy
 from scipy import interpolate
 from bisect import bisect_left
 
+
 def next_fast_len(target):
     """
     Find the next fast size of input data to `fft`, for zero-padding, etc.
@@ -77,6 +78,7 @@ def next_fast_len(target):
         match = p5
     return match
 
+
 def tridisolve(d, e, b, overwrite_b=True):
     """Symmetric tridiagonal system solver, from Golub and Van Loan p157.
     .. note:: Copied from NiTime.
@@ -117,6 +119,7 @@ def tridisolve(d, e, b, overwrite_b=True):
     if not overwrite_b:
         return x
 
+
 def tridi_inverse_iteration(d, e, w, x0=None, rtol=1e-8):
     """Perform an inverse iteration.
     This will find the eigenvector corresponding to the given eigenvalue
@@ -153,6 +156,7 @@ def tridi_inverse_iteration(d, e, w, x0=None, rtol=1e-8):
         norm_x = np.linalg.norm(x0)
         x0 /= norm_x
     return x0
+
 
 def dpss_windows(N, half_nbw, Kmax, low_bias=True, interp_from=None,
                  interp_kind='linear'):
@@ -247,7 +251,7 @@ def dpss_windows(N, half_nbw, Kmax, low_bias=True, interp_from=None,
         ab[0, 1:] = off_diag[:-1]
         # only calculate the highest Kmax eigenvalues
         w = scipy.linalg.eigvals_banded(ab, select='i',
-                                  select_range=(N - Kmax, N - 1))
+                                        select_range=(N - Kmax, N - 1))
         w = w[::-1]
 
         # find the corresponding eigenvectors via inverse iteration

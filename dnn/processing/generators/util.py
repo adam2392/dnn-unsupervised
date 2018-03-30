@@ -166,6 +166,7 @@ def transform_matrix_offset_center(matrix, x, y):
     transform_matrix = np.dot(np.dot(offset_matrix, matrix), reset_matrix)
     return transform_matrix
 
+
 def apply_transform(x,
                     transform_matrix,
                     channel_axis=0,
