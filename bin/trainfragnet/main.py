@@ -76,7 +76,7 @@ def mainmodel(traindatadir, rawdatadir):
     return dnnmodel, datamunger
 
 
-def maintrain(dnnmodel, datamunger, outputdatadir, tempdatadir, traindatadir, testdatadir, patient):
+def maintrain(dnnmodel, datamunger, outputdatadir, tempdatadir):
     modelname = '1dcnn'
     ##################### PARAMETERS FOR TRAINING - CREATE TRAINER ####################
     batch_size = 32
@@ -154,7 +154,6 @@ if __name__ == '__main__':
         os.makedirs(tempdatadir)
 
     # create the dnn model and the data munger if necessary
-    dnnmodel = mainmodel()
-    trainer = maintrain(dnnmodel, outputdatadir, tempdatadir,
-                        traindatadir, testdatadir, patient)
+    dnnmodel, datamunger = mainmodel(traindatadir, rawdatadir)
+    trainer = maintrain(dnnmodel, datamunger, outputdatadir, tempdatadir)
     maintest(dnnmodel, trainer)
