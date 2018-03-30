@@ -46,7 +46,7 @@ patient="${patient:-id001_ac}"
 tempdatadir="/scratch/users/ali39@jhu.edu/data/dnn/temp/fragnet/exp001/$patient"
 outputdatadir="/scratch/users/ali39@jhu.edu/data/dnn/output/fragnet/exp001/$patient"
 traindatadir='/scratch/users/ali39@jhu.edu/data/output/pert/'
-testdatadir='/scratch/users/ali39@jhu.edu/data/output/pert/'
+rawdatadir='/scratch/users/ali39@jhu.edu/data/converted/'
 
 # /scratch/users/ali39@jhu.edu
 printf "\nThis is the data directories: \n"

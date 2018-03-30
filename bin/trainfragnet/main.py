@@ -144,7 +144,10 @@ if __name__ == '__main__':
     # the training data directory - storing fragility maps
     traindatadir = str(sys.argv[3])
     # the testing data direcotry - stores the fragility maps we want to use
-    testdatadir = str(sys.argv[4])
+    # testdatadir = str(sys.argv[4])
+
+    # the datadir where the original raw data is
+    rawdatadir = str(sys.argv[4])
     patient = str(sys.argv[5])
 
     # create the output and temporary saving directories
