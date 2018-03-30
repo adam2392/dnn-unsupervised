@@ -68,7 +68,7 @@ def mainmodel(traindatadir, rawdatadir):
     dnnmodel = cnn.model
 
     # print some debugging outputs to allow user to see how model is being trained
-    sys.stdout.write("Input of fragnet model is: ", cnn.model.input_shape)
+    print("Input of fragnet model is: ", cnn.model.input_shape)
     sys.stdout.write("We have %i datasets" % len(datamunger.datafilepaths))
     sys.stdout.write(datamunger.datafilepaths[0])
     sys.stdout.write(numwins)
