@@ -71,9 +71,9 @@ def mainmodel(traindatadir, rawdatadir):
     print("Input of fragnet model is: ", cnn.model.input_shape)
     sys.stdout.write("We have %i datasets" % len(datamunger.datafilepaths))
     sys.stdout.write(datamunger.datafilepaths[0])
-    sys.stdout.write(numwins)
-    sys.stdout.write(len(datamunger.ylabels))
-    sys.stdout.write(len(datamunger.main_data))
+    print(numwins)
+    print(len(datamunger.ylabels))
+    print(len(datamunger.main_data))
     return dnnmodel, datamunger
 
 
