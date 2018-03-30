@@ -11,6 +11,7 @@ import numpy as np
 
 # Custom Built libraries
 from model.nets.fragilityaux import CNNFragility
+from model.nets.ieegcnn import iEEGCNN
 from model.train import traincnnaux
 from model.train.fragaux.processdata import LabelData
 
