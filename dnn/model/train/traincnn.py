@@ -72,7 +72,6 @@ class TestCallback(Callback):
               classification_report(ytrue, predicted))
         print('\n confusion matrix:\n', confusion_matrix(ytrue, predicted))
 
-
 class TrainCNN(BaseTrain):
     def __init__(self, dnnmodel, batch_size, NUM_EPOCHS, AUGMENT):
         self.dnnmodel = dnnmodel
@@ -135,8 +134,8 @@ class TrainCNN(BaseTrain):
                                      mode='max')
         reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5,
                                       patience=10, min_lr=1e-8)
-        # testcheck = TestCallback()
-        self.callbacks = [checkpoint, testcheck]
+        testcheck = TestCallback()
+        self.callbacks = [checkpoint]#, testcheck]
 
     def loaddirs(self, traindatadir, testdatadir, listofpats_train, listofpats_test):
         ''' Get list of file paths '''
@@ -243,7 +242,8 @@ class TrainCNN(BaseTrain):
         if not self.AUGMENT:
             print('Not using data augmentation. Implement Solution still!')
             HH = dnnmodel.fit(X_train, y_train,
-                              steps_per_epoch=X_train.shape[0] // self.batch_size,
+                              # steps_per_epoch=X_train.shape[0] // self.batch_size,
+                              batch_size = self.batch_size,
                               epochs=self.NUM_EPOCHS,
                               validation_data=(X_test, y_test),
                               shuffle=True,
