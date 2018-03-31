@@ -290,7 +290,7 @@ class TrainCNN(BaseTrain):
         Xmain_test = np.vstack(Xmain_test)
         # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
         invert_y = 1 - y_test
-        y_test = np.concatenate((invert_y, y_test, axis=1))
+        y_test = np.concatenate((invert_y, y_test), axis=1)
         self.X_test = Xmain_test
         self.y_test = y_test
 
