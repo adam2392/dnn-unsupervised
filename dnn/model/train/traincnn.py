@@ -243,7 +243,7 @@ class TrainCNN(BaseTrain):
         if not self.AUGMENT:
             print('Not using data augmentation. Implement Solution still!')
             HH = dnnmodel.fit(X_train, y_train,
-                              steps_per_epoch=X_train.shape[0] // batch_size,
+                              steps_per_epoch=X_train.shape[0] // self.batch_size,
                               batch_size=self.batch_size,
                               epochs=self.NUM_EPOCHS,
                               validation_data=(X_test, y_test),
