@@ -53,7 +53,7 @@ def mainmodel(traindatadir, rawdatadir):
     datamunger.loaddirofdata(traindatadir, listofpats)
     datamunger.formatdata()   #
     # setup training scheme for data
-    datamunger.trainingscheme(scheme='rand')
+    datamunger.trainingscheme(scheme='loo')
 
     # 02: initialize the convolutional auxiliary network
     # build the baseline CNN model
@@ -91,6 +91,11 @@ def maintrain(dnnmodel, datamunger, outputdatadir, tempdatadir):
     y_train = datamunger.y_train
     Xmain_test = datamunger.Xmain_test
     y_test = datamunger.y_test
+
+    # cnn_trainer.loaddirs(traindatadir, testdatadir,
+    #                      listofpats_train, listofpats_test)
+    # cnn_trainer.loadtrainingdata()
+    # cnn_trainer.loadtestdata()
 
     # configure, load generator and load training/testing data
     cnn_trainer.configure(tempdatadir)
