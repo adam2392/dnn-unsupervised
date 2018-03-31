@@ -76,7 +76,6 @@ def mainmodel(traindatadir, rawdatadir):
     print(len(datamunger.main_data))
     return dnnmodel, datamunger
 
-
 def maintrain(dnnmodel, datamunger, outputdatadir, tempdatadir):
     modelname = '1dcnn'
     ##################### PARAMETERS FOR TRAINING - CREATE TRAINER ####################
