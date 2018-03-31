@@ -273,7 +273,9 @@ class TrainCNN(BaseTrain):
         self.X_train = Xmain_train
         self.y_train = y_train
 
-                # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
+        print(y_train.shape)
+        print(Xmain_train.shape)
+        # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
         invert_y = 1 - y_train
         y_train = np.concatenate((invert_y, y_train), axis=1)
         # format the data correctly
@@ -284,6 +286,9 @@ class TrainCNN(BaseTrain):
         self.class_weight = class_weight
 
     def loadtestingdata_vars(self, Xmain_test, y_test):
+        y_test = np.array(y_test)
+        Xmain_test = np.concatenate(Xmain_test, axis=0)
+
         self.X_test = Xmain_test
         self.y_test = y_test
 
