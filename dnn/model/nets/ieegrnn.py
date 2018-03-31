@@ -84,8 +84,8 @@ class iEEGRNN(BaseNet):
         model               the sequential model object with all layers added in CNN style
         '''
         # check for weight initialization -> apply Glorotuniform
-        if w_init is None:
-            w_init = [keras.initializers.glorot_uniform()] * sum(n_layers)
+        # if w_init is None:
+            # w_init = [keras.initializers.glorot_uniform()] * sum(n_layers)
 
         if celltype not in ['rnn', 'lstm', 'gru']:
             raise ValueError('This celltype is not supported! Only the rnn, lstm and gru cells are supported')
