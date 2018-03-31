@@ -224,7 +224,7 @@ class LabelData(object):
             Perform leave one out train/test split with the groups of patients
             we have.
             '''
-            logo = LeaveOneGroupOut(listofpats)
+            logo = LeaveOneGroupOut()
 
             for train_index, test_index in logo.split(X=main_data, y=ylabels, groups=listofpats):
                 X_train.append(main_data[train_index])
