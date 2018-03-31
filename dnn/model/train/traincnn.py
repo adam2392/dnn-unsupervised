@@ -269,6 +269,14 @@ class TrainCNN(BaseTrain):
     def loadtrainingdata_vars(self, Xmain_train, y_train):
         self.X_train = Xmain_train
         self.y_train = y_train
+
+        # format the data correctly
+        class_weight = sklearn.utils.compute_class_weight('balanced',
+                                                          np.unique(
+                                                              y_train).astype(int),
+                                                          np.argmax(y_train, axis=1))
+        self.class_weight = class_weight
+
     def loadtestingdata_vars(self, Xmain_test, y_test):
         self.X_test = Xmain_test
         self.y_test = y_test
