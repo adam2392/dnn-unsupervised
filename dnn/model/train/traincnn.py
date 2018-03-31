@@ -267,10 +267,10 @@ class TrainCNN(BaseTrain):
     These two functions for directly loading in the test/train datasets
     '''
     def loadtrainingdata_vars(self, Xmain_train, y_train):
-        self.Xmain_train = Xmain_train
+        self.X_train = Xmain_train
         self.y_train = y_train
     def loadtestingdata_vars(self, Xmain_test, y_test):
-        self.Xmain_test = Xmain_test
+        self.X_test = Xmain_test
         self.y_test = y_test
 
     def _loadgenerator(self):
