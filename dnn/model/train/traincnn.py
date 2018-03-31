@@ -267,6 +267,9 @@ class TrainCNN(BaseTrain):
     These two functions for directly loading in the test/train datasets
     '''
     def loadtrainingdata_vars(self, Xmain_train, y_train):
+        y_train = np.array(y_train)
+        Xmain_train = np.concatenate(Xmain_train, axis=0)
+
         self.X_train = Xmain_train
         self.y_train = y_train
 

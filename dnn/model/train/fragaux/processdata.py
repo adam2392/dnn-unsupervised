@@ -180,6 +180,7 @@ class LabelData(object):
             allinds, ezinds = self.getinds(chanlabels, ezchans)
 
             # loop through all channels and separate into datasets
+            
             for ichan in range(0, len(allinds)):
                 fragmat_main = fragmat[:, ichan].T
 
