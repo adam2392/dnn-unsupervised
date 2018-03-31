@@ -81,7 +81,7 @@ def maintrain(dnnmodel, datamunger, outputdatadir, tempdatadir):
     ##################### PARAMETERS FOR TRAINING - CREATE TRAINER ####################
     batch_size = 32
     NUM_EPOCHS = 300
-    AUGMENT = True
+    AUGMENT = False
 
     cnn_trainer = traincnn.TrainCNN(dnnmodel, batch_size, NUM_EPOCHS, AUGMENT)
 
