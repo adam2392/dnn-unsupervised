@@ -8,13 +8,12 @@ import json
 import pickle
 
 import keras
-from keras.optimizers import Adam
+from keras.optimizers import Adam, RMSprop
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
-from .testingcallback import TestCallback
 
 from keras.preprocessing.image import ImageDataGenerator
-
 import sklearn.utils
+from .testingcallback import TestCallback
 
 # metrics for postprocessing of the results
 import sklearn
@@ -23,9 +22,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score, \
     recall_score, classification_report, \
     f1_score, roc_auc_score
-
 import pprint
-
 
 def preprocess_imgwithnoise(image_tensor):
     # preprocessing_function: function that will be implied on each input.
@@ -43,34 +40,12 @@ def preprocess_imgwithnoise(image_tensor):
             scale=stdmult*np.std(feat), size=feat.size).reshape(imsize, imsize)
     return image_tensor
 
-class TrainCNN(BaseTrain):
+class TrainRNN(BaseTrain):
     def __init__(self, dnnmodel, batch_size, NUM_EPOCHS, AUGMENT):
         self.dnnmodel = dnnmodel
         self.batch_size = batch_size
         self.NUM_EPOCHS = NUM_EPOCHS
         self.AUGMENT = AUGMENT
-
-    def saveoutput(self, modelname, outputdatadir):
-        modeljsonfile = os.path.join(outputdatadir, modelname + "_model.json")
-        historyfile = os.path.join(
-            outputdatadir,  modelname + '_history' + '.pkl')
-        finalweightsfile = os.path.join(
-            outputdatadir, modelname + '_final_weights' + '.h5')
-
-        # save model
-        if not os.path.exists(modeljsonfile):
-            # serialize model to JSON
-            model_json = self.dnnmodel.to_json()
-            with open(modeljsonfile, "w") as json_file:
-                json_file.write(model_json)
-            print("Saved model to disk")
-
-        # save history
-        with open(historyfile, 'wb') as file_pi:
-            pickle.dump(self.HH.history, file_pi)
-
-        # save final weights
-        self.dnnmodel.save(finalweightsfile)
 
     def summaryinfo(self):
         summary = {
@@ -84,11 +59,10 @@ class TrainCNN(BaseTrain):
     def configure(self, tempdatadir):
         # initialize loss function, SGD optimizer and metrics
         loss = 'binary_crossentropy'
-        optimizer = Adam(lr=1e-5,
-                         beta_1=0.9,
-                         beta_2=0.99,
-                         epsilon=1e-08,
-                         decay=0.0)
+        optimizer = RMSprop(lr=1e-4,
+                            rho=0.9,
+                            epsilon=1e-08,
+                            decay=0.0)
         metrics = ['accuracy']
         self.modelconfig = self.dnnmodel.compile(loss=loss,
                                                  optimizer=optimizer,
@@ -96,7 +70,6 @@ class TrainCNN(BaseTrain):
 
         tempfilepath = os.path.join(
             tempdatadir, "weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5")
-
         # callbacks availabble
         checkpoint = ModelCheckpoint(tempfilepath,
                                      monitor='val_acc',
@@ -106,90 +79,13 @@ class TrainCNN(BaseTrain):
         reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5,
                                       patience=10, min_lr=1e-8)
         testcheck = TestCallback()
-        self.callbacks = [checkpoint]#, testcheck]
-
-    def loaddirs(self, traindatadir, testdatadir, listofpats_train, listofpats_test):
-        ''' Get list of file paths '''
-        self.testfilepaths = []
-        for root, dirs, files in os.walk(testdatadir):
-            for file in files:
-                if any(pat in file for pat in listofpats_test):
-                    self.testfilepaths.append(os.path.join(root, file))
-        self.testfilepaths.append(os.path.join(root, file))
-
-        ''' Get list of file paths '''
-        self.filepaths = []
-        for root, dirs, files in os.walk(traindatadir):
-            for file in files:
-                if any(pat in file for pat in listofpats_train):
-                    self.filepaths.append(os.path.join(root, file))
-
-        # AUGMENTATION OF DATA WITH REAL add data from the real data
-        listofpats_train.remove(listofpats_test[0])
-        for root, dirs, files in os.walk(testdatadir):
-            for file in files:
-                # if all(pat not in file for pat in listofpats_train):
-                if any(pat in file for pat in listofpats_train):
-                    self.filepaths.append(os.path.join(root, file))
-
-        print('training pats: ', listofpats_train)
-        print('testing pats: ', listofpats_test)
-        print("testing data is found in: ", root)
-        print("training data is found in: ", root)
+        self.callbacks = [checkpoint, reduce_lr, testcheck]
 
     def _formatdata(self, images):
         images = images.swapaxes(1, 3)
         # lower sample by casting to 32 bits
         images = images.astype("float32")
         return images
-
-    def loadtestdata(self):
-        '''     LOAD TESTING DATA      '''
-        for idx, datafile in enumerate(self.testfilepaths):
-            imagedata = np.load(datafile)
-            image_tensor = imagedata['image_tensor']
-            metadata = imagedata['metadata'].item()
-
-            if idx == 0:
-                image_tensors = image_tensor
-                ylabels = metadata['ylabels']
-            else:
-                image_tensors = np.append(image_tensors, image_tensor, axis=0)
-                ylabels = np.append(ylabels, metadata['ylabels'], axis=0)
-        # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
-        invert_y = 1 - ylabels
-        ylabels = np.concatenate((invert_y, ylabels), axis=1)
-        # format the image tensor correctly
-        image_tensors = self._formatdata(image_tensors)
-        self.X_test = image_tensors
-        self.y_test = ylabels
-
-    def loadtrainingdata(self):
-        '''     LOAD TRAINING DATA      '''
-        for idx, datafile in enumerate(self.filepaths):
-            imagedata = np.load(datafile)
-            image_tensor = imagedata['image_tensor']
-            metadata = imagedata['metadata'].item()
-
-            if idx == 0:
-                image_tensors = image_tensor
-                ylabels = metadata['ylabels']
-            else:
-                image_tensors = np.append(image_tensors, image_tensor, axis=0)
-                ylabels = np.append(ylabels, metadata['ylabels'], axis=0)
-
-        # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
-        invert_y = 1 - ylabels
-        ylabels = np.concatenate((invert_y, ylabels), axis=1)
-        # format the data correctly
-        class_weight = sklearn.utils.compute_class_weight('balanced',
-                                                          np.unique(
-                                                              ylabels).astype(int),
-                                                          np.argmax(ylabels, axis=1))
-        image_tensors = self._formatdata(image_tensors)
-        self.X_train = image_tensors
-        self.y_train = ylabels
-        self.class_weight = class_weight
 
     def train(self):
         self._loadgenerator()
@@ -232,7 +128,6 @@ class TrainCNN(BaseTrain):
                                         callbacks=callbacks, verbose=2)
 
         self.HH = HH
-    
     '''
     These two functions for directly loading in the test/train datasets
     '''

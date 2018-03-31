@@ -43,8 +43,8 @@ patient="${patient:-id001_ac}"
 # rawdatadir='/scratch/users/ali39@jhu.edu/data/converted/'
 
 # # For training and modeling with real fragility data - 1d fragnet 
-tempdatadir="/scratch/users/ali39@jhu.edu/data/dnn/temp/fragnet/exp001/$patient"
-outputdatadir="/scratch/users/ali39@jhu.edu/data/dnn/output/fragnet/exp001/$patient"
+tempdatadir="/scratch/users/ali39@jhu.edu/data/dnn/temp/fragnet/exp002/"
+outputdatadir="/scratch/users/ali39@jhu.edu/data/dnn/output/fragnet/exp002/"
 traindatadir='/scratch/users/ali39@jhu.edu/data/output/pert/'
 rawdatadir='/scratch/users/ali39@jhu.edu/data/converted/'
 
