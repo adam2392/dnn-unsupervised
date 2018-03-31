@@ -268,7 +268,8 @@ class TrainCNN(BaseTrain):
     '''
     def loadtrainingdata_vars(self, Xmain_train, y_train):
         y_train = np.array(y_train)
-        Xmain_train = np.concatenate(Xmain_train, axis=0)
+        # Xmain_train = np.concatenate(Xmain_train, axis=0)
+        Xmain_train = np.vstack(Xmain_train)
 
         self.X_train = Xmain_train
         self.y_train = y_train
