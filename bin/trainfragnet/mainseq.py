@@ -10,7 +10,7 @@ import os
 import numpy as np
 
 # Custom Built libraries
-from model.nets.ieegcnn import iEEGRNN
+from model.nets.ieegrnn import iEEGRNN
 from model.train import traincnn
 from model.train.fragaux.processdata import LabelData
 
