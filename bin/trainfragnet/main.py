@@ -98,7 +98,7 @@ def maintrain(dnnmodel, datamunger, outputdatadir, tempdatadir):
     # cnn_trainer.loaddirs(traindatadir, testdatadir,
     #                      listofpats_train, listofpats_test)
     cnn_trainer.loadtrainingdata_vars(Xmain_train, y_train)
-    cnn_trainer.loadtestdata_vars(Xmain_test, y_test)
+    cnn_trainer.loadtestingdata_vars(Xmain_test, y_test)
     cnn_trainer.train()
 
     print(len(cnn_trainer.Xmain_train))
