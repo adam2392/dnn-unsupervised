@@ -277,7 +277,7 @@ class TrainCNN(BaseTrain):
         print(y_train.shape)
         print(Xmain_train.shape)
         # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
-        invert_y = 1 - y_train
+        invert_y = 1 - y_train[:,np.newaxis]
         y_train = np.concatenate((invert_y, y_train), axis=1)
         # format the data correctly
         class_weight = sklearn.utils.compute_class_weight('balanced',
