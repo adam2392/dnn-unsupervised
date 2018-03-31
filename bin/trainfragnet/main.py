@@ -123,9 +123,9 @@ def maintest(dnnmodel, cnn_trainer):
     ytrue = np.argmax(y_test, axis=1)
     y_pred = dnnmodel.predict_classes(X_test)
 
-    sys.stdout.write(prob_predicted.shape)
-    sys.stdout.write(ytrue.shape)
-    sys.stdout.write(y_pred.shape)
+    print(prob_predicted.shape)
+    print(ytrue.shape)
+    print(y_pred.shape)
     print("ROC_AUC_SCORES: ", roc_auc_score(y_test, prob_predicted))
     print('Mean accuracy score: ', accuracy_score(ytrue, y_pred))
     print('F1 score:', f1_score(ytrue, y_pred))
