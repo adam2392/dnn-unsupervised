@@ -100,8 +100,8 @@ def maintrain(dnnmodel, datamunger, outputdatadir, tempdatadir):
     cnn_trainer.loadtestingdata_vars(Xmain_test, y_test)
     cnn_trainer.train()
 
-    print(len(cnn_trainer.Xmain_train))
-    print(len(cnn_trainer.y_train))
+    print(cnn_trainer.X_train.shape)
+    print(cnn_trainer.y_train.shape)
 
     # print out summary info for the model and the training
     cnn_trainer.summaryinfo()
