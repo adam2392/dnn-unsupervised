@@ -135,7 +135,7 @@ class TrainCNN(BaseTrain):
                                      mode='max')
         reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5,
                                       patience=10, min_lr=1e-8)
-        testcheck = TestCallback()
+        # testcheck = TestCallback()
         self.callbacks = [checkpoint, testcheck]
 
     def loaddirs(self, traindatadir, testdatadir, listofpats_train, listofpats_test):
