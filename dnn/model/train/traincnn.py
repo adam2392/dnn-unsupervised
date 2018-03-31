@@ -269,7 +269,7 @@ class TrainCNN(BaseTrain):
     def loadtrainingdata_vars(self, Xmain_train, y_train):
         y_train = np.array(y_train)[:,np.newaxis]
         # Xmain_train = np.concatenate(Xmain_train, axis=0)
-        Xmain_train = np.vstack(Xmain_train)[np.newaxis, ...]
+        Xmain_train = np.vstack(Xmain_train)[..., np.newaxis]
 
         print(y_train.shape)
         print(Xmain_train.shape)
@@ -287,7 +287,7 @@ class TrainCNN(BaseTrain):
 
     def loadtestingdata_vars(self, Xmain_test, y_test):
         y_test = np.array(y_test)[:,np.newaxis]
-        Xmain_test = np.vstack(Xmain_test)[np.newaxis, ...]
+        Xmain_test = np.vstack(Xmain_test)[..., np.newaxis]
         # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
         invert_y = 1 - y_test
         y_test = np.concatenate((invert_y, y_test), axis=1)
