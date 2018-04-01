@@ -21,12 +21,12 @@ from keras.optimizers import Adam
 # for CNN
 from keras.layers import Conv1D, Conv2D, Conv3D, MaxPooling2D, MaxPooling3D, MaxPooling1D
 # for general NN behavior
-from keras.layers import Dense, Dropout, Flatten
+from keras.layers import Dense, Dropout, Flatten, LeakyReLU
 from keras.layers import Input, Concatenate, Permute, Reshape, Merge
 
 # utility functionality for keras
 # from keras.preprocessing import sequence
-from keras.layers.embeddings import Embedding, LeakyReLU
+from keras.layers.embeddings import Embedding
 import pprint
 
 
