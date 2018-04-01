@@ -30,7 +30,7 @@ class BaseFormat(object):
             metadata[key] = convert(metadata[key])
         return metadata
 
-    def loaddatafiles(self, fftdatadir)
+    def loaddatafiles(self, fftdatadir):
     # get all datafiles for the fft maps
     # fftdatadir = '/Volumes/ADAM LI/pydata/output/outputfft/tng/'
     # Get ALL datafiles from all downstream files

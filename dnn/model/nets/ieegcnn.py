@@ -26,7 +26,7 @@ from keras.layers import Input, Concatenate, Permute, Reshape, Merge
 
 # utility functionality for keras
 # from keras.preprocessing import sequence
-from keras.layers.embeddings import Embedding
+from keras.layers.embeddings import Embedding, LeakyReLU
 import pprint
 
 
@@ -76,7 +76,7 @@ class iEEGCNN(BaseNet):
     def buildmodel(self, output=True):
         w_init = None                       # weight initialization
         # number of convolutions per layer
-        n_layers = (4, 2, 1)
+        n_layers = (4, 3, 2, 1)
         numfilters = 32                     # number of filters in first layer of each new layer
         poolsize = ((2,)*self.modeldim)      # pool size
         filter_size = ((3,)*self.modeldim)   # filter size
@@ -188,7 +188,8 @@ class iEEGCNN(BaseNet):
                                       input_shape=(
                                           self.imsize, self.imsize, self.n_colors),
                                       kernel_initializer=w_init[count],
-                                      activation='relu'))
+                                      activation='linear'))
+                self.model.add(LeakyReLU(alpha=0.1))
                 # increment counter to the next weight initializer
                 count += 1
             # create a network at the end with a max pooling

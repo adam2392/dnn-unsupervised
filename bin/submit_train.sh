@@ -31,10 +31,10 @@ patient="${patient:-id001_ac}"
 # testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
 
 # # For training and modeling with the simulated data
-# tempdatadir="/scratch/users/ali39@jhu.edu/data/dnn/temp/exp002/$patient/"
-# outputdatadir="/scratch/users/ali39@jhu.edu/data/dnn/output/exp002/$patient/"
-# traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/expfull/"
-# testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
+tempdatadir="/scratch/users/ali39@jhu.edu/data/dnn/temp/exp003/$patient/"
+outputdatadir="/scratch/users/ali39@jhu.edu/data/dnn/output/exp003/$patient/"
+traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/expfull/"
+testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
 
 # # For training and modeling with real fragility data 
 # tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/fragilityaux/train_v1/'
@@ -43,10 +43,10 @@ patient="${patient:-id001_ac}"
 # rawdatadir='/scratch/users/ali39@jhu.edu/data/converted/'
 
 # # For training and modeling with real fragility data - 1d fragnet 
-tempdatadir="/scratch/users/ali39@jhu.edu/data/dnn/temp/fragnet/exp002/"
-outputdatadir="/scratch/users/ali39@jhu.edu/data/dnn/output/fragnet/exp002/"
-traindatadir='/scratch/users/ali39@jhu.edu/data/output/pert/'
-rawdatadir='/scratch/users/ali39@jhu.edu/data/converted/'
+# tempdatadir="/scratch/users/ali39@jhu.edu/data/dnn/temp/fragnet/exp002/"
+# outputdatadir="/scratch/users/ali39@jhu.edu/data/dnn/output/fragnet/exp002/"
+# traindatadir='/scratch/users/ali39@jhu.edu/data/output/pert/'
+# rawdatadir='/scratch/users/ali39@jhu.edu/data/converted/'
 
 # /scratch/users/ali39@jhu.edu
 printf "\nThis is the data directories: \n"
