@@ -76,10 +76,13 @@ class iEEGCNN(BaseNet):
     def buildmodel(self, output=True):
         w_init = None                       # weight initialization
         # number of convolutions per layer
-        n_layers = (4, 2, 2, 1)
+        n_layers = (4, 3, 1)
         numfilters = 32                     # number of filters in first layer of each new layer
+        # poolsize = ((2,)*self.modeldim)      # pool size
+        # filter_size = ((3,)*self.modeldim)   # filter size
         poolsize = ((2,)*self.modeldim)      # pool size
         filter_size = ((2,)*self.modeldim)   # filter size
+
         size_fc = 1024
 
         self.w_init = w_init
