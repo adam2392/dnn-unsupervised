@@ -31,10 +31,10 @@ patient="${patient:-id001_ac}"
 # testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
 
 # # For training and modeling with the simulated data
-tempdatadir="/scratch/users/ali39@jhu.edu/data/dnn/temp/exp003/$patient/"
-outputdatadir="/scratch/users/ali39@jhu.edu/data/dnn/output/exp003/$patient/"
-traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/expfull/"
-testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
+# tempdatadir="/scratch/users/ali39@jhu.edu/data/dnn/temp/exp003/$patient/"
+# outputdatadir="/scratch/users/ali39@jhu.edu/data/dnn/output/exp003/$patient/"
+# traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/expfull/"
+# testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
 
 # # For training and modeling with real fragility data 
 # tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/fragilityaux/train_v1/'
