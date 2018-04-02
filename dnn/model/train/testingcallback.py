@@ -1,6 +1,12 @@
 from keras.callbacks import Callback
 import numpy as np
 
+from sklearn.metrics import precision_score, \
+    recall_score, classification_report, \
+    f1_score, roc_auc_score
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import accuracy_score
+
 class TestCallback(Callback):
     def __init__(self):
         # self.test_data = test_data
