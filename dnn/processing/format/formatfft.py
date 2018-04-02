@@ -37,7 +37,7 @@ def path_leaf(path):
 
 
 class FormatFFT(BaseFormat):
-    def __init__(self, fftdatadir, metadatadir, outputdatadir):
+    def __init__(self, fftdatadir, rawdatadir, metadatadir, outputdatadir):
         # establish frequency bands
         freqbands = {
             'dalpha': [0, 15],
@@ -53,7 +53,7 @@ class FormatFFT(BaseFormat):
         self.typetransform = 'fourier'
         self.mtbandwidth = 4
         self.mtfreqs = []
-        # self.rawdatadir = rawdatadir
+        self.rawdatadir = rawdatadir
         self.fftdatadir = fftdatadir
         self.metadatadir = metadatadir
         self.outputdatadir = outputdatadir
@@ -110,24 +110,43 @@ class FormatFFT(BaseFormat):
 
         The datalabels is then passed which are the data labels from
         the computed step (fft, fragility, etc.).
-        '''
 
+        Output:
+        - seeginds (np.ndarray) of seeg indices to use in the
+        seeg_xyz/labels of the seeg.txt files
+        '''
         # get overlapping indices
-        datalabels = list(datalabels)
-        seeg_labels = list(seeg_labels)
+        seeg_labels_list = list(seeg_labels)
+        inter_labels = list(set(datalabels) & set(seeg_labels))
 
         seeginds = []
-        for idx, label in enumerate(datalabels):
-            seeginds.append(seeg_labels.index(label))
+        for idx, label in enumerate(inter_labels):
+            seeginds.append(seeg_labels_list.index(label))
+        seeginds.sort()
+        seeginds = np.array(seeginds).astype(int)
+        return seeginds
+    
+    def getsupersetinds(self, seeg_xyz, seeg_labels, datalabels):
+        '''
+        Pass in the seeg_xyz/labels from the raw data.
 
-        # get the subset of the xyz/labels for seeg contacts
-        seeg_xyz = seeg_xyz[seeginds, :]
-        seeg_labels = seeg_labels[seeginds]
+        The datalabels is then passed which are the data labels from
+        the computed step (fft, fragility, etc.).
 
-        # recompute the gain matrix from this set of the xyz
-        gainmat = self.gain_matrix_inv_square()
+        Output:
+        - seeginds (np.ndarray) of seeg indices to use in the
+        seeg_xyz/labels of the seeg.txt files
+        '''
+        # get overlapping indices
+        datalabels_list = list(datalabels)
+        inter_labels = list(set(datalabels) & set(seeg_labels))
 
-        return seeg_xyz, seeg_labels
+        seeginds = []
+        for idx, label in enumerate(inter_labels):
+            seeginds.append(datalabels_list.index(label))
+        seeginds.sort()
+        seeginds = np.array(seeginds).astype(int)
+        return seeginds
 
     def loadgainmat(self, gainfile):
         # function to get model in its equilibrium value
@@ -135,7 +154,8 @@ class FormatFFT(BaseFormat):
         self.gainmat = gain_pd.as_matrix().T
 
     def mapdatatoregs(self, data):
-        return data*self.gain_mat
+        # return np.tensordot(data,self.gainmat,axes=0)
+        return np.matmul(self.gainmat, data)
         # or just compute the inverse from a least squares solution x = A \ b
         # return np.linalg.lstsq(data, gain_mat)
 
@@ -151,7 +171,16 @@ class FormatFFT(BaseFormat):
     def loadregionsxyz(self, confile):
         con = readconnectivity(confile)
         regions_xyz = con['centres']
-        return regions_xyz
+        self.regions_xyz = regions_xyz
+    def loadseegxyz(self, seegfile):
+        '''
+        This is just a wrapper function to retrieve the seeg coordinate data in a pd dataframe
+        '''
+        seeg_pd = pd.read_csv(
+            seegfile, names=['x', 'y', 'z'], delim_whitespace=True)
+        self.seegfile = seegfile
+        self.seeg_labels = seeg_pd.index.values
+        self.seeg_xyz = seeg_pd.as_matrix(columns=None)
 
     def convertdatafromfile(self, datafile):
         # define the data handler
@@ -160,13 +189,15 @@ class FormatFFT(BaseFormat):
 
         # load in the data for this fft computation
         fftdata = np.load(datafile, encoding='bytes')
+        print(fftdata.keys())
         power = fftdata['power']
         freqs = fftdata['freqs']
         timepoints = fftdata['timepoints']
-        metadata = fftdata['metadata'].item()
 
-        # extract the metadata needed
-        metadata = decodebytes(metadata)
+        # only used if simulation
+        metadata = fftdata['metadata'].item()
+        # extract the metadata needed - only avail in tng sim data
+        metadata = self.decodebytes(metadata)
         onset_times = metadata['onsettimes']
         offset_times = metadata['offsettimes']
         seeg_labels = metadata['chanlabels']
@@ -181,12 +212,11 @@ class FormatFFT(BaseFormat):
             thing == x for thing in seeg_labels)]
         seeg_xyz = seeg_xyz[xyzinds, :]
 
-        print("Patient is: ", patient)
-        print("file id is: ", fileid)
         assert power.shape[0] == seeg_xyz.shape[0]
         assert power.shape[0] == len(seeg_labels)
 
         # postprocess fft into bins
+        postprocessfft = PreProcess()
         power = postprocessfft.binFrequencyValues(power, freqs)
 
         # project xyz data
@@ -208,46 +238,80 @@ class FormatFFT(BaseFormat):
         metadata['timepoints'] = timepoints
         return image_tensor, metadata
 
-    def converttoregs(self, datafile):
+    def converttoregs(self, datafile, dataloader=None):
+        # define the data handler
+        datahandler = DataHandler()
+
         # load in the data for this fft computation
         fftdata = np.load(datafile, encoding='bytes')
+        print(fftdata.keys())
         power = fftdata['power']
         freqs = fftdata['freqs']
         timepoints = fftdata['timepoints']
-        metadata = fftdata['metadata'].item()
 
-        # extract the metadata needed
-        metadata = decodebytes(metadata)
-        onset_times = metadata['onsettimes']
-        offset_times = metadata['offsettimes']
-        seeg_labels = metadata['chanlabels']
-        samplerate = metadata['samplerate']
+        # load in the region centers and seeg xyz
+        reg_xyz = self.regions_xyz
+        seeg_xyz = self.seeg_xyz
+        seeg_labels = self.seeg_labels
 
-        # load in the region centers xyz
-        reg_xyz = metadata['region_centers']
-        reg_xyz = self.loadregionsxyz(confile)
+        # metadata = fftdata['metadata'].item()
+        # extract the metadata needed - only avail in tng sim data
+        # metadata = self.decodebytes(metadata)
+        # onset_times = metadata['onsettimes']
+        # offset_times = metadata['offsettimes']
+        # seeg_labels = metadata['chanlabels']
+        # samplerate = metadata['samplerate']
+        # seeg_xyz = metadata['seeg_xyz']
 
         # get indices of channels that we have seeg_xyz for
         power = np.abs(power)
 
-        print("Patient is: ", patient)
-        print("file id is: ", fileid)
+        onset_times = dataloader.onset_time
+        offset_times = dataloader.offset_time
+        trimmedchanlabels = dataloader.chanlabels
+        samplerate = dataloader.samplerate
+
+        seeginds = self.getoverlapdata(seeg_xyz, seeg_labels, trimmedchanlabels)
+        # get the subset of the xyz/labels for seeg contacts
+        seeg_xyz = seeg_xyz[seeginds, :]
+        seeg_labels = seeg_labels[seeginds]
+        self.gainmat = self.gainmat[:,seeginds]
+
+        powerinds = self.getsupersetinds(seeg_xyz, seeg_labels, trimmedchanlabels)
+        power = power[powerinds,...]
+
         assert power.shape[0] == len(seeg_labels)
 
         # postprocess fft into bins
+        if samplerate <= 500:
+            # establish frequency bands
+            freqbands = {
+                'dalpha': [0, 15],
+                'beta': [15, 30],
+                'gamma': [30, 90],
+                'high': [90, 200],
+            }
+        else:
+            freqbands = None
+        postprocessfft = PreProcess(freqbands=freqbands)
+        print(power.shape)
         power = postprocessfft.binFrequencyValues(power, freqs)
 
-        print('Converttoregs summary of data:')
-        print(power.shape)
-        print(reg_xyz.shape)
-        print(self.gain_mat.shape)
         # Tensor of size [samples, freqbands, W, H] containing generated images.
-        for ifreq in range(power.shape[1]):
-            image_tensor = self.mapdatatoregs(power)
+        image_tensor = np.zeros((reg_xyz.shape[0], power.shape[1], power.shape[2]))
+        for isamp in range(power.shape[2]):
+            image_tensor[...,isamp] = self.mapdatatoregs(power[...,isamp].squeeze())
 
         # compute ylabels
         ylabels = datahandler.computelabels(
             onset_times, offset_times, timepoints)
+
+        print('Converttoregs summary of data:')
+        print("power shape: ", power.shape)
+        print("regions xyz shape: ",reg_xyz.shape)
+        print("gainmat shape: ", self.gainmat.shape)
+        print("image tensor shape: ", image_tensor.shape)
+        print("Y labels shape: ", ylabels.shape)
         # instantiate metadata hash table
         metadata = dict()
         metadata['chanlabels'] = seeg_labels
@@ -271,12 +335,27 @@ class FormatFFT(BaseFormat):
             fileid = filename.split('_fftmodel')[0]
             patient = '_'.join(fileid.split('_')[0:2])
 
+            # get the connectivity and gainmatrix files
+            confile = os.path.join(self.metadatadir, patient, 'connectivity.zip')
+            gainmatfile = os.path.join(self.metadatadir, patient, 'gain_inv-square.txt')
+            seegfile = os.path.join(self.metadatadir, patient, 'seeg.txt')
+            
+            # load in the onset/offset times
+            dataloader = LoadPat(patient=fileid, datadir=self.rawdatadir)
+
+            self.loadgainmat(gainmatfile)
+            self.loadregionsxyz(confile)
+            self.loadseegxyz(seegfile)
+            print("Patient is: ", patient)
+            print("file id is: ", fileid)
+
             # convert into an image tensor and metadata
-            image_tensor, metadata = self.convertdatafromfile(datafile)
+            # image_tensor, metadata = self.convertdatafromfile(datafile)
+            image_tensor, metadata = self.converttoregs(datafile, dataloader)
 
             # save image and meta data
             imagefilename = os.path.join(
-                trainimagedir, filename.split('.npz')[0])
+                self.outputdatadir, filename.split('.npz')[0])
             print(image_tensor.shape)
             print('saved at ', imagefilename)
             np.savez_compressed(

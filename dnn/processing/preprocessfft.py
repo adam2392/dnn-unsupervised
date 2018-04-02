@@ -39,7 +39,7 @@ def get_factors(x):
 
 
 class PreProcess(object):
-    def __init__(self, datafiles=[], freqbands=None):
+    def __init__(self, freqbands=None):
         if not freqbands:
             # establish frequency bands
             freqbands = {
@@ -49,7 +49,7 @@ class PreProcess(object):
                 'high': [90, 200],
                 'hfo': [200, 500]
             }
-        self.datafiles = datafiles
+        # self.datafiles = datafiles
         self.freqbands = freqbands
 
     def _computefreqindices(self, freqs, freqbands):

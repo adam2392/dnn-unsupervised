@@ -23,9 +23,11 @@ class BaseFormat(object):
             if isinstance(data, tuple):
                 return map(convert, data)
             return data
-        # try:
-        metadata = {k.decode("utf-8"): (v.decode("utf-8")
-                                        if isinstance(v, bytes) else v) for k, v in metadata.items()}
+        try:
+            metadata = {k.decode("utf-8"): (v.decode("utf-8") if isinstance(v, bytes) else v) for k, v in metadata.items()}
+        except:
+            print('metadata cant be decoded')
+
         for key in metadata.keys():
             metadata[key] = convert(metadata[key])
         return metadata

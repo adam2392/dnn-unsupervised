@@ -8,6 +8,7 @@ def main(fftdatadir, metadatadir, outputdatadir, gainmatfile):
 
     # load in the gainmat file, regions file and get all datafiles to analyze
     formatter.loadgainmat(gainmatfile)
+    formatter.loadseegxyz(seegfile)
     formatter.getdatafiles()
     formatter.formatdata()
 
@@ -20,6 +21,7 @@ if __name__ == '__main__':
     fftdatadir = '/Volumes/ADAM LI/pydata/output_fft/tng/win500_step250/'
     outputdatadir = '/Volumes/ADAM LI/pydata/output_fft/asimages/regions/'
 
+
     gainmatfile = os.path.join(metadatadir, patid, 'gain_inv-square.txt')
     # run conversion
-    main(rawdatadir, metadatadir, outputdatadirgainmatfile)
+    main(rawdatadir, metadatadir, outputdatadir, gainmatfile)
