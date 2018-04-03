@@ -208,7 +208,7 @@ class LabelData(object):
         self.main_data = main_list
 
     def trainingscheme(self, scheme='rand'):
-        listofpats = np.unique(self.listofpats)
+        listofpats = self.listofpats
         main_data = self.main_data
         ylabels = self.ylabels
 
@@ -226,6 +226,9 @@ class LabelData(object):
             '''
             logo = LeaveOneGroupOut()
 
+            print(np.array(main_data).shape)
+            print(np.array(ylabels).shape)
+            print(np.array(listofpats).shape)
             for train_index, test_index in logo.split(X=main_data, y=ylabels, groups=listofpats):
                 X_train.append(main_data[train_index])
                 X_test.append(main_data[test_index])
