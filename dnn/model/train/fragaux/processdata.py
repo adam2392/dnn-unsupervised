@@ -236,8 +236,8 @@ class LabelData(object):
 
             X_train = np.vstack(X_train)[..., np.newaxis]
             X_test = np.vstack(X_test)[..., np.newaxis]
-            y_train = np.vstack(y_train)
-            y_test = np.vstack(y_test)
+            y_train = np.array(y_train)
+            y_test = np.array(y_test)
 
             print('Finished setting up data')
             print(X_train.shape)
