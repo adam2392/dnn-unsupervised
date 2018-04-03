@@ -225,7 +225,7 @@ class LabelData(object):
             we have.
             '''
             logo = LeaveOneGroupOut()
-
+            print('in leave one group out.')
             print(np.array(main_data).shape)
             print(np.array(ylabels).shape)
             print(np.array(listofpats).shape)
@@ -256,6 +256,12 @@ class LabelData(object):
                                                           np.unique(
                                                               ylabels).astype(int),
                                                           ylabels)
+
+        print('Finished setting up data')
+        print(len(X_train))
+        print(len(X_test))
+        print(len(y_train))
+        print(len(y_test))
         self.class_weight = class_weight
         self.Xmain_train = Xmain_train
         self.y_train = y_train
