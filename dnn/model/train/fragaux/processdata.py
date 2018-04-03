@@ -224,10 +224,10 @@ class LabelData(object):
             y_test = []
 
             logo = LeaveOneGroupOut()
-            print('in leave one group out.')
-            print(np.array(main_data).shape)
-            print(np.array(ylabels).shape)
-            print(np.array(listofpats).shape)
+            # print('in leave one group out.')
+            # print(np.array(main_data).shape)
+            # print(np.array(ylabels).shape)
+            # print(np.array(listofpats).shape)
             for train_index, test_index in logo.split(X=main_data, y=ylabels, groups=listofpats):
                 X_train.append(main_data[train_index,:])
                 X_test.append(main_data[test_index,:])
@@ -239,11 +239,11 @@ class LabelData(object):
             y_train = np.hstack(y_train)
             y_test = np.hstack(y_test)
 
-            print('Finished setting up data')
-            print(X_train.shape)
-            print(X_test.shape)
-            print(y_train.shape)
-            print(y_test.shape)
+            # print('Finished setting up data')
+            # print(X_train.shape)
+            # print(X_test.shape)
+            # print(y_train.shape)
+            # print(y_test.shape)
 
             return X_train, X_test, y_train, y_test
 
