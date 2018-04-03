@@ -212,18 +212,17 @@ class LabelData(object):
         main_data = np.array(self.main_data)
         ylabels = np.array(self.ylabels)
 
-
-        # initialize lists for the training/testing data sets
-        X_train = []
-        X_test = []
-        y_train = []
-        y_test = []
-
         def _loo():
             '''
             Perform leave one out train/test split with the groups of patients
             we have.
             '''
+            # initialize lists for the training/testing data sets
+            X_train = []
+            X_test = []
+            y_train = []
+            y_test = []
+
             logo = LeaveOneGroupOut()
             print('in leave one group out.')
             print(np.array(main_data).shape)
@@ -239,7 +238,7 @@ class LabelData(object):
             X_test = np.vstack(X_test)[..., np.newaxis]
             y_train = np.vstack(y_train)
             y_test = np.vstack(y_test)
-            
+
             print('Finished setting up data')
             print(X_train.shape)
             print(X_test.shape)
