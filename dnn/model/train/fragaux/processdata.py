@@ -234,6 +234,18 @@ class LabelData(object):
                 X_test.append(main_data[test_index,:])
                 y_train.append(ylabels[train_index])
                 y_test.append(ylabels[test_index])
+
+            X_train = np.vstack(X_train)[..., np.newaxis]
+            X_test = np.vstack(X_test)[..., np.newaxis]
+            y_train = np.vstack(y_train)
+            y_test = np.vstack(y_test)
+            
+            print('Finished setting up data')
+            print(X_train.shape)
+            print(X_test.shape)
+            print(y_train.shape)
+            print(y_test.shape)
+
             return X_train, X_test, y_train, y_test
 
         def _randsplit():
@@ -256,12 +268,6 @@ class LabelData(object):
                                                           np.unique(
                                                               ylabels).astype(int),
                                                           ylabels)
-
-        print('Finished setting up data')
-        print(len(X_train))
-        print(len(X_test))
-        print(len(y_train))
-        print(len(y_test))
         self.class_weight = class_weight
         self.Xmain_train = Xmain_train
         self.y_train = y_train
