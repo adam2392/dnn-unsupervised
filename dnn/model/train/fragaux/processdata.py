@@ -208,9 +208,9 @@ class LabelData(object):
         self.main_data = main_list
 
     def trainingscheme(self, scheme='rand'):
-        listofpats = self.listofpats
-        main_data = self.main_data
-        ylabels = self.ylabels
+        listofpats = np.array(self.listofpats)
+        main_data = np.array(self.main_data)
+        ylabels = np.array(self.ylabels)
 
 
         # initialize lists for the training/testing data sets
