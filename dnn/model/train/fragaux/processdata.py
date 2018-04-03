@@ -232,8 +232,8 @@ class LabelData(object):
             for train_index, test_index in logo.split(X=main_data, y=ylabels, groups=listofpats):
                 X_train.append(main_data[train_index,:])
                 X_test.append(main_data[test_index,:])
-                y_train.append(y[train_index])
-                y_test.append(y[test_index])
+                y_train.append(ylabels[train_index])
+                y_test.append(ylabels[test_index])
             return X_train, X_test, y_train, y_test
 
         def _randsplit():
