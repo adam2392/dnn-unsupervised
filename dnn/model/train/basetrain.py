@@ -64,7 +64,7 @@ class BaseTrain(metaclass=ABCMeta):
     These two functions for directly loading in the test/train datasets
     '''
     def loadtrainingdata_vars(self, Xmain_train, y_train):
-        # y_train = np.array(y_train)[:,np.newaxis]
+        y_train = np.array(y_train)[:,np.newaxis]
         # Xmain_train = np.concatenate(Xmain_train, axis=0)
         # Xmain_train = np.vstack(Xmain_train)[..., np.newaxis]
 
@@ -83,7 +83,7 @@ class BaseTrain(metaclass=ABCMeta):
         self.class_weight = class_weight
 
     def loadtestingdata_vars(self, Xmain_test, y_test):
-        # y_test = np.array(y_test)[:,np.newaxis]
+        y_test = np.array(y_test)[:,np.newaxis]
         # Xmain_test = np.vstack(Xmain_test)[..., np.newaxis]
         # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
         invert_y = 1 - y_test
