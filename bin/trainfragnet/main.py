@@ -53,7 +53,7 @@ def mainmodel(traindatadir, rawdatadir, patient):
     datamunger.loaddirofdata(traindatadir, listofpats)
     datamunger.formatdata()   #
     # setup training scheme for data
-    datamunger.trainingscheme(scheme='loo', patient)
+    datamunger.trainingscheme(scheme='loo', patient=patient)
 
     # 02: initialize the convolutional auxiliary network
     # build the baseline CNN model
