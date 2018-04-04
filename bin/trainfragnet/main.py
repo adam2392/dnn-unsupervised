@@ -37,7 +37,7 @@ def mainmodel(traindatadir, rawdatadir, patient):
     listofpats = [
         'jh105',
         'pt1', 'pt2', 'pt3',
-        'pt8', 'pt11', 'pt13', 'pt15'
+        'pt8', 'pt11', 'pt13', 'pt15',
         'pt16', 'pt17',
         'la01',
         'la02', 'la03',
@@ -46,6 +46,7 @@ def mainmodel(traindatadir, rawdatadir, patient):
         'ummc004', 'ummc005',
         'ummc006',
     ]
+
 
     # 01: initialize a munger class to help format the data
     datamunger = LabelData(numwins, rawdatadir)  # feed in PCA size

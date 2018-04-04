@@ -228,17 +228,30 @@ class LabelData(object):
             # print(np.array(main_data).shape)
             # print(np.array(ylabels).shape)
             # print(np.array(listofpats).shape)
-            for train_index, test_index in logo.split(X=main_data, y=ylabels, groups=listofpats):
-                pattest = np.unique(listofpats[test_index])
-                print(pattest)
-                assert pattest.size == 1
-                X_train.append(main_data[train_index,:])
-                X_test.append(main_data[test_index,:])
-                y_train.append(ylabels[train_index])
-                y_test.append(ylabels[test_index])
+            allinds = np.arange(0, len(listofpats)).astype(int)
+            test_index = [i for i,s in enumerate(listofpats) if patient in s]
+            train_index = np.setdiff1d(allinds, train_index).astype(int)
+            
+            # test index
+            pattest = np.unique(listofpats[test_index])
+            print("The patient we are testing is: ", pattest)
 
-                if pattest == patient:
-                    break
+            X_train.append(main_data[train_index,:])
+            X_test.append(main_data[test_index,:])
+            y_train.append(ylabels[train_index])
+            y_test.append(ylabels[test_index])
+
+            # for train_index, test_index in logo.split(X=main_data, y=ylabels, groups=listofpats):
+            #     pattest = np.unique(listofpats[test_index])
+            #     print(pattest)
+            #     assert pattest.size == 1
+            #     X_train.append(main_data[train_index,:])
+            #     X_test.append(main_data[test_index,:])
+            #     y_train.append(ylabels[train_index])
+            #     y_test.append(ylabels[test_index])
+
+            #     if pattest == patient:
+            #         break
 
             X_train = np.vstack(X_train)[..., np.newaxis]
             X_test = np.vstack(X_test)[..., np.newaxis]
