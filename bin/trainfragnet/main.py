@@ -24,7 +24,7 @@ from sklearn.metrics import precision_score, \
     f1_score, roc_auc_score
 
 
-def mainmodel(traindatadir, rawdatadir):
+def mainmodel(traindatadir, rawdatadir, patient):
     ##################### PARAMETERS FOR NN - CREATE NN ####################
     n_colors = 1
     num_classes = 2       # dimension of output predictions
@@ -53,7 +53,7 @@ def mainmodel(traindatadir, rawdatadir):
     datamunger.loaddirofdata(traindatadir, listofpats)
     datamunger.formatdata()   #
     # setup training scheme for data
-    datamunger.trainingscheme(scheme='loo')
+    datamunger.trainingscheme(scheme='loo', patient)
 
     # 02: initialize the convolutional auxiliary network
     # build the baseline CNN model
@@ -162,6 +162,6 @@ if __name__ == '__main__':
         os.makedirs(tempdatadir)
 
     # create the dnn model and the data munger if necessary
-    dnnmodel, datamunger = mainmodel(traindatadir, rawdatadir)
+    dnnmodel, datamunger = mainmodel(traindatadir, rawdatadir, patient)
     trainer = maintrain(dnnmodel, datamunger, outputdatadir, tempdatadir)
     maintest(dnnmodel, trainer)

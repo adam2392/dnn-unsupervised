@@ -22,7 +22,7 @@ echo "Begin analysis." # print beginning statement
 # NEED TO RUN FOR EZ=0,1,2,3 and varying PZ all once
 
 # patient="${patient:-id001_ac}"
-patient="${patient:-id001_ac}"
+patient="${patient:-jh105}"
 
 # For training and modeling with the real data
 # tempdatadir="/scratch/users/ali39@jhu.edu/data/dnn/temp/exp001/$patient/"

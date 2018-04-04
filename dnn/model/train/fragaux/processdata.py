@@ -207,7 +207,7 @@ class LabelData(object):
         self.ylabels = ylabels
         self.main_data = main_list
 
-    def trainingscheme(self, scheme='rand'):
+    def trainingscheme(self, scheme='rand', patient=None):
         listofpats = np.array(self.listofpats)
         main_data = np.array(self.main_data)
         ylabels = np.array(self.ylabels)
@@ -229,10 +229,16 @@ class LabelData(object):
             # print(np.array(ylabels).shape)
             # print(np.array(listofpats).shape)
             for train_index, test_index in logo.split(X=main_data, y=ylabels, groups=listofpats):
+                pattest = np.unique(listofpats[test_index])
+                print(pattest)
+                assert pattest.size == 1
                 X_train.append(main_data[train_index,:])
                 X_test.append(main_data[test_index,:])
                 y_train.append(ylabels[train_index])
                 y_test.append(ylabels[test_index])
+
+                if pattest == patient:
+                    break
 
             X_train = np.vstack(X_train)[..., np.newaxis]
             X_test = np.vstack(X_test)[..., np.newaxis]
