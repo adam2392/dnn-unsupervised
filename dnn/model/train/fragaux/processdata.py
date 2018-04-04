@@ -230,7 +230,7 @@ class LabelData(object):
             # print(np.array(listofpats).shape)
             allinds = np.arange(0, len(listofpats)).astype(int)
             test_index = [i for i,s in enumerate(listofpats) if patient in s]
-            train_index = np.setdiff1d(allinds, train_index).astype(int)
+            train_index = np.setdiff1d(allinds, test_index).astype(int)
             
             # test index
             pattest = np.unique(listofpats[test_index])
