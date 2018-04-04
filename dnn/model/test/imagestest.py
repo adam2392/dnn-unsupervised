@@ -108,4 +108,27 @@ class TestCNN(BaseTest):
     sequentially.
     
     '''
+        # load the testing dataset
+        X_test = self.X_test
+        y_test = self.y_test
+
+        # get the final loss and accuracy from the testing dataset
+        loss, acc = self.model.evaluate(X_test, y_test, verbose=0)
+        print('\nTesting loss: {}, acc: {}\n'.format(loss, acc))
+
+        # make a predictions o n the entire X_test
+        pred_test = self.model.predict(X_test)
+
+        # analyze the pred_test output from the X_test
+        self.summarize_seqpred(pred_test)
+
+        # return the sequential predictions, so that user can plot
+        return pred_test
+
+    def summarize_seqpred(self, pred_test):
+        '''
+        Given the testing prediction output, we want to summarize how 
+        our sequential model performed.
+
+        '''
         pass

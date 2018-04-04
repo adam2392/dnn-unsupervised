@@ -97,7 +97,7 @@ def maintrain(dnnmodel, outputdatadir, tempdatadir, traindatadir, testdatadir, p
     return cnn_trainer
 
 
-def maintest(dnnmodel, cnn_trainer):
+def maintest(dnnmodel, cnn_trainer, outputdatadir=None):
     # get the testing data to run a final summary output
     X_test = cnn_trainer.X_test
     y_test = cnn_trainer.y_test
@@ -106,6 +106,13 @@ def maintest(dnnmodel, cnn_trainer):
     prob_predicted = dnnmodel.predict(X_test)
     ytrue = np.argmax(y_test, axis=1)
     y_pred = dnnmodel.predict_classes(X_test)
+
+    # Save the output predictions also
+    print("The probability predictions for the testing set is ", prob_predicted.shape)
+    print("The class predictions for the testing set is ", y_pred.shape)
+    if outputdatadir is not None:
+        outputfilename = os.path.join(outputdatadir, 'test_predictions.npz')
+        np.savez_compressed(outputfilename, test_prob=prob_predicted, test_class=y_pred)
 
     print(prob_predicted.shape)
     print(ytrue.shape)
@@ -141,4 +148,4 @@ if __name__ == '__main__':
     dnnmodel = mainmodel()
     trainer = maintrain(dnnmodel, outputdatadir, tempdatadir,
                         traindatadir, testdatadir, patient)
-    maintest(dnnmodel, trainer)
+    maintest(dnnmodel, trainer, outputdatadir)

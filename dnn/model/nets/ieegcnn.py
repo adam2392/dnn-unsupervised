@@ -237,3 +237,12 @@ class iEEGCNN(BaseNet):
                 count += 1
             # create a network at the end with a max pooling
             self.model.add(MaxPooling3D(pool_size=poolsize))
+
+
+    def _build_inception2dcnn(self, w_init=None):
+        '''
+        Build our own customized inception style 2d cnn for our data.
+
+        Allows customization based on number of layers, layout, etc.
+        '''
+        pass
