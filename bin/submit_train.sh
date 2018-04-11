@@ -21,20 +21,20 @@ read -p "Enter patient: " patient
 echo "Begin analysis." # print beginning statement
 # NEED TO RUN FOR EZ=0,1,2,3 and varying PZ all once
 
-# patient="${patient:-id001_ac}"
-patient="${patient:-jh105}"
+patient="${patient:-id001_ac}"
+# patient="${patient:-jh105}"
 
 # For training and modeling with the real data
-# tempdatadir="/scratch/users/ali39@jhu.edu/data/dnn/temp/exp001/$patient/"
-# outputdatadir="/scratch/users/ali39@jhu.edu/data/dnn/output/exp001/$patient/"
-# traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
-# testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
+tempdatadir="/scratch/users/ali39@jhu.edu/data/dnn/temp/exp004/real_$patient/"
+outputdatadir="/scratch/users/ali39@jhu.edu/data/dnn/output/exp004/real_$patient/"
+traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
+testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
 
 # # For training and modeling with the simulated data
-# tempdatadir="/scratch/users/ali39@jhu.edu/data/dnn/temp/exp003/$patient/"
-# outputdatadir="/scratch/users/ali39@jhu.edu/data/dnn/output/exp003/$patient/"
-# traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/expfull/"
-# testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
+tempdatadir="/scratch/users/ali39@jhu.edu/data/dnn/temp/exp004/augment_$patient/"
+outputdatadir="/scratch/users/ali39@jhu.edu/data/dnn/output/exp004/augment_$patient/"
+traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/expfull/"
+testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
 
 # # For training and modeling with real fragility data 
 # tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/fragilityaux/train_v1/'
@@ -43,10 +43,10 @@ patient="${patient:-jh105}"
 # rawdatadir='/scratch/users/ali39@jhu.edu/data/converted/'
 
 # # For training and modeling with real fragility data - 1d fragnet 
-tempdatadir="/scratch/users/ali39@jhu.edu/data/dnn/temp/fragnet/exp002/$patient/"
-outputdatadir="/scratch/users/ali39@jhu.edu/data/dnn/output/fragnet/exp002/$patient/"
-traindatadir='/scratch/users/ali39@jhu.edu/data/output/pert/'
-rawdatadir='/scratch/users/ali39@jhu.edu/data/converted/'
+# tempdatadir="/scratch/users/ali39@jhu.edu/data/dnn/temp/fragnet/exp002/$patient/"
+# outputdatadir="/scratch/users/ali39@jhu.edu/data/dnn/output/fragnet/exp002/$patient/"
+# traindatadir='/scratch/users/ali39@jhu.edu/data/output/pert/'
+# rawdatadir='/scratch/users/ali39@jhu.edu/data/converted/'
 
 # /scratch/users/ali39@jhu.edu
 printf "\nThis is the data directories: \n"
