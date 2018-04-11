@@ -13,7 +13,7 @@ from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 
 from keras.preprocessing.image import ImageDataGenerator
 import sklearn.utils
-from .testingcallback import TestCallback
+from .callbacks.testingcallback import TestCallback
 
 # metrics for postprocessing of the results
 import sklearn

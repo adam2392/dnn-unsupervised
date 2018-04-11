@@ -6,8 +6,6 @@ import time
 import math as m
 
 ############################ ANN FUNCTIONS ############################
-######### import DNN for training using GPUs #########
-# from keras.utils.training_utils import multi_gpu_model
 ######### import DNN frameworks #########
 import tensorflow as tf
 import keras
@@ -20,6 +18,7 @@ from keras.layers import InputLayer
 from keras.optimizers import Adam
 # for CNN
 from keras.layers import Conv1D, Conv2D, Conv3D, MaxPooling2D, MaxPooling3D, MaxPooling1D
+from keras.layers import AveragePooling1D, AveragePooling2D
 # for general NN behavior
 from keras.layers import Dense, Dropout, Flatten, LeakyReLU
 from keras.layers import Input, Concatenate, Permute, Reshape, Merge
@@ -92,19 +91,19 @@ class iEEGCNN(BaseNet):
         self.filter_size = filter_size
 
         if self.modeldim == 1:
-            self._build_1dcnn(w_init=w_init,
+            self.build_vgg_1dcnn(w_init=w_init,
                               n_layers=n_layers,
                               poolsize=poolsize,
                               n_filters_first=numfilters,
                               filter_size=filter_size)
         elif self.modeldim == 2:
-            self._build_2dcnn(w_init=w_init,
+            self.build_vgg_2dcnn(w_init=w_init,
                               n_layers=n_layers,
                               poolsize=poolsize,
                               n_filters_first=numfilters,
                               filter_size=filter_size)
         elif self.modeldim == 3:
-            self._build_3dcnn(w_init=w_init,
+            self.build_vgg_3dcnn(w_init=w_init,
                               n_layers=n_layers,
                               poolsize=poolsize,
                               n_filters_first=numfilters,
@@ -119,7 +118,7 @@ class iEEGCNN(BaseNet):
     def buildoutput(self, size_fc):
         self._build_seq_output(size_fc=size_fc)
 
-    def _build_1dcnn(self, w_init=None, n_layers=(4, 2, 1), poolsize=(2), n_filters_first=32, filter_size=(3)):
+    def build_vgg_1dcnn(self, w_init=None, n_layers=(4, 2, 1), poolsize=(2), n_filters_first=32, filter_size=(3), size_fc=1024, output=True):
         '''
         Creates a Convolutional Neural network in VGG-16 style. It requires self
         to initialize a sequential model first.
@@ -157,7 +156,10 @@ class iEEGCNN(BaseNet):
             # create a network at the end with a max pooling
             self.model.add(MaxPooling1D(pool_size=poolsize))
 
-    def _build_2dcnn(self, w_init=None, n_layers=(4, 2, 1), poolsize=(2, 2), n_filters_first=32, filter_size=(3, 3)):
+        if output:
+            self.buildoutput(size_fc)
+
+    def build_vgg_2dcnn(self, w_init=None, n_layers=(4, 2, 1), poolsize=(2, 2), n_filters_first=32, filter_size=(3, 3), size_fc=1024, output=True):
         '''
         Creates a Convolutional Neural network in VGG-16 style. It requires self
         to initialize a sequential model first.
@@ -198,7 +200,10 @@ class iEEGCNN(BaseNet):
             # create a network at the end with a max pooling
             self.model.add(MaxPooling2D(pool_size=poolsize))
 
-    def _build_3dcnn(self, w_init=None, n_layers=(4, 2, 1), poolsize=(2, 2, 2), n_filters_first=32, filter_size=(3, 3, 3)):
+        if output:
+            self.buildoutput(size_fc)
+
+    def build_vgg_3dcnn(self, w_init=None, n_layers=(4, 2, 1), poolsize=(2, 2, 2), n_filters_first=32, filter_size=(3, 3, 3), size_fc=1024, output=True):
         '''
         Creates a Convolutional Neural network in VGG-16 style. It requires self
         to initialize a sequential model first.
@@ -238,11 +243,94 @@ class iEEGCNN(BaseNet):
             # create a network at the end with a max pooling
             self.model.add(MaxPooling3D(pool_size=poolsize))
 
+        if output:
+            self.buildoutput(size_fc)
 
-    def _build_inception2dcnn(self, w_init=None):
+    def build_inception2dcnn(self, num_layers=10, n_filters_first=64, size_fc=1024):
         '''
         Build our own customized inception style 2d cnn for our data.
 
         Allows customization based on number of layers, layout, etc.
         '''
-        pass
+        # define the input image
+        input_img = Input(shape=(self.imsize, self.imsize, self.n_colors))
+
+        # first add the beginning convolutional layers
+        conv_input_img = Conv2D(n_filters_first//2, 
+                            kernel_size=(3,3),
+                            strides=(2,2),
+                            padding='valid',
+                            activation='relu')(input_img)
+        conv_input_img = Conv2D(n_filters_first//2, 
+                            kernel_size=(3,3),
+                            strides=(1,1),
+                            padding='valid',
+                            activation='relu')(conv_input_img)
+        conv_input_img = Conv2D(n_filters_first, 
+                            kernel_size=(3,3),
+                            strides=(1,1),
+                            padding='same',
+                            activation='relu')(conv_input_img)
+        conv_input_img = MaxPooling2D((3,3), 
+                        strides=(2,2), 
+                        padding='same')(conv_input_img)
+
+        # add the inception modules
+        for i in range(num_layers):
+            if i == 0:
+                numfilters = n_filters_first
+            else:
+                numfilters = n_filters_first // i
+
+            # build the inception towers
+            if i == 0:
+                tower_0, tower_1, tower_2, tower_3 = self._build_inception_towers(conv_input_img, numfilters)
+            else:
+                output = MaxPooling2D((3,3), strides=(2,2), 
+                        padding='same')(output)
+                tower_0, tower_1, tower_2, tower_3 = self._build_inception_towers(output, numfilters)  
+            # concatenate the layers and flatten
+            output = keras.layers.concatenate([tower_0, tower_1, tower_2, tower_3], axis=1)
+
+        # make sure layers are all flattened
+        output = Flatten()(output)
+        # output = AveragePooling1D(pool_size=4,
+        #                           strides=1)(output)
+        # output = AveragePooling2D(pool_size=(4,4),
+        #                         strides=1)(output)
+        # create the output layers that are generally fc - with some DROPOUT
+        output = self._build_output(output, size_fc=size_fc)
+        # create the model
+        self.model = Model(inputs=input_img, outputs=output)
+        return self.model
+
+    def _build_inception_towers(self, input_img, n_filters_first=64):
+        '''
+        Utility function to build up the inception modules for an
+        inception style network that operates at different scales (e.g.
+        1x1, 3x3, 5x5 convolutions)
+        '''
+
+        # create the towers that occur during each layer of diff scale convolutions
+        tower_0 = Conv2D(n_filters_first, kernel_size=(1,1),
+                        padding='same',
+                        activation='relu')(input_img)
+        tower_1 = Conv2D(n_filters_first, kernel_size=(1,1), 
+                        padding='same', 
+                        activation='relu')(input_img)
+        tower_1 = Conv2D(n_filters_first, kernel_size=(3,3), 
+                        padding='same',
+                        activation='relu')(tower_1)
+        tower_2 = Conv2D(n_filters_first, kernel_size=(1,1), 
+                        padding='same', 
+                        activation='relu')(input_img)
+        tower_2 = Conv2D(n_filters_first, kernel_size=(5,5), 
+                        padding='same', 
+                        activation='relu')(tower_2)
+        tower_3 = MaxPooling2D((3,3), strides=(1,1), 
+                        padding='same')(input_img)
+        tower_3 = Conv2D(n_filters_first, kernel_size=(1,1), 
+                        padding='same', 
+                        activation='relu')(tower_3)
+
+        return tower_0, tower_1, tower_2, tower_3

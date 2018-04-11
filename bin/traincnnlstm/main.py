@@ -27,7 +27,8 @@ if __name__ == '__main__':
     if not os.path.exists(tempdatadir):
         os.makedirs(tempdatadir)
 
-    # load in model and weights -> NEED TO ADAPT OUTPUTDATADIR to get the correct weights! (version exp)
+    # load in model and weights -> NEED TO ADAPT OUTPUTDATADIR to get the
+    # correct weights! (version exp)
     weightsfile = os.path.join(outputdatadir, 'final_weights.h5')
     modelfile = os.path.join(outputdatadir, 'cnn_model.json')
 
@@ -107,7 +108,8 @@ if __name__ == '__main__':
     # configure, load generator
     seq_trainer.configure(tempdatadir)
     seq_trainer.loadgenerator()
-    # load directory of data to compute file paths for the data we want per patient
+    # load directory of data to compute file paths for the data we want per
+    # patient
     seq_trainer.loaddirofdata(pattraindir, listofpats_train)
     # use the training data and loop through once to compute the class weights
     seq_trainer.compute_classweights()

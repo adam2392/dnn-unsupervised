@@ -57,13 +57,12 @@ class iEEGRNN(BaseNet):
         }
         pprint.pprint(summary)
 
-    def buildmodel(self, output=True):
-        w_init = None                       # weight initialization
+    def buildmodel(self, celltype='lstm', output=True):
+        # weight initialization
         size_fc = 1024
 
-        self.w_init = w_init
         # build up the deep RNN
-        self._build_deeprnn(w_init=None, celltype='lstm')
+        self._build_deeprnn(celltype=celltype)
         # build the final fully connected layers for the output.
         if output:
             self.buildoutput(size_fc)
@@ -71,7 +70,7 @@ class iEEGRNN(BaseNet):
     def buildoutput(self, size_fc):
         self._build_seq_output(size_fc=size_fc)
 
-    def _build_deeprnn(self, w_init=None, celltype='lstm'):
+    def _build_deeprnn(self, celltype='lstm'):
         '''
         Creates a deep recurrent style neural network, that can
         either be rnn, lstm, or a gru. It requires self
@@ -79,14 +78,12 @@ class iEEGRNN(BaseNet):
 
         Parameters:
         w_init              (list) of all the weights (#layers * #nodes_in_layers)
+        celltype            (string) is the cell type we use for our deep 
+                            recurrent neural network
 
         Returns:
         model               the sequential model object with all layers added in CNN style
         '''
-        # check for weight initialization -> apply Glorotuniform
-        # if w_init is None:
-            # w_init = [keras.initializers.glorot_uniform()] * sum(n_layers)
-
         if celltype not in ['rnn', 'lstm', 'gru']:
             raise ValueError('This celltype is not supported! Only the rnn, lstm and gru cells are supported')
 

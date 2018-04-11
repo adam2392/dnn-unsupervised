@@ -10,7 +10,7 @@ import pickle
 import keras
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
-from .testingcallback import TestCallback
+from .callbacks.testingcallback import TestCallback
 
 from keras.preprocessing.image import ImageDataGenerator
 
@@ -25,7 +25,6 @@ from sklearn.metrics import precision_score, \
     f1_score, roc_auc_score
 
 import pprint
-
 
 def preprocess_imgwithnoise(image_tensor):
     # preprocessing_function: function that will be implied on each input.
@@ -49,8 +48,16 @@ class TrainCNN(BaseTrain):
         self.batch_size = batch_size
         self.NUM_EPOCHS = NUM_EPOCHS
         self.AUGMENT = AUGMENT
+        self.HH = None
 
     def saveoutput(self, modelname, outputdatadir):
+        # if self.dnnmodel # check if dnnmodel has been set
+
+        # check if the history file has been set yet
+        if self.HH is None:
+            raise AttributeError('History object has not been set yet',
+                                'Need to run train() first!')
+
         modeljsonfile = os.path.join(outputdatadir, modelname + "_model.json")
         historyfile = os.path.join(
             outputdatadir,  modelname + '_history' + '.pkl')

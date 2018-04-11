@@ -22,11 +22,12 @@ from sklearn.metrics import precision_score, \
     recall_score, classification_report, \
     f1_score, roc_auc_score
 
+
 def mainmodel(traindatadir, rawdatadir):
     ##################### PARAMETERS FOR NN - CREATE NN ####################
     num_classes = 2       # dimension of output predictions
     DROPOUT = True
-    numhiddenunits = 500 # the size of the hidden layers for the rnn
+    numhiddenunits = 500  # the size of the hidden layers for the rnn
     numwins = 500  # use 500 windows for a fragility
     numlayers = 2
 
@@ -53,9 +54,9 @@ def mainmodel(traindatadir, rawdatadir):
     datamunger.trainingscheme(scheme='rand')
 
     # 02: initialize the Recurrent style network
-    rnn = iEEGRNN(num_times=numwins, 
-                  num_layers=numlayers, 
-                  hidden_size=numhiddenunits, 
+    rnn = iEEGRNN(num_times=numwins,
+                  num_layers=numlayers,
+                  hidden_size=numhiddenunits,
                   num_classes=num_classes,
                   DROPOUT=DROPOUT)
     rnn.buildmodel()
@@ -63,7 +64,8 @@ def mainmodel(traindatadir, rawdatadir):
     rnn.summaryinfo()
     dnnmodel = rnn.model
 
-    # print some debugging outputs to allow user to see how model is being trained
+    # print some debugging outputs to allow user to see how model is being
+    # trained
     print("Input of fragnet model is: ", rnn.model.input_shape)
     sys.stdout.write("We have %i datasets" % len(datamunger.datafilepaths))
     sys.stdout.write(datamunger.datafilepaths[0])
@@ -72,9 +74,10 @@ def mainmodel(traindatadir, rawdatadir):
     print(len(datamunger.main_data))
     return dnnmodel, datamunger
 
+
 def maintrain(dnnmodel, datamunger, outputdatadir, tempdatadir):
     modelname = 'deeplstm'
-    ##################### PARAMETERS FOR TRAINING - CREATE TRAINER ####################
+    ##################### PARAMETERS FOR TRAINING - CREATE TRAINER ###########
     batch_size = 32
     NUM_EPOCHS = 300
     AUGMENT = False
@@ -106,6 +109,7 @@ def maintrain(dnnmodel, datamunger, outputdatadir, tempdatadir):
     # get the history object as a result of training
     HH = trainer.HH
     return trainer
+
 
 def maintest(dnnmodel, trainer):
     # get the testing data to run a final summary output

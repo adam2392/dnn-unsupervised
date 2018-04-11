@@ -46,7 +46,7 @@ class BaseNet(metaclass=ABCMeta):
             self.num_classes, activation='softmax')(self.output)
         if self.DROPOUT:
             self.output = Dropout(0.5)(self.output)
-
+        return self.output
     def _build_seq_output(self, size_fc=1024):
         '''
         Creates the final output layers of the sequential model: a fully connected layer

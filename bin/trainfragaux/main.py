@@ -34,13 +34,15 @@ if __name__ == '__main__':
     if not os.path.exists(tempdatadir):
         os.makedirs(tempdatadir)
 
-    # load in model and weights -> NEED TO ADAPT OUTPUTDATADIR to get the correct weights! (version exp)
+    # load in model and weights -> NEED TO ADAPT OUTPUTDATADIR to get the
+    # correct weights! (version exp)
     weightsfile = os.path.join(outputdatadir, 'fragfinal_weights.h5')
     modelfile = os.path.join(outputdatadir, 'fragcnn_model.json')
 
     modelname = '2dfragnet'
 
-    # imsize=30    # the size of the PCA that you perform on the rest of the fragility map
+    # imsize=30    # the size of the PCA that you perform on the rest of the
+    # fragility map
     n_colors = 1
     num_classes = 2
     DROPOUT = True

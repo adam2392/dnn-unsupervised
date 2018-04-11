@@ -459,17 +459,3 @@ class SplitData(LabelData):
         self.Xmain_test = Xmain_test
         self.Xaux_test = Xaux_test
         self.y_test = y_test
-
-    def transformdata(data, numwins):
-        '''
-        Function to transform the data before input. We may meed to downsample, or pad
-        the data to get our desired 'length'.
-
-        '''
-        if data.shape[1] > numwins:
-            # just simply slice off the end of the data
-            data = data[:, 0:numwins]
-        else:
-            # need to apply padding
-            # data =
-            print('padding')

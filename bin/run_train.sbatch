@@ -51,7 +51,7 @@ printf "Running training model"
 # singularity exec -B /scratch/ --nv ../tensorflow.simg python ./trainbasecnn/main_refactored.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${testdatadir} ${patient}
 
 # for 1dcnn fragnet
-singularity exec -B /scratch/ --nv ../tensorflow.simg python ./trainfragnet/main.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${rawdatadir} ${patient}
+# singularity exec -B /scratch/ --nv ../tensorflow.simg python ./trainfragnet/main.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${rawdatadir} ${patient}
 
 # for deep lstm fragnet
 # singularity exec -B /scratch/ --nv ../tensorflow.simg python ./trainfragnet/mainseq.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${rawdatadir} ${patient}
@@ -61,5 +61,9 @@ singularity exec -B /scratch/ --nv ../tensorflow.simg python ./trainfragnet/main
 
 # for training fragnet
 # singularity exec -B /scratch/ --nv ../tensorflow.simg python ./trainfragaux/main_refactored.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${rawdatadir}
+
+# for inception-cnn
+singularity exec -B /scratch/ --nv ../tensorflow.simg python ./traininception/main.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${testdatadir} ${patient}
+
 
 exit

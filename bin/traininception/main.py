@@ -4,8 +4,6 @@ sys.path.append('../dnn/')
 import os
 import numpy as np
 
-print(sys.path)
-
 # Custom Built libraries
 from model.nets.ieegcnn import iEEGCNN
 from model.train import traincnn
@@ -15,11 +13,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import scale
 
 # metrics for postprocessing of the results
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score, \
     recall_score, classification_report, \
-    f1_score, roc_auc_score
+    f1_score, roc_auc_score, confusion_matrix,
+    accuracy_score
 
 
 def mainmodel():
@@ -28,8 +25,11 @@ def mainmodel():
     n_colors = 4             # the #channels in convnet
     num_classes = 2           # output dimension
     DROPOUT = True            # use DROPOUT?
-
     modeldim = 2              # (optional): dim of model (1,2,3)
+
+    num_layers = 8
+    n_filters_first = 64
+    size_fc = 512
 
     # build the baseline CNN model
     cnn = iEEGCNN(imsize=imsize,
@@ -37,15 +37,16 @@ def mainmodel():
                   num_classes=num_classes,
                   modeldim=modeldim,
                   DROPOUT=DROPOUT)
-    cnn.buildmodel()
+    dnnmodel = cnn.build_inception2dcnn(num_layers=num_layers,
+                                        n_filters_first=n_filters_first,
+                                        size_fc=size_fc)
     # instantiate this current model
     dnnmodel = cnn.model
 
     print("Input shape for the model is: ", dnnmodel.input_shape)
-    print("Created VGG12 Style CNN")
+    print("Created Inception Style CNN")
     print(dnnmodel.summary())
     return dnnmodel
-
 
 def maintrain(dnnmodel, outputdatadir, tempdatadir,
               traindatadir, testdatadir, patient):
@@ -70,7 +71,7 @@ def maintrain(dnnmodel, outputdatadir, tempdatadir,
     #                 'id013_pg'
     #                 ]
 
-    # listofpats_train.remove(patient)
+    listofpats_train.remove(patient)
     listofpats_test = [patient]
     ##################### PARAMETERS FOR TRAINING - CREATE TRAINER ###########
     batch_size = 32

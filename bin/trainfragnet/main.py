@@ -36,17 +36,21 @@ def mainmodel(traindatadir, rawdatadir, patient):
     # list of patients to train on
     listofpats = [
         'jh105',
-        'pt1', 'pt2', 'pt3',
-        'pt8', 'pt11', 'pt13', 'pt15',
+        'pt1', 'pt2',
+        # 'pt3',
+        # 'pt8',
+        'pt11',
+        # 'pt13',
+        'pt15',
         'pt16', 'pt17',
-        'la01',
+        # 'la01',
         'la02', 'la03',
         'la05', 'la07',
-        'ummc002', 'ummc003',
-        'ummc004', 'ummc005',
-        'ummc006',
+        # 'ummc002',
+        # 'ummc003',
+        # 'ummc004', 'ummc005',
+        # 'ummc006',
     ]
-
 
     # 01: initialize a munger class to help format the data
     datamunger = LabelData(numwins, rawdatadir)  # feed in PCA size
@@ -68,7 +72,8 @@ def mainmodel(traindatadir, rawdatadir, patient):
     cnn.summaryinfo()
     dnnmodel = cnn.model
 
-    # print some debugging outputs to allow user to see how model is being trained
+    # print some debugging outputs to allow user to see how model is being
+    # trained
     print("Input of fragnet model is: ", cnn.model.input_shape)
     sys.stdout.write("We have %i datasets \n" % len(datamunger.datafilepaths))
     sys.stdout.write(datamunger.datafilepaths[0])
@@ -77,9 +82,10 @@ def mainmodel(traindatadir, rawdatadir, patient):
     print(len(datamunger.main_data))
     return dnnmodel, datamunger
 
+
 def maintrain(dnnmodel, datamunger, outputdatadir, tempdatadir):
     modelname = '1dcnn'
-    ##################### PARAMETERS FOR TRAINING - CREATE TRAINER ####################
+    ##################### PARAMETERS FOR TRAINING - CREATE TRAINER ###########
     batch_size = 32
     NUM_EPOCHS = 300
     AUGMENT = False
@@ -118,6 +124,7 @@ def maintrain(dnnmodel, datamunger, outputdatadir, tempdatadir):
     # get the history object as a result of training
     HH = cnn_trainer.HH
     return cnn_trainer
+
 
 def maintest(dnnmodel, cnn_trainer):
     # get the testing data to run a final summary output
