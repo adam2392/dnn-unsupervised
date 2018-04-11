@@ -27,7 +27,7 @@ def mainmodel():
     DROPOUT = True            # use DROPOUT?
     modeldim = 2              # (optional): dim of model (1,2,3)
 
-    num_layers = 8
+    num_layers = 6
     n_filters_first = 64
     size_fc = 512
 
