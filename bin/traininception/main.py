@@ -15,7 +15,7 @@ from sklearn.preprocessing import scale
 # metrics for postprocessing of the results
 from sklearn.metrics import precision_score, \
     recall_score, classification_report, \
-    f1_score, roc_auc_score, confusion_matrix,
+    f1_score, roc_auc_score, confusion_matrix, \
     accuracy_score
 
 
