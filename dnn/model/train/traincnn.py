@@ -243,19 +243,19 @@ class TrainCNN(BaseTrain):
     def _loadgenerator(self):
         # This will do preprocessing and realtime data augmentation:
         self.generator = ImageDataGenerator(
-            # featurewise_cente/r=True,  # set input mean to 0 over the dataset
-            # samplewise_center=True,  # set each sample mean to 0
-            # featurewise_std_normalization=True,  # divide inputs by std of the dataset
-            # samplewise_std_normalization=True,  # divide each input by its std
-            # zca_whitening=False,      # apply ZCA whitening
+            featurewise_center=True,  # set input mean to 0 over the dataset
+            samplewise_center=True,  # set each sample mean to 0
+            featurewise_std_normalization=True,  # divide inputs by std of the dataset
+            samplewise_std_normalization=True,  # divide each input by its std
+            zca_whitening=False,      # apply ZCA whitening
             # randomly rotate images in the range (degrees, 0 to 180)
-            # rotation_range=5,
+            rotation_range=5,
             # randomly shift images horizontally (fraction of total width)
-            # width_shift_range=0.2,
+            width_shift_range=0.2,
             # randomly shift images vertically (fraction of total height)
-            # height_shift_range=0.2,
-            # horizontal_flip=True,    # randomly flip images
-            # vertical_flip=True,      # randomly flip images
-            # channel_shift_range=4,
-            # fill_mode='nearest',
+            height_shift_range=0.2,
+            horizontal_flip=True,    # randomly flip images
+            vertical_flip=True,      # randomly flip images
+            channel_shift_range=4,
+            fill_mode='nearest',
             preprocessing_function=preprocess_imgwithnoise)

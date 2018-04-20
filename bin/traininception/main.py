@@ -27,7 +27,7 @@ def mainmodel():
     DROPOUT = True            # use DROPOUT?
     modeldim = 2              # (optional): dim of model (1,2,3)
 
-    num_layers = 6
+    num_layers = 5
     n_filters_first = 64
     size_fc = 512
 
@@ -107,7 +107,7 @@ def maintest(dnnmodel, cnn_trainer, outputdatadir=None):
     ##################### INPUT DATA FOR NN ####################
     prob_predicted = dnnmodel.predict(X_test)
     ytrue = np.argmax(y_test, axis=1)
-    y_pred = dnnmodel.predict_classes(X_test)
+    y_pred = np.argmax(prob_predicted, axis=1)
 
     # Save the output predictions also
     print(
