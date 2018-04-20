@@ -60,10 +60,10 @@ printf "Running training model"
 # singularity exec -B /scratch/ --nv ../tensorflow.simg python ./traincnnlstm/main.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${rawdatadir}
 
 # for training fragnet
-# singularity exec -B /scratch/ --nv ../tensorflow.simg python ./trainfragaux/main_refactored.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${rawdatadir}
+singularity exec -B /scratch/ --nv ../tensorflow.simg python ./trainfragaux/main_refactored.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${rawdatadir}
 
 # for inception-cnn
-singularity exec -B /scratch/ --nv ../tensorflow.simg python ./traininception/main.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${testdatadir} ${patient}
+# singularity exec -B /scratch/ --nv ../tensorflow.simg python ./traininception/main.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${testdatadir} ${patient}
 
 
 exit
