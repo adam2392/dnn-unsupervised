@@ -423,19 +423,64 @@ class SplitData(LabelData):
         main_data = self.main_data
         ylabels = self.ylabels
 
-        def loo():
-            # format the data correctly
-            Xmain_train, Xmain_test,\
-                Xaux_train, Xaux_test,\
-                y_train, y_test = LeaveOneOut(aux_data, main_data, ylabels)
-            return Xmain_train, Xmain_test, Xaux_train, Xaux_test, y_train, y_test
+        listofpats = np.array(self.listofpats)
+        main_data = np.array(self.main_data)
+        aux_data = np.array(self.aux_data)
+        ylabels = np.array(self.ylabels)
 
+        def _loo():
+            '''
+            Perform leave one out train/test split with the groups of patients
+            we have.
+            '''
+            # initialize lists for the training/testing data sets
+            X_train = []
+            X_test = []
+            y_train = []
+            y_test = []
+
+            logo = LeaveOneGroupOut()
+            # print('in leave one group out.')
+            # print(np.array(main_data).shape)
+            # print(np.array(ylabels).shape)
+            # print(np.array(listofpats).shape)
+            allinds = np.arange(0, len(listofpats)).astype(int)
+            test_index = [i for i,s in enumerate(listofpats) if patient in s]
+            train_index = np.setdiff1d(allinds, test_index).astype(int)
+            
+            # test index
+            pattest = np.unique(listofpats[test_index])
+            print("The patient we are testing is: ", pattest)
+
+            Xmain_train.append(main_data[train_index,:])
+            Xmain_test.append(main_data[test_index,:])
+            Xaux_train.append(aux_data[train_index,:])
+            Xaux_test.append(aux_data[test_index,:])
+            y_train.append(ylabels[train_index])
+            y_test.append(ylabels[test_index])
+
+            Xmain_train = np.vstack(Xmain_train)[..., np.newaxis]
+            Xmain_test = np.vstack(Xmain_test)[..., np.newaxis]
+            Xaux_train = np.vstack(Xaux_train)[..., np.newaxis]
+            Xaux_test = np.vstack(Xaux_test)[..., np.newaxis]
+            y_train = np.hstack(y_train)
+            y_test = np.hstack(y_test)
+
+            return Xmain_train, Xmain_test, Xaux_train, Xaux_test, y_train, y_test
         def randsplit():
             # format the data correctly
             Xmain_train, Xmain_test,\
                 Xaux_train, Xaux_test,\
                 y_train, y_test = train_test_split(
                     aux_data, main_data, ylabels, test_size=0.33, random_state=42)
+
+            Xmain_train = np.vstack(Xmain_train)[..., np.newaxis]
+            Xmain_test = np.vstack(Xmain_test)[..., np.newaxis]
+            Xaux_train = np.vstack(Xaux_train)[..., np.newaxis]
+            Xaux_test = np.vstack(Xaux_test)[..., np.newaxis]
+            y_train = np.hstack(y_train)
+            y_test = np.hstack(y_test)
+            
             return Xmain_train, Xmain_test, Xaux_train, Xaux_test, y_train, y_test
 
         schemes = ['loo', 'rand']
@@ -445,6 +490,7 @@ class SplitData(LabelData):
             Xmain_train, Xmain_test, Xaux_train, Xaux_test, y_train, y_test = loo()
         elif scheme == 'rand':
             Xmain_train, Xmain_test, Xaux_train, Xaux_test, y_train, y_test = randsplit()
+
 
         # compute the class weights, if we need them
         class_weight = sklearn.utils.compute_class_weight('balanced',

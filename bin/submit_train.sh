@@ -21,8 +21,8 @@ read -p "Enter patient: " patient
 echo "Begin analysis." # print beginning statement
 # NEED TO RUN FOR EZ=0,1,2,3 and varying PZ all once
 
-patient="${patient:-id001_ac}"
-# patient="${patient:-jh105}"
+# patient="${patient:-id001_ac}"
+patient="${patient:-jh105}"
 
 # For training and modeling with the real data
 # tempdatadir="/scratch/users/ali39@jhu.edu/data/dnn/temp/exp004/real_$patient/"
@@ -37,8 +37,8 @@ patient="${patient:-id001_ac}"
 # testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
 
 # # For training and modeling with real fragility data 
-tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/fragnet/exp003/'
-outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/fragnet/exp003/'
+tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/fragnet/exp003/$patient/'
+outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/fragnet/exp003/$patient/'
 traindatadir='/scratch/users/ali39@jhu.edu/data/outputfordnn/pert/'
 rawdatadir='/scratch/users/ali39@jhu.edu/data/converted/'
 
