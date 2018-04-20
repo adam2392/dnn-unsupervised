@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 import keras
 from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
-from .testingcallback import TestCallback
+from .callbacks.testingcallback import TestCallback
 from keras.preprocessing.image import ImageDataGenerator
 
 # metrics for postprocessing of the results
