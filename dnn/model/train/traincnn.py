@@ -95,7 +95,8 @@ class TrainCNN(BaseTrain):
                          beta_1=0.9,
                          beta_2=0.99,
                          epsilon=1e-08,
-                         decay=0.0)
+                         decay=0.0,
+                         amsgrad=True)
         metrics = ['accuracy']
         self.modelconfig = self.dnnmodel.compile(loss=loss,
                                                  optimizer=optimizer,

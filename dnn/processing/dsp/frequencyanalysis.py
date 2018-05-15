@@ -45,7 +45,7 @@ class MultiTaperFFT(BaseFreqModel):
         print("Loaded raw data in MultiTaperFFT!")
 
     def fftchan(self, datawin, numsamps, overlapsamps, numtapers, w, vweights):
-        print(datawin.shape)
+        # print(datawin.shape)
         # split signal into windows and apply tapers to each one
         eegwin = self.buffer(datawin, numsamps, overlapsamps, opt='nodelay')
         detrendedeeg = scipy.signal.detrend(eegwin, axis=0)
@@ -56,11 +56,11 @@ class MultiTaperFFT(BaseFreqModel):
         wpermuted = np.transpose(
             np.repeat(w[:, :, np.newaxis], axis=2, repeats=windows), [0, 2, 1])
 
-        print(eegwin.shape)
+        # print(eegwin.shape)
         # get coefficients, power and phases
         fx = np.fft.fft(np.multiply(wpermuted, eegwin), axis=0)
 
-        print(fx.shape)
+        # print(fx.shape)
         # only get the frequencies we weant
         fx = fx[0:len(self.freqsfft), :, :] / np.sqrt(numsamps)
 
@@ -123,11 +123,10 @@ class MultiTaperFFT(BaseFreqModel):
             # save phase data - only of first taper -> can test complex average
             phasemultitaper[ichan, :, :] = fxphase[:, :, 0]
 
-            return timefreqmat
+            # return timefreqmat
         # make it log based power
         powermultitaper = np.log10(powermultitaper)
         return powermultitaper, self.freqsfft, self.timepoints, phasemultitaper
-
 
 class MorletWavelet(BaseFreqModel):
     def __init__(self, winsizems, stepsizems, samplerate, waveletfreqs, waveletwidth):

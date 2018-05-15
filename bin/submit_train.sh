@@ -37,8 +37,8 @@ patient="${patient:-jh105}"
 # testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
 
 # # For training and modeling with real fragility data 
-tempdatadir='/scratch/users/ali39@jhu.edu/data/dnn/temp/fragnet/exp003/$patient/'
-outputdatadir='/scratch/users/ali39@jhu.edu/data/dnn/output/fragnet/exp003/$patient/'
+tempdatadir="/scratch/users/ali39@jhu.edu/data/dnn/temp/fragnet/exp003/$patient/"
+outputdatadir="/scratch/users/ali39@jhu.edu/data/dnn/output/fragnet/exp003/$patient/"
 traindatadir='/scratch/users/ali39@jhu.edu/data/outputfordnn/pert/'
 rawdatadir='/scratch/users/ali39@jhu.edu/data/converted/'
 
