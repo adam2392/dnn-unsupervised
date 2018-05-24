@@ -8,14 +8,18 @@ from dnn_pytorch.util.layer import Flatten, PrintLayer
 from dnn_pytorch.base.constants.config import Config
 from dnn_pytorch.base.utils.log_error import initialize_logger
 
-class ConvNet(nn.Module):
-    def __init__(self, num_classes=2, config=None):
+class RecConvNet(nn.Module):
+    def __init__(self, num_classes=2, numwins=500, config=None):
         super(ConvNet, self).__init__()
 
         self.config = config or Config()
         self.logger = initialize_logger(self.__class__.__name__, self.config.out.FOLDER_LOGS)
 
-        # VGG params
+        # RNN-LSTM params
+        num_hidden_units = 1024
+        self.numwins = numwins
+
+        # CNN-VGG params
         w_init = True
         n_layers = (4,2,1)
         poolsize = 2
@@ -80,13 +84,12 @@ class Train(object):
         self.config = config or Config()
         self.logger = initialize_logger(self.__class__.__name__, self.config.out.FOLDER_LOGS)
 
-        self.net = net
-
         if device is None:
             # Device configuration
             device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         self.device = device
 
+        self.net = net
         # Hyper parameters
         self.num_epochs = 100
         self.batch_size = 64
@@ -114,8 +117,7 @@ class Train(object):
 
     def train(self):
         optimparams = {
-            'lr': learning_rate,
-            'amsgrad': True,
+            'lr': learning_rate
         }
         optimizer = torch.optim.Adam(self.net.parameters(), 
                                     **optimparams)
@@ -168,25 +170,11 @@ class Train(object):
         # Save the model checkpoint
         torch.save(self.net.state_dict(), 'model.ckpt')
 
-        #Later to restore:
-        # model.load_state_dict(torch.load(filepath))
-        # model.eval()
-
-        # state = {
-        #     'epoch': epoch,
-        #     'state_dict': model.state_dict(),
-        #     'optimizer': optimizer.state_dict(),
-        #     ...
-        # }
-        # torch.save(state, filepath)
-        # model.load_state_dict(state['state_dict'])
-        # optimizer.load_state_dict(stata['optimizer'])
-
 if __name__ == '__main__':
     # Device configuration
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
-    cnn = ConvNet()
+    rcnn = RecConvNet()
 
     ## SUMMARIZE WEIGHTS IN EACH LAYER
     # for i, weights in enumerate(list(cnn.parameters())):
@@ -196,7 +184,7 @@ if __name__ == '__main__':
     expected_image_shape = (4, 28, 28)
     input_tensor = torch.autograd.Variable(torch.rand(1, *expected_image_shape))
     # this call will invoke all registered forward hooks
-    output_tensor, x = cnn(input_tensor)
+    output_tensor, x = rcnn(input_tensor)
     print(x.shape)
     print(output_tensor.shape)
     print(cnn)
