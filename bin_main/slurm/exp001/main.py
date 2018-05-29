@@ -100,17 +100,19 @@ def localtest():
     traindatadir = os.path.join(datadir, './')
 
 if __name__ == '__main__':
-#     traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/expfull/"
-# testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
-# # logs for the training logs, and outputdata directory for final summary
-# logdatadir="/scratch/users/ali39@jhu.edu/data/dnn/logs/$expname/"           
-# outputdatadir="/scratch/users/al
+    expname = 'exp001'
+    traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
+    testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
+    # logs for the training logs, and outputdata directory for final summary
+    logdatadir="/scratch/users/ali39@jhu.edu/data/dnn/logs/{}/".format(expname)     
+    outputdatadir="/scratch/users/ali39@jhu.edu/data/dnn/output/{}/".format(expname)
+    patient='id001_bt'
     # ${outputdatadir} ${logdatadir} ${traindatadir} ${testdatadir} ${patient}
-    outputdatadir = str(sys.argv[1])    # output for data dir
-    logdatadir = str(sys.argv[2])      # the temp data dire
-    traindatadir = str(sys.argv[3])          # the training data directory
-    testdatadir = str(sys.argv[4])      # the test data directory
-    patient = str(sys.argv[5])
+    # outputdatadir = str(sys.argv[1])    # output for data dir
+    # logdatadir = str(sys.argv[2])      # the temp data dire
+    # traindatadir = str(sys.argv[3])          # the training data directory
+    # testdatadir = str(sys.argv[4])      # the test data directory
+    # patient = str(sys.argv[5])
 
     num_classes = 2
     data_procedure='loo'
