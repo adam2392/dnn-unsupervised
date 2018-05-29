@@ -71,8 +71,8 @@ def load_data(traindir, testdir, data_procedure='loo', testpat=None):
     # initialize reader to get the training/testing data
     reader = Reader()
     reader.loadbydir(traindir, testdir, procedure=data_procedure, testname=testpat)
-    reader.loadfiles(mode=mode=constants.TRAIN)
-    reader.loadfiles(mode=mode=constants.TEST)
+    reader.loadfiles(mode=constants.TRAIN)
+    reader.loadfiles(mode=constants.TEST)
 
     print(reader.trainfilepaths)
     print(reader.testfilepaths)
