@@ -76,10 +76,10 @@ walltime=0:30:0
 for patient in $patients; do
 	# create export commands
 	exvars="--export=logdatadir=${logdatadir},\
-	outputdatadir=${outputdatadir},\
-	traindatadir=${traindatadir},\
-	testdatadir=${testdatadir},\
-	patient=${patient} "
+outputdatadir=${outputdatadir},\
+traindatadir=${traindatadir},\
+testdatadir=${testdatadir},\
+patient=${patient} "
 
 	# build basic sbatch command with all params parametrized
 	sbatcomm="sbatch \
