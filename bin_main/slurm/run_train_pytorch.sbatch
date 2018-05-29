@@ -13,19 +13,19 @@
 #---------------------------------------------------------------------
 ############################# LOAD IN MODULES AND UNLOAD #############
 module unload git
-ml anaconda-python/3.6
+# ml anaconda-python/3.6
 ml cuda/9.0
-# ml singularity 
+ml singularity 
 
 # activate our conda environment
-source activate dnn
+# source activate dnn
 
 # add CUDA paths
-CPATH="/usr/local/cuda/include:$CPATH"
-PATH="/usr/local/cuda/bin:$PATH"
-LD_LIBRARY_PATH="/usr/local/cuda/lib64:$LD_LIBRARY_PATH"
-CUDA_HOME="/usr/local/cuda"
-export CPATH PATH LD_LIBRARY_PATH CUDA_HOME
+# CPATH="/usr/local/cuda/include:$CPATH"
+# PATH="/usr/local/cuda/bin:$PATH"
+# LD_LIBRARY_PATH="/usr/local/cuda/lib64:$LD_LIBRARY_PATH"
+# CUDA_HOME="/usr/local/cuda"
+# export CPATH PATH LD_LIBRARY_PATH CUDA_HOME
 
 # cd to the scratch location 
 cd /scratch/users/$USER/dnn-unsupervised/bin_main/
@@ -56,9 +56,9 @@ echo "Running training model"
 # echo "This is the command being run: singularity exec -B /scratch/ --nv ../pytorch.simg python ./trainfragaux/main_refactored.py \
 # ${outputdatadir} ${logdatadir} ${traindatadir} ${datadir}"
 
-python ./slurm/exp001/main.py ${outputdatadir} ${logdatadir} ${traindatadir} ${testdatadir} ${patient}
-# singularity pull --name pytorch.simg shub://marcc-hpc/pytorch
-# singularity exec -B /scratch/ --nv ./pytorch.simg python ./slurm/exp001/main.py ${outputdatadir} ${logdatadir} ${traindatadir} ${testdatadir} ${patient}
+# python ./slurm/exp001/main.py ${outputdatadir} ${logdatadir} ${traindatadir} ${testdatadir} ${patient}
+singularity pull --name pytorch.simg shub://marcc-hpc/pytorch
+singularity exec -B /scratch/ --nv ./pytorch.simg python ./slurm/exp001/main.py ${outputdatadir} ${logdatadir} ${traindatadir} ${testdatadir} ${patient}
 
 
 exit
