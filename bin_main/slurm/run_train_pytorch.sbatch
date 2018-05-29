@@ -12,10 +12,10 @@
 # SLURM job script to run Singularity Keras/Tflow Training
 #---------------------------------------------------------------------
 ############################# LOAD IN MODULES AND UNLOAD #############
-# module unload git
-# ml anaconda-python/3.6
+module unload git
+ml anaconda-python/3.6
 ml cuda/9.0
-ml singularity 
+# ml singularity 
 
 # activate our conda environment
 source activate dnn
@@ -49,7 +49,9 @@ echo "Running training model"
 echo "This is the command being run: singularity exec -B /scratch/ --nv ../pytorch.simg python ./trainfragaux/main_refactored.py \
 ${outputdatadir} ${logdatadir} ${traindatadir} ${datadir}"
 
-singularity exec -B /scratch/ --nv ../pytorch.simg python ./slurm/exp001/main.py ${outputdatadir} ${logdatadir} ${traindatadir} ${testdatadir} ${patient}
+python ./slurm/exp001/main.py ${outputdatadir} ${logdatadir} ${traindatadir} ${testdatadir} ${patient}
+# singularity pull --name pytorch.simg shub://marcc-hpc/pytorch
+# singularity exec -B /scratch/ --nv ./pytorch.simg python ./slurm/exp001/main.py ${outputdatadir} ${logdatadir} ${traindatadir} ${testdatadir} ${patient}
 
 
 exit

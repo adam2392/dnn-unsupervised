@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd 
 import json 
 import os
-# from enum import Enum
 
 from dnn_pytorch.base.constants.config import Config
 from dnn_pytorch.base.utils.log_error import initialize_logger
