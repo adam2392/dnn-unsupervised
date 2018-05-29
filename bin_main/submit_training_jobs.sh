@@ -70,7 +70,7 @@ jobname="train_${patient}_${expname}.log"
 ## job reqs
 walltime=5:00:0
 
-partition=debug
+# partition=gpu
 walltime=0:30:0
 
 # create export commands

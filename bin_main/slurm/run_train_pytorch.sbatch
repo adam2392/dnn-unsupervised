@@ -40,7 +40,7 @@ nvidia-smi
 export SINGULARITY_HOME=$PWD:/home/$USER
 
 echo $PWD
-printf "Running training model"
+echo "Running training model"
 # docker://python:latest
 # singularity options: 
 # -vvv -d = very verbose / debugging mode
