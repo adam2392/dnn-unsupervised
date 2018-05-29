@@ -26,9 +26,9 @@ cd /scratch/users/$USER/dnn-unsupervised/bin/
 
 ########################## DEBUG OUTPUT  ###########################
 # grep for SLURM_EXPORT_ENV
-echo "Temp data dir is : ${tempdatadir}"
+echo "log data dir is : ${logdatadir}"
 echo "Output data dir is: ${outputdatadir}"
-echo "Train data dir is: ${traindatadir}"
+echo "Data dir is: ${datadir}"
 echo "Raw data dir is: ${rawdatadir}"
 echo "Patient to analyze is: ${patient}"
 echo ${CUDA_VISIBLE_DEVICES}
@@ -46,23 +46,12 @@ printf "Running training model"
 # -vvv -d = very verbose / debugging mode
 # -B = bind path /scratch /work /data
 
-# for cnn
-# singularity exec -B /scratch/ --nv ../tensorflow.simg python ./trainbasecnn/main_refactored.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${testdatadir} ${patient}
-
-# for 1dcnn fragnet
-# singularity exec -B /scratch/ --nv ../tensorflow.simg python ./trainfragnet/main.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${rawdatadir} ${patient}
-
-# for deep lstm fragnet
-# singularity exec -B /scratch/ --nv ../tensorflow.simg python ./trainfragnet/mainseq.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${rawdatadir} ${patient}
-
-# for training cnn-lstm
-# singularity exec -B /scratch/ --nv ../tensorflow.simg python ./traincnnlstm/main.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${rawdatadir}
-
 # for training fragnet
-singularity exec -B /scratch/ --nv ../tensorflow.simg python ./trainfragaux/main_refactored.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${rawdatadir}
+echo "This is the command being run: singularity exec -B /scratch/ --nv ../pytorch.simg python ./trainfragaux/main_refactored.py \
+${outputdatadir} ${logdatadir} ${traindatadir} ${datadir}"
 
-# for inception-cnn
-# singularity exec -B /scratch/ --nv ../tensorflow.simg python ./traininception/main.py ${outputdatadir} ${tempdatadir} ${traindatadir} ${testdatadir} ${patient}
+singularity exec -B /scratch/ --nv ../pytorch.simg python ./trainfragaux/main_refactored.py \
+${outputdatadir} ${logdatadir} ${traindatadir} ${datadir}
 
 
 exit

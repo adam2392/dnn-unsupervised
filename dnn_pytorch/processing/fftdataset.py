@@ -10,13 +10,19 @@ warnings.filterwarnings("ignore")
 
 from dnn_pytorch.base.constants.config import Config
 from dnn_pytorch.base.utils.log_error import initialize_logger
+import dnn_pytorch.base.constants.model_constants as constants
 
 class FFT2DImageDataset(Dataset):
     '''
     Uses pytorch abstract class for representing our FFT image dataset.
 
     '''
-    def __init__(self, root_dir, datasetnames=None, transform=None, config=None):
+    chanmeans = None
+    chanstd = None
+    imsize = None
+    n_colors = None
+
+    def __init__(self, data_tensor, ylabels, mode=constants.TRAIN, transform=None, config=None):
         """
         Args:
             root_dir (string): directory with all the data
@@ -27,117 +33,100 @@ class FFT2DImageDataset(Dataset):
         self.config = config or Config()
         self.logger = initialize_logger(self.__class__.__name__, self.config.out.FOLDER_LOGS)
 
-        self.root_dir = root_dir
-        self.datasetnames = datasetnames
-        self.chanmeans = None
-        self.chanstd = None
+        assert len(data_tensor) == len(ylabels)
+        self.data_tensor = data_tensor
+        self.ylabels = ylabels
+        # call function to obtain avg/std along channel axis
+        self._getchanstats()
 
-        # get all the datafiles avail
-        datafiles = []
-        for root, dirs, files in os.walk(root_dir):
-            for file in files:
-                if datasetnames is None:
-                    if any(name in file for name in datasetnames):
-                        datafiles.append(os.path.join(root, file))
-                else:
-                    datafiles.append(os.path.join(root, file))
-        self.datafiles = datafiles
-
-        self._loadalldata()
-
-        if transform is not None:
-            self.transform = transform
-        else:
-            transforms_to_use = [
-                transforms.ToPILImage()#mode='RGBA'),
-                augmentations.RandomLightingNoise(),
-                transforms.RandomHorizontalFlip(p=0.5),
-                transforms.RandomVerticalFlip(p=0.5),
-                transforms.RandomRotation(degrees=5, 
-                                        resample=False, 
-                                        expand=False, 
-                                        center=None),
-                transforms.RandomAffine(degrees=5, 
-                                        translate=(0.1,0.1), 
-                                        scale=None, 
-                                        shear=5, 
-                                        resample=False, 
-                                        fillcolor=0),
-                transforms.ToTensor()
-            ]
-            if self.chanmeans is not None and self.chanstd is not None:
-                transforms_to_use.append(transforms.Normalize(mean=self.chanmeans,    # apply normalization along channel axis
-                                                             std=self.chanstd))
-            transforms_to_use.append(augmentations.InjectNoise())
-
-            data_transform = transforms.Compose(transforms_to_use)
-            self.transform = data_transform
+        # set the transformations to use
+        self.transform = transform
+        if mode == constants.TRAIN:
+            self._set_training_transforms()
+        elif mode == constants.TEST:
+            self._setdefaulttransforms()
 
     def __len__(self):
-        # return len(self.datasetnames)
-        return len(self.datafiles)
-
-        return len(self.X_train)
+        return len(self.data_tensor)
 
     def __getitem__(self, idx):
-        sample = self.X_train[idx,...]
-        ylabels = self.y_train[idx,...]
+        sample = self.data_tensor[idx,...]
+        ylabels = self.ylabels[idx,...]
 
         # apply transformations to the dataset
         if self.transform:
             sample = self.transform(sample)
-
         return sample, ylabels
 
+    @property
+    def imsize(self):
+        return self.data_tensor.shape[3]
 
-    def _loadalldata(self):
-        for idx, datafile in enumerate(self.datafiles):
-            datastruct = np.load(datafile)
-            image_tensor = datastruct['image_tensor']
-            metadata = datastruct['metadata'].item()
-
-            if idx == 0:
-                image_tensors = image_tensor
-                ylabels = metadata['ylabels']
-            else:
-                image_tensors = np.append(image_tensors, image_tensor, axis=0)
-                ylabels = np.append(ylabels, metadata['ylabels'], axis=0)
-
-            break
-
-        # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
-        invert_y = 1 - ylabels
-        ylabels = np.concatenate((invert_y, ylabels), axis=1)
-        # format the data correctly
-        class_weight = sklearn.utils.compute_class_weight('balanced',
-                                                          np.unique(
-                                                              ylabels).astype(int),
-                                                          np.argmax(ylabels, axis=1))
-        # so that the image_tensors channel x h x w
-        image_tensors = image_tensors.swapaxes(1, 3)
-        # lower sample by casting to 32 bits
-        image_tensors = image_tensors.astype("float32")
-        self.X_train = image_tensors
-        self.y_train = ylabels
-        self.class_weight = class_weight
-
-        # call function to obtain avg/std along channel axis
-        self._getchanstats()
+    @property
+    def n_colors(self):
+        return self.data_tensor.shape[1]
 
     def _getchanstats(self):
-        assert self.X_train.shape[2] == self.X_train.shape[3]
+        assert self.data_tensor.shape[2] == self.data_tensor.shape[3]
         chanaxis = 1
-        numchans = self.X_train.shape[chanaxis]
+        numchans = self.data_tensor.shape[chanaxis]
 
         chanmeans = []
         chanstd = []
         for ichan in range(numchans):
-            chandata = self.X_train[:, ichan, ...].ravel()
+            chandata = self.data_tensor[:, ichan, ...].ravel()
             chanmeans.append(np.mean(chandata))
             chanstd.append(np.std(chandata))
 
         self.chanmeans = chanmeans
         self.chanstd = chanstd
+
+    def _setdefaulttransforms(self):
+        transforms_to_use = [
+            transforms.ToPILImage(),#mode='RGBA'),
+            transforms.ToTensor()
+        ]
+        # compose the transformations
+        data_transform = transforms.Compose(transforms_to_use)
+        self.transform = data_transform
+
+    def _set_training_transforms(self):
+        '''
+        Add transforms:
+        1. to pil image data struct
+        2. random lighting,
+        3. random horizontal/vertical flipping
+        4. random rotation
+        5. random affine translation
+        6. to tensor data struct
+        '''
+        transforms_to_use = [
+            transforms.ToPILImage(), #mode='RGBA'),
+            augmentations.RandomLightingNoise(),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.RandomVerticalFlip(p=0.5),
+            transforms.RandomRotation(degrees=5, 
+                                    resample=False, 
+                                    expand=False, 
+                                    center=None),
+            transforms.RandomAffine(degrees=5, 
+                                    translate=(0.1,0.1), 
+                                    scale=None, 
+                                    shear=5, 
+                                    resample=False, 
+                                    fillcolor=0),
+            transforms.ToTensor()
+        ]
+        # apply normalization to tensor if available
+        if self.chanmeans is not None and self.chanstd is not None:
+            transforms_to_use.append(transforms.Normalize(mean=self.chanmeans,    # apply normalization along channel axis
+                                                         std=self.chanstd))
+        # apply image level noise to tensor
+        transforms_to_use.append(augmentations.InjectNoise())
+
+        # compose the transformations
+        data_transform = transforms.Compose(transforms_to_use)
+        self.transform = data_transform
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt

@@ -22,6 +22,37 @@ class InputConfig(object):
     def __init__(self, raw_folder=None):
         self._raw_data = raw_folder
 
+class TensorboardConfig(object):
+    subfolder = None
+
+    def __init__(self, out_base=None, separate_by_run=False):
+        """
+        :param work_folder: Base folder where logs/figures/results should be kept
+        :param separate_by_run: Set TRUE, when you want logs/results/figures to be in different files / each run
+        """
+        self._out_base = out_base or os.path.join(os.getcwd(), "tensorboard_out")
+        self._separate_by_run = separate_by_run
+
+    @property
+    def FOLDER_LOGS(self):
+        folder = os.path.join(self._out_base, "logs")
+        if self._separate_by_run:
+            folder = folder + datetime.strftime(datetime.now(), '%Y-%m-%d_%H-%M')
+        if not (os.path.isdir(folder)):
+            os.makedirs(folder)
+        return folder
+
+    @property
+    def FOLDER_FIGURES(self):
+        folder = os.path.join(self._out_base, "figs")
+        if self._separate_by_run:
+            folder = folder + datetime.strftime(datetime.now(), '%Y-%m-%d_%H-%M')
+        if not (os.path.isdir(folder)):
+            os.makedirs(folder)
+        if self.subfolder is not None:
+            os.path.join(folder, self.subfolder)
+        return folder
+
 class OutputConfig(object):
     subfolder = None
 
@@ -30,7 +61,7 @@ class OutputConfig(object):
         :param work_folder: Base folder where logs/figures/results should be kept
         :param separate_by_run: Set TRUE, when you want logs/results/figures to be in different files / each run
         """
-        self._out_base = out_base or os.path.join(os.getcwd(), "training_out")
+        self._out_base = out_base or os.path.join(os.getcwd(), "dnn_pytorch_out")
         self._separate_by_run = separate_by_run
 
     @property
@@ -90,3 +121,4 @@ class Config(object):
                 separate_by_run=False):
         self.input = InputConfig(raw_data_folder)
         self.out = OutputConfig(output_base, separate_by_run)
+        self.tboard = TensorboardConfig(output_base, separate_by_run)
