@@ -39,6 +39,7 @@ echo "Test data dir is: ${testdatadir}"
 echo "Patient to analyze is: ${patient}"
 echo ${CUDA_VISIBLE_DEVICES}
 
+# print out nvidia's system management interface log
 nvidia-smi
 
 ################### SETUP SINGULARITY CONTAINER  ####################
@@ -51,8 +52,6 @@ echo "Running training model"
 # singularity options: 
 # -vvv -d = very verbose / debugging mode
 # -B = bind path /scratch /work /data
-
-# for training fragnet
 # echo "This is the command being run: singularity exec -B /scratch/ --nv ../pytorch.simg python ./trainfragaux/main_refactored.py \
 # ${outputdatadir} ${logdatadir} ${traindatadir} ${datadir}"
 

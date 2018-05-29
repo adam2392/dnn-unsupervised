@@ -6,7 +6,6 @@ import sklearn
 import numpy as np
 # Ignore warnings
 import warnings
-warnings.filterwarnings("ignore")
 
 from dnn_pytorch.base.constants.config import Config
 from dnn_pytorch.base.utils.log_error import initialize_logger

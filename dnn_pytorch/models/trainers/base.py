@@ -19,18 +19,18 @@ class TestMetrics(object):
     fp_queue = []
     
 class BaseTrainer(object):
-	def __init__(self, net, device=None, config=None):
-		self.config = config or Config()
-	    self.logger = initialize_logger(self.__class__.__name__, self.config.out.FOLDER_LOGS)
-		
+    def __init__(self, net, device=None, config=None):
+        self.config = config or Config()
+        self.logger = initialize_logger(self.__class__.__name__, self.config.out.FOLDER_LOGS)
+        
         if device is None:
             # Device configuration
             device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         self.device = device
         self.logger.info("Setting the device to be {}".format(self.device))
 
-		self.net = net
-	# ================================================================== #
+        self.net = net
+    # ================================================================== #
     #                        Tensorboard Logging                         #
     # ================================================================== #
     def _tboard_metrics(self, loss, metrics, step, mode=constants.TRAIN):

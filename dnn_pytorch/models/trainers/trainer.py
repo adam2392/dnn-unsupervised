@@ -9,13 +9,17 @@ from dnn_pytorch.models.evaluate import evaluate
 from dnn_pytorch.models.metrics.classifier import BinaryClassifierMetric
 import dnn_pytorch.base.constants.model_constants as constants
 
+# import regularizers
+from dnn_pytorch.models.regularizer.post_class_regularizer import Postalarm
+
 # import tensorboard for writing stuff
 from tensorboardX import SummaryWriter
 from tqdm import trange
 
 class Trainer(BaseTrainer):
     metric_comp = BinaryClassifierMetric()
-    
+    post_regularizer = None
+
     # create a dictionary of metrics with their corresponding "lambda" functions
     metrics = {
         'accuracy': metric_comp._accuracy,
@@ -87,6 +91,13 @@ class Trainer(BaseTrainer):
         # self.metricholder.accuracy_queue.append(self.metrics.accuracy)
 
     def config(self):
+        """
+        Configuration function that can change:
+        - sets optimizer
+        - sets loss function
+        - sets scheduler
+        - sets post-prediction-regularizer
+        """
         optimparams = {
             'lr': learning_rate,
             'amsgrad': True,
@@ -105,6 +116,15 @@ class Trainer(BaseTrainer):
 
         # Loss and optimizer
         criterion = nn.CrossEntropyLoss()
+
+        # post-predictive regularizer
+        # winsize = 5                 # each image being 5/2.5 seconds => 12.5 seconds
+        # stepsize = 1                # step at an image per time
+        # post_regularizer = Postalarm(winsize, stepsize, samplerate)
+        # winsize_persamp = 5000
+        # stepsize_persamp = 2500
+        # numsamples = len(self.test_loader)
+        # post_regularizer.compute_timepoints(winsize_persamp, stepsize_persamp, numsamples)
 
         # set lr scheduler, optimizer and loss function
         self.scheduler = scheduler
@@ -195,6 +215,13 @@ class Trainer(BaseTrainer):
             # extract data from torch Variable, move to cpu, convert to numpy arrays
             output_batch = output_batch.data.cpu().numpy()
             labels_batch = labels_batch.data.cpu().numpy()
+
+            # regularize the output
+            if post_regularizer is not None:
+                post_regularizer.load_predictions(output_batch)
+                alarm_inds = post_regularizer.temporal_smooth(thresh=0.5)
+                output_batch[:] = 0
+                output_batch[alarm_inds] = 1
 
             # compute all metrics on this batch
             summary_batch = {metric: self.metrics[metric](output_batch, labels_batch)

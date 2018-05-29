@@ -13,8 +13,6 @@ from fragility.base.utils.log_error import initialize_logger
 from datetime import date
 import warnings
 
-warnings.filterwarnings("ignore", ".*not conform to MNE naming conventions.*")
-
 class LoadDataset(object):
     def __init__(self, root_dir, datafile, patient=None, preload=False, reference='monopolar', config=None):
         self.config = config or Config()

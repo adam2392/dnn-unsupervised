@@ -11,6 +11,7 @@ from dnn_pytorch.models.trainer import Trainer
 from dnn_pytorch.models.cnn import ConvNet, Train
 
 from dnn_pytorch.io.read_dataset import Reader
+from dnn_pytorch.base.dataset.fftdataset import FFT2DImageDataset
 import dnn_pytorch.base.constants.model_constants as constants
 
 # preprocessing data
