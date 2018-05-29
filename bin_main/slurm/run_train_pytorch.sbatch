@@ -12,9 +12,8 @@
 # SLURM job script to run Singularity Keras/Tflow Training
 #---------------------------------------------------------------------
 ############################# LOAD IN MODULES AND UNLOAD #############
-module unload git
-ml anaconda-python/3.6
-ml python/3.6.5
+# module unload git
+# ml anaconda-python/3.6
 ml cuda/9.0
 ml singularity 
 

@@ -25,9 +25,9 @@ class Trainer(BaseTrainer):
     }
 
     def __init__(self, net, num_epochs, batch_size, 
-                device=None, 
-                tboard_log_name=None, comment='',
-                explogdir=None,
+                device=None,                            # device(s) to train on
+                tboard_log_name=None, comment='',       # for tensorboard logging
+                explogdir=None,                         # for gen. experiment logging
                 learning_rate=constants.LEARNING_RATE,
                 dropout=constants.DROPOUT,
                 shuffle=constants.SHUFFLE,
@@ -45,13 +45,20 @@ class Trainer(BaseTrainer):
         # hyper parameters - dataset
         self.shuffle = shuffle 
 
+        '''         SET LOGGING DIRECTORIES: MODEL, TENSORBOARD         '''
         # set tensorboard writer
-        tboard_log_name = 'tboard_logs'
-        self.writer = SummaryWriter(os.path.join(self.config.tboard.FOLDER_LOGS, tboard_log_name),
-                                    comment=comment)
+        if tboard_log_name is None: 
+            tboard_log_name = 'tboard_logs'
+            # self.writer = SummaryWriter(os.path.join(self.config.tboard.FOLDER_LOGS, tboard_log_name),
+                                    # comment=comment)
+        self.writer = SummaryWriter(os.path.join(explogdir, tboard_log_name),
+                                                comment=comment)
 
-        # use tensorflow bboard logger
-        self.explogdir = explogdir
+        # set where to log outputs of explog
+        if explogdir is None:
+            self.explogdir = os.path.join(self.config.tboard.FOLDER_LOGS, 'explogs')
+        else:
+            self.explogdir = explogdir
         self._log_model_tboard()
 
     def composedatasets(self, train_dataset_obj, test_dataset_obj):
@@ -281,9 +288,9 @@ class Trainer(BaseTrainer):
         # self._tboard_features(images, label, epoch, name='default')
         self.logger.info("Finished training!")
 
-    def save(self, resultfile):
+    def save(self, resultfilename):
         # Save the model checkpoint
-        torch.save(self.net.state_dict(), 'model.ckpt')
+        torch.save(self.net.state_dict(), resultfilename)
 
 if __name__ == '__main__':
     from dnn_pytorch.models.nets.cnn import ConvNet
@@ -310,5 +317,5 @@ if __name__ == '__main__':
 
     # Test the model
     # trainer.test()
-    resultfile = os.path.join(resultdatadir, '{}_endmodel.ckpt'.format(expname))
-    trainer.save(resultfile)
+    # resultfilename = '{}_endmodel.ckpt'.format(patient)
+    # trainer.save(resultfile)

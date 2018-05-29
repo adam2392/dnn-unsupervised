@@ -73,28 +73,31 @@ walltime=5:00:0
 # partition=gpu
 walltime=0:30:0
 
-# create export commands
-exvars="--export=logdatadir=${logdatadir},\
-outputdatadir=${outputdatadir},\
-traindatadir=${traindatadir},\
-testdatadir=${testdatadir},\
-patient=${patient} "
+for patient in $patients; do
+	# create export commands
+	exvars="--export=logdatadir=${logdatadir},\
+	outputdatadir=${outputdatadir},\
+	traindatadir=${traindatadir},\
+	testdatadir=${testdatadir},\
+	patient=${patient} "
 
-# build basic sbatch command with all params parametrized
-sbatcomm="sbatch \
- --time=${walltime} \
- --nodes=${NUM_NODES} \
- --cpus-per-task=${NUM_CPUPERTASK} \
- --job-name=${jobname} \
- --ntasks-per-node=${NUM_PROCSPERNODE} \
- --partition=${partition} "
- # --gres=${gpu} "
+	# build basic sbatch command with all params parametrized
+	sbatcomm="sbatch \
+	 --time=${walltime} \
+	 --nodes=${NUM_NODES} \
+	 --cpus-per-task=${NUM_CPUPERTASK} \
+	 --job-name=${jobname} \
+	 --ntasks-per-node=${NUM_PROCSPERNODE} \
+	 --partition=${partition} "
+	 # --gres=${gpu} "
 
-# build a scavenger job, gpu job, or other job
-printf "Sbatch should run now\n"
-echo $sbatcomm $exvars ./slurm/run_train_pytorch.sbatch
+	# build a scavenger job, gpu job, or other job
+	echo "Sbatch should run now"
+	echo $sbatcomm $exvars ./slurm/run_train_pytorch.sbatch
 
-${sbatcomm} $exvars ./slurm/run_train_pytorch.sbatch
+	${sbatcomm} $exvars ./slurm/run_train_pytorch.sbatch
 
-read -p "Continuing in 0.5 Seconds...." -t 0.5
-echo "Continuing ...."
+	read -p "Continuing in 0.5 Seconds...." -t 0.5
+	echo "Continuing ...."
+
+done

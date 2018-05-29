@@ -31,7 +31,7 @@ def createmodel(num_classes, imsize, n_colors):
                     n_colors=n_colors)
     return model
 
-def trainmodel(model, train_dataset, test_dataset):
+def trainmodel(model, train_dataset, test_dataset, logdatadir, outputdatadir):
     # training parameters 
     num_epochs = 100
     batch_size = 64
@@ -49,7 +49,7 @@ def trainmodel(model, train_dataset, test_dataset):
     print(device)
 
     # 1) create the trainer
-    trainer = Trainer(model, num_epochs, batch_size, device=device)
+    trainer = Trainer(model, num_epochs, batch_size, device=device, explogdir=expname)
     trainer.composedatasets(train_dataset, test_dataset)
     trainer.config()
 
@@ -57,9 +57,8 @@ def trainmodel(model, train_dataset, test_dataset):
     # trainer.train()
     return trainer
 
-def testmodel(trainer, resultfile):
-    # trainer.test()
-    trainer.save(resultfile)
+def testmodel(trainer, resultfilename):
+    trainer.save(resultfilename=resultfilename)
     return trainer
 
 def load_data(traindir, testdir, data_procedure='loo', testpat=None):
@@ -139,9 +138,9 @@ if __name__ == '__main__':
     print(model)
     
     # train model
-    # trainer = trainmodel(model, train_dataset, test_dataset)
+    trainer = trainmodel(model, train_dataset, test_dataset, logdatadir, outputdatadir)
 
     # # test model
-    # resultfile = os.path.join(outputdatadir, '{}_endmodel.ckpt'.format(patient))
-    # trainer = testmodel(trainer, resultfile)
+    resultfilename = '{}_endmodel.ckpt'.format(patient)
+    trainer = testmodel(trainer, resultfilename)
 
