@@ -1,3 +1,5 @@
+import os
+
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -55,15 +57,13 @@ class Trainer(BaseTrainer):
             tboard_log_name = 'tboard_logs'
             # self.writer = SummaryWriter(os.path.join(self.config.tboard.FOLDER_LOGS, tboard_log_name),
                                     # comment=comment)
-        self.writer = SummaryWriter(os.path.join(explogdir, tboard_log_name),
-                                                comment=comment)
-
         # set where to log outputs of explog
         if explogdir is None:
             self.explogdir = os.path.join(self.config.tboard.FOLDER_LOGS, 'explogs')
         else:
             self.explogdir = explogdir
-        self._log_model_tboard()
+        self.writer = SummaryWriter(os.path.join(explogdir, tboard_log_name),
+                                                comment=comment)
 
     def composedatasets(self, train_dataset_obj, test_dataset_obj):
         self.train_loader = DataLoader(train_dataset_obj, 
@@ -75,11 +75,11 @@ class Trainer(BaseTrainer):
                             shuffle=self.shuffle, 
                             num_workers=1)
         # get input characteristics
-        self.imsize = self.train_loader.imsize
-        self.n_colors = self.train_loader.n_colors
+        self.imsize = train_dataset_obj.imsize
+        self.n_colors = train_dataset_obj.n_colors
 
         self.logger.info("Setting the datasets for training/testing in trainer object!")
-        self.logger.info("Image size is {} with {} colors".format(imsize, n_colors))
+        self.logger.info("Image size is {} with {} colors".format(self.imsize, self.n_colors))
 
     def loadmetrics(self, y_true, y_pred, metricholder):
         self.metric_comp.compute_scores(y_true, y_pred)
@@ -90,7 +90,7 @@ class Trainer(BaseTrainer):
         # self.metricholder.fp_queue.append(self.metrics.fp)
         # self.metricholder.accuracy_queue.append(self.metrics.accuracy)
 
-    def config(self):
+    def run_config(self):
         """
         Configuration function that can change:
         - sets optimizer
@@ -99,7 +99,7 @@ class Trainer(BaseTrainer):
         - sets post-prediction-regularizer
         """
         optimparams = {
-            'lr': learning_rate,
+            'lr': self.learning_rate,
             'amsgrad': True,
         }
         
@@ -112,7 +112,7 @@ class Trainer(BaseTrainer):
         #     ], lr=1e-2, momentum=0.9)
         # scheduler = LambdaLR(optimizer, lr_lambda=[lambda1, lambda2])
         scheduler = ReduceLROnPlateau(optimizer, mode='min', 
-                                    factor=0.8, patient=10, min_lr=1e-8)
+                                    factor=0.8, patience=10, min_lr=1e-8)
 
         # Loss and optimizer
         criterion = nn.CrossEntropyLoss()
@@ -131,6 +131,8 @@ class Trainer(BaseTrainer):
         self.optimizer = optimizer
         self.criterion = criterion
 
+        # log model
+        self._log_model_tboard()
     def train(self, num_steps):
         """
         Main training function for pytorch
@@ -316,6 +318,8 @@ class Trainer(BaseTrainer):
         self.logger.info("Finished training!")
 
     def save(self, resultfilename):
+        if self.explogdir not in resultfilename:
+            resultfilename = os.path.join(self.explogdir, resultfilename)
         # Save the model checkpoint
         torch.save(self.net.state_dict(), resultfilename)
 

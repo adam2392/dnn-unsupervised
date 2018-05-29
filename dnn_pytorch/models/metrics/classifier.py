@@ -9,7 +9,7 @@ from sklearn import metrics
 
 class BinaryClassifierMetric(BaseMetric):
     def __init__(self, config=None):
-        super(ClassifierMetric, self).__init__(config=config)
+        super(BinaryClassifierMetric, self).__init__(config=config)
 
     def compute_metrics(self, y_true, y_pred, sample_weight=None):
         self.y_true = y_true

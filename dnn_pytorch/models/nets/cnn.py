@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torchvision
-from torchvision import transforms, utils
 from torchsummary import summary
 
 from dnn_pytorch.util.layer import Flatten, PrintLayer

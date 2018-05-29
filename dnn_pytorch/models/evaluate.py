@@ -3,15 +3,6 @@ import logging
 import os
 import numpy as np
 import torch
-import utils
-
-# import argparse
-# parser = argparse.ArgumentParser()
-# parser.add_argument('--data_dir', default='data/small', help="Directory containing the dataset")
-# parser.add_argument('--model_dir', default='experiments/base_model', help="Directory containing params.json")
-# parser.add_argument('--restore_file', default='best', help="name of the file in --model_dir \
-#                      containing weights to load")
-
 
 def evaluate(model, device, loss_fn, data_iterator, metrics, num_steps):
     """Evaluate the model on `num_steps` batches.

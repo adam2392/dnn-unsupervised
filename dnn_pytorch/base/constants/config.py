@@ -61,7 +61,7 @@ class OutputConfig(object):
         :param work_folder: Base folder where logs/figures/results should be kept
         :param separate_by_run: Set TRUE, when you want logs/results/figures to be in different files / each run
         """
-        self._out_base = out_base or os.path.join(os.getcwd(), "dnn_pytorch_out")
+        self._out_base = out_base or os.path.join(os.getcwd(), "_dnn_pytorch_out")
         self._separate_by_run = separate_by_run
 
     @property
@@ -99,6 +99,17 @@ class OutputConfig(object):
     def FOLDER_TEMP(self):
         return os.path.join(self._out_base, "temp")
 
+class CalculusConfig(object):
+    SYMBOLIC_CALCULATIONS_FLAG = False
+
+    # Normalization configuration
+    WEIGHTS_NORM_PERCENT = 95
+
+    MIN_SINGLE_VALUE = np.finfo("single").min
+    MAX_SINGLE_VALUE = np.finfo("single").max
+    MAX_INT_VALUE = np.iinfo(np.int64).max
+    MIN_INT_VALUE = np.iinfo(np.int64).max
+
 class FiguresConfig(object):
     VERY_LARGE_SIZE = (40, 20)
     VERY_LARGE_PORTRAIT = (30, 50)
@@ -114,6 +125,7 @@ class FiguresConfig(object):
 class Config(object):
     generic = GenericConfig()
     figures = FiguresConfig()
+    calcul = CalculusConfig()
 
     def __init__(self, 
                 raw_data_folder=None,

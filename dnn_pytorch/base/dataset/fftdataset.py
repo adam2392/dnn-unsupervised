@@ -1,4 +1,5 @@
 import torch
+from torchvision import transforms, utils
 from torch.utils.data import Dataset, DataLoader
 import os
 import sklearn
@@ -6,6 +7,7 @@ import numpy as np
 
 # Ignore warnings
 import warnings
+from dnn_pytorch.util import augmentations
 from dnn_pytorch.base.constants.config import Config
 from dnn_pytorch.base.utils.log_error import initialize_logger
 import dnn_pytorch.base.constants.model_constants as constants

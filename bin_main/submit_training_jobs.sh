@@ -78,7 +78,8 @@ for patient in $patients; do
 outputdatadir=${outputdatadir},\
 traindatadir=${traindatadir},\
 testdatadir=${testdatadir},\
-patient=${patient} "
+patient=${patient},\
+expname=${expname} "
 
 	# build basic sbatch command with all params parametrized
 	sbatcomm="sbatch \

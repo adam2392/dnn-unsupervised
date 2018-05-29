@@ -2,6 +2,8 @@ import torch
 from dnn_pytorch.base.constants.config import Config, OutputConfig
 from dnn_pytorch.base.utils.log_error import initialize_logger
 
+import dnn_pytorch.base.constants.model_constants as constants
+
 class TrainMetrics(object):
     # metrics
     loss_queue = []
@@ -44,7 +46,7 @@ class BaseTrainer(object):
         for tag, value in info.items():
             self.writer.add_scalar(tag+'/'+mode, value, step+1)
 
-    def _tboard_grad(self, step)
+    def _tboard_grad(self, step):
         # 2. Log values and gradients of the parameters (histogram summary)
         for tag, value in self.net.named_parameters():
             tag = tag.replace('.', '/')
@@ -59,7 +61,7 @@ class BaseTrainer(object):
         for tag, images in info.items():
             self.writer.add_image(tag, images, step+1)
 
-    def _tboard_features(self, images, label, step, name='default')
+    def _tboard_features(self, images, label, step, name='default'):
         # 4. add embedding:
         self.writer.add_embedding(images.ravel(), 
                                 metadata=label, 
@@ -69,9 +71,9 @@ class BaseTrainer(object):
 
     def _log_model_tboard(self):
         # log model to tensorboard
-        expected_image_shape = (self.n_colors, self.imsize, self.imsize)
-        input_tensor = torch.autograd.Variable(torch.rand(1, *expected_image_shape),
+        expected_image_shape = (self.batch_size, self.n_colors, self.imsize, self.imsize)
+        input_tensor = torch.autograd.Variable(torch.rand(*expected_image_shape),
                                     requires_grad=True)
         # this call will invoke all registered forward hooks
-        res = self.net(input_tensor)
-        self.writer.add_graph(self.net, res)
+        # res = self.net(input_tensor)
+        self.writer.add_graph(self.net, input_tensor)

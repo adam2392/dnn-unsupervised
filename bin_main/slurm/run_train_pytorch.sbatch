@@ -55,9 +55,12 @@ echo "Running training model"
 # echo "This is the command being run: singularity exec -B /scratch/ --nv ../pytorch.simg python ./trainfragaux/main_refactored.py \
 # ${outputdatadir} ${logdatadir} ${traindatadir} ${datadir}"
 
+pycmd="python ./slurm/exp001/main.py ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}"
+singularity exec -B /scratch/ --nv ./pytorch.simg $pycmd
+
 # python ./slurm/exp001/main.py ${outputdatadir} ${logdatadir} ${traindatadir} ${testdatadir} ${patient}
-singularity pull --name pytorch.simg shub://marcc-hpc/pytorch
-singularity exec -B /scratch/ --nv ./pytorch.simg python ./slurm/exp001/main.py ${outputdatadir} ${logdatadir} ${traindatadir} ${testdatadir} ${patient}
+# singularity pull --name pytorch.simg shub://marcc-hpc/pytorch
+# singularity exec -B /scratch/ --nv ./pytorch.simg python ./slurm/exp001/main.py ${outputdatadir} ${logdatadir} ${traindatadir} ${testdatadir} ${patient}
 
 
 exit
