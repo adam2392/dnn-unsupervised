@@ -53,8 +53,8 @@ echo "Running training model"
 # -B = bind path /scratch /work /data
 
 # for training fragnet
-echo "This is the command being run: singularity exec -B /scratch/ --nv ../pytorch.simg python ./trainfragaux/main_refactored.py \
-${outputdatadir} ${logdatadir} ${traindatadir} ${datadir}"
+# echo "This is the command being run: singularity exec -B /scratch/ --nv ../pytorch.simg python ./trainfragaux/main_refactored.py \
+# ${outputdatadir} ${logdatadir} ${traindatadir} ${datadir}"
 
 python ./slurm/exp001/main.py ${outputdatadir} ${logdatadir} ${traindatadir} ${testdatadir} ${patient}
 # singularity pull --name pytorch.simg shub://marcc-hpc/pytorch

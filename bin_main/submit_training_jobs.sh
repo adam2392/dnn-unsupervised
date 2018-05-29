@@ -26,8 +26,8 @@ source activate dnn
 module list
 
 # Pause before running to check
-printf "About to run on patients (press enter to continue): $patients" 
-read answer
+# printf "About to run on patients (press enter to continue): $patients" 
+# read answer
 
 expname="exp001"
 ## For training and modeling with the simulated data
@@ -38,12 +38,11 @@ testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/pipelin
 logdatadir="/scratch/users/ali39@jhu.edu/data/dnn/logs/$expname/" 			
 outputdatadir="/scratch/users/ali39@jhu.edu/data/dnn/output/$expname/"
 
-printf "\nThese are the data directories: \n"
-printf "Temp datadir: $logdatadir \n"
-printf "Output datadir: $outputdatadir \n"
-printf "Results datadir: $datadir \n"
+echo "These are the data directories: "
+echo "Temp datadir: $logdatadir "
+echo "Output datadir: $outputdatadir "
+echo "Results datadir: $datadir "
 echo "Testing datadir is: $testdatadir"
-printf "\n"
 
 #### Create all logging directories if needed
 outdir=_out
@@ -88,8 +87,8 @@ patient=${patient} "
 	 --cpus-per-task=${NUM_CPUPERTASK} \
 	 --job-name=${jobname} \
 	 --ntasks-per-node=${NUM_PROCSPERNODE} \
-	 --partition=${partition} "
-	 # --gres=${gpu} "
+	 --partition=${partition} \
+	 --gres=${gpu} "
 
 	# build a scavenger job, gpu job, or other job
 	echo "Sbatch should run now"
