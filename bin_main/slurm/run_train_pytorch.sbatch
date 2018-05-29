@@ -20,6 +20,13 @@ ml cuda/9.0
 # activate our conda environment
 source activate dnn
 
+# add CUDA paths
+CPATH="/usr/local/cuda/include:$CPATH"
+PATH="/usr/local/cuda/bin:$PATH"
+LD_LIBRARY_PATH="/usr/local/cuda/lib64:$LD_LIBRARY_PATH"
+CUDA_HOME="/usr/local/cuda"
+export CPATH PATH LD_LIBRARY_PATH CUDA_HOME
+
 # cd to the scratch location 
 cd /scratch/users/$USER/dnn-unsupervised/bin_main/
 
