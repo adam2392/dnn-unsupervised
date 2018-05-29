@@ -60,7 +60,7 @@ NUM_NODES=1				# number of nodes to request
 NUM_CPUPERTASK=1
 
 # set the parameters for the GPU partition
-partition=debug 	# debug, shared, unlimited, parallel, gpu, lrgmem, scavenger
+partition=gpu 	# debug, shared, unlimited, parallel, gpu, lrgmem, scavenger
 numgpus=1
 gpu="gpu:$numgpus"
 echo $gpu
@@ -69,6 +69,9 @@ echo $gpu
 jobname="train_${patient}_${expname}.log"
 ## job reqs
 walltime=5:00:0
+
+partition=debug
+walltime=0:30:0
 
 # create export commands
 exvars="--export=logdatadir=${logdatadir},\
