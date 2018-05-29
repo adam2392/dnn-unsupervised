@@ -29,21 +29,42 @@ class Reader(object):
     def __len__(self):
         return len(self.filelist)
 
-    def loadbydir(self, traindir, testdir):
+    def loadbydir(self, traindir, testdir, procedure='loo', testname=None):
     	self.logger.info("Reading testing data directory %s " % testdir)
-    	''' Get list of file paths '''
-        self.testfilepaths = []
-        for root, dirs, files in os.walk(testdir):
-            for file in files:
-                self.testfilepaths.append(os.path.join(root, file))
-        self.testfilepaths.append(os.path.join(root, file))
 
-        self.logger.info("Reading training data directory %s " % traindir)
-        ''' Get list of file paths '''
-        self.trainfilepaths = []
-        for root, dirs, files in os.walk(traindir):
-            for file in files:
-                self.trainfilepaths.append(os.path.join(root, file))
+        if procedure == 'loo' and testname is None:
+            self.logger.error("Testname must be set to the file directory we want to ignore!")
+            return
+        elif procedure == 'loo':
+            ''' Get list of file paths '''
+            self.testfilepaths = []
+            for root, dirs, files in os.walk(testdir):
+                for file in files:
+                    if testname in file:
+                        self.testfilepaths.append(os.path.join(root, file))
+            self.testfilepaths.append(os.path.join(root, file))
+
+            self.logger.info("Reading training data directory %s " % traindir)
+            ''' Get list of file paths '''
+            self.trainfilepaths = []
+            for root, dirs, files in os.walk(traindir):
+                for file in files:
+                    if testname not in file:
+                        self.trainfilepaths.append(os.path.join(root, file))
+        else:
+        	''' Get list of file paths '''
+            self.testfilepaths = []
+            for root, dirs, files in os.walk(testdir):
+                for file in files:
+                    self.testfilepaths.append(os.path.join(root, file))
+            self.testfilepaths.append(os.path.join(root, file))
+
+            self.logger.info("Reading training data directory %s " % traindir)
+            ''' Get list of file paths '''
+            self.trainfilepaths = []
+            for root, dirs, files in os.walk(traindir):
+                for file in files:
+                    self.trainfilepaths.append(os.path.join(root, file))
 
         self.logger.info("Finished reading in data by directories!")
 

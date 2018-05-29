@@ -14,7 +14,7 @@
 ############################# LOAD IN MODULES AND UNLOAD #############
 module unload git
 ml anaconda-python/3.6
-ml python/3.6.0
+ml python/3.6.5
 ml cuda/9.0
 ml singularity 
 
@@ -22,14 +22,14 @@ ml singularity
 source activate dnn
 
 # cd to the scratch location 
-cd /scratch/users/$USER/dnn-unsupervised/bin/
+cd /scratch/users/$USER/dnn-unsupervised/
 
 ########################## DEBUG OUTPUT  ###########################
 # grep for SLURM_EXPORT_ENV
 echo "log data dir is : ${logdatadir}"
 echo "Output data dir is: ${outputdatadir}"
-echo "Data dir is: ${datadir}"
-echo "Raw data dir is: ${rawdatadir}"
+echo "Train data dir is: ${traindatadir}"
+echo "Test data dir is: ${testdatadir}"
 echo "Patient to analyze is: ${patient}"
 echo ${CUDA_VISIBLE_DEVICES}
 
@@ -50,8 +50,7 @@ printf "Running training model"
 echo "This is the command being run: singularity exec -B /scratch/ --nv ../pytorch.simg python ./trainfragaux/main_refactored.py \
 ${outputdatadir} ${logdatadir} ${traindatadir} ${datadir}"
 
-singularity exec -B /scratch/ --nv ../pytorch.simg python ./trainfragaux/main_refactored.py \
-${outputdatadir} ${logdatadir} ${traindatadir} ${datadir}
+singularity exec -B /scratch/ --nv ../pytorch.simg python ./slurm/exp001/main.py ${outputdatadir} ${logdatadir} ${traindatadir} ${testdatadir} ${patient}
 
 
 exit

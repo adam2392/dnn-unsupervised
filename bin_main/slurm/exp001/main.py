@@ -1,8 +1,9 @@
 import sys
 sys.path.append('../')
-sys.path.append('../../../')
 import os
 import numpy as np
+import torch
+import torch.nn as nn
 
 # Custom Built libraries
 import dnn_pytorch
@@ -26,8 +27,8 @@ from sklearn.metrics import precision_score, \
 def createmodel(num_classes, imsize, n_colors):
     # 1) create the model - cnn
     model = ConvNet(num_classes=num_classes,
-                        imsize=imsize,
-                        n_colors=n_colors)
+                    imsize=imsize,
+                    n_colors=n_colors)
     return model
 
 def trainmodel(model, train_dataset, test_dataset):
@@ -35,42 +36,59 @@ def trainmodel(model, train_dataset, test_dataset):
     num_epochs = 100
     batch_size = 64
 
+    if device is None:
+        # Device configuration
+        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    if torch.cuda.device_count() > 1:
+          print("Let's use", torch.cuda.device_count(), "GPUs!")
+          model = nn.DataParallel(model)
+
+    # MOVE THE MODEL ONTO THE DEVICE WE WANT
+    model = model.to(device)
+
+    print(device)
+
     # 1) create the trainer
-    trainer = Trainer(model, num_epochs, batch_size)
+    trainer = Trainer(model, num_epochs, batch_size, device=device)
     trainer.composedatasets(train_dataset, test_dataset)
-    trainer.train()
+    trainer.config()
+
+    print(trainer)
+    # trainer.train()
     return trainer
 
-def testmodel(trainer):
-    trainer.test()
+def testmodel(trainer, resultfile):
+    # trainer.test()
+    trainer.save(resultfile)
     return trainer
 
-def load_data(traindir, testdir):
-    # trainfiles = reader.trainfilepaths
-    # testfiles = 
+def load_data(traindir, testdir, data_procedure='loo', testpat=None):
+    '''
+    If LOO training, then we have to trim these into 
+    their separate filelists
+    '''
 
     # initialize reader to get the training/testing data
     reader = Reader()
-    reader.loadbydir(traindir, testdir)
-    reader.loadfiles(mode=mode=constants.TRAIN,)
-    reader.loadfiles(mode=mode=constants.TEST,)
+    reader.loadbydir(traindir, testdir, procedure=data_procedure, testname=testpat)
+    reader.loadfiles(mode=mode=constants.TRAIN)
+    reader.loadfiles(mode=mode=constants.TEST)
+
+    print(reader.trainfilepaths)
+    print(reader.testfilepaths)
 
     # create the dataset objects
     train_X = reader.X_train
     train_y = reader.y_train
     test_X = reader.X_test
     test_y = reader.y_test
+
+    # create the loaders
     train_dataset = FFT2DImageDataset(train_X, train_y, mode=constants.TRAIN, transform=True)
     test_dataset = FFT2DImageDataset(test_X, test_y,  mode=constants.TEST, ransform=None)
     return train_dataset, test_dataset
 
-if __name__ == '__main__':
-    # outputdatadir = str(sys.argv[1])    # output for data dir
-    # logdatadir = str(sys.argv[2])      # the temp data dire
-    # datadir = str(sys.argv[3])          # the training data directory
-    # testdatadir = str(sys.argv[4])      # the test data directory
-    # patient = str(sys.argv[5])
-
+def localtest():
     '''
     For testing locally
     '''
@@ -81,26 +99,49 @@ if __name__ == '__main__':
     patient = ''
     traindatadir = os.path.join(datadir, './')
 
-    num_classes = 2
+if __name__ == '__main__':
+#     traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/expfull/"
+# testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
+# # logs for the training logs, and outputdata directory for final summary
+# logdatadir="/scratch/users/ali39@jhu.edu/data/dnn/logs/$expname/"           
+# outputdatadir="/scratch/users/al
+    # ${outputdatadir} ${logdatadir} ${traindatadir} ${testdatadir} ${patient}
+    outputdatadir = str(sys.argv[1])    # output for data dir
+    logdatadir = str(sys.argv[2])      # the temp data dire
+    traindatadir = str(sys.argv[3])          # the training data directory
+    testdatadir = str(sys.argv[4])      # the test data directory
+    patient = str(sys.argv[5])
 
+    num_classes = 2
+    data_procedure='loo'
+    testpat = patient
+
+    logdatadir = os.path.join(logdatadir, patient)
+    outputdatadir = os.path.join(outputdatadir, patient)
     # create the output and temporary saving directories
-    # if not os.path.exists(outputdatadir):
-    #     os.makedirs(outputdatadir)
-    # if not os.path.exists(logdatadir):
-    #     os.makedirs(logdatadir)
+    if not os.path.exists(outputdatadir):
+        os.makedirs(outputdatadir)
+    if not os.path.exists(logdatadir):
+        os.makedirs(logdatadir)
 
     # get the datasets
-    train_dataset, test_dataset = load_data(traindir, testdir)
+    train_dataset, test_dataset = load_data(traindir, testdir, data_procedure=data_procedure, testpat=testpat)
     # get the image size and n_colors from the datasets
     imsize = train_dataset.imsize
     n_colors = train_dataset.n_colors
     print("Image size is {} with {} colors".format(imsize, n_colors))
+
+    print(traindir)
+    print(testdir)
     
     # create model
     model = createmodel(num_classes, imsize, n_colors)
-
+    print(model)
+    
     # train model
-    trainer = trainmodel(model, train_dataset, test_dataset)
+    # trainer = trainmodel(model, train_dataset, test_dataset)
 
-    # test model
-    trainer = testmodel(model)
+    # # test model
+    # resultfile = os.path.join(outputdatadir, '{}_endmodel.ckpt'.format(patient))
+    # trainer = testmodel(trainer, resultfile)
+

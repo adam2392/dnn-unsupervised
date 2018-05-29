@@ -14,7 +14,6 @@ from tensorboardX import SummaryWriter
 from tqdm import trange
 
 class Trainer(BaseTrainer):
-    grad_queue = []
     metric_comp = BinaryClassifierMetric()
     
     # create a dictionary of metrics with their corresponding "lambda" functions
@@ -24,9 +23,6 @@ class Trainer(BaseTrainer):
         'precision': metric_comp._precision,
         'fp': metric_comp._fp
     }
-    # create objects to hold our train/test metrics
-    trainmetrics = TrainMetrics()
-    testmetrics = TestMetrics()
 
     def __init__(self, net, num_epochs, batch_size, 
                 device=None, 
@@ -78,10 +74,10 @@ class Trainer(BaseTrainer):
         self.metric_comp.compute_scores(y_true, y_pred)
 
         # add to list for the metrics
-        self.metricholder.recall_queue.append(self.metrics.recall)
-        self.metricholder.precision_queue.append(self.metrics.precision)
-        self.metricholder.fp_queue.append(self.metrics.fp)
-        self.metricholder.accuracy_queue.append(self.metrics.accuracy)
+        # self.metricholder.recall_queue.append(self.metrics.recall)
+        # self.metricholder.precision_queue.append(self.metrics.precision)
+        # self.metricholder.fp_queue.append(self.metrics.fp)
+        # self.metricholder.accuracy_queue.append(self.metrics.accuracy)
 
     def config(self):
         optimparams = {
