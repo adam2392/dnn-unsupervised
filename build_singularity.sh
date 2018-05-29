@@ -13,5 +13,5 @@ cd /scratch/users/$USER/dnn-unsupervised/
 # rm tensorflow.simg
 # singularity pull --name tensorflow.simg shub://marcc-hpc/python3-keras-tensorflow
 
-singularity pull --name pytorch.simg shub://marcc-hpc/pytorch
+singularity pull --name pytorch.simg shub://marcc-hpc/pytorch:latest
 
