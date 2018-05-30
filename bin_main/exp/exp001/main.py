@@ -28,11 +28,9 @@ parser.add_argument('--expname', default='_exp_default',
                     help="name of the experiment name")
 
 def local_test(args):
-
-
-    # train_data_dir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
-    # test_data_dir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
-    # patient='id001_bt'
+    train_data_dir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
+    test_data_dir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
+    patient='id001_bt'
 
 def hpc_run(args):
     testpat = args.patient_to_loo
