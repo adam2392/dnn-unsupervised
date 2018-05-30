@@ -1,17 +1,12 @@
 import sys
-sys.path.append('../')
-sys.path.append('./util/')
-sys.path.append('../../../')
-sys.path.append('../../util/')
 import os
 import argparse
-from run import *
 
 parser = argparse.ArgumentParser()
-# parser.add_argument('train_data_dir',
-#                     help="Directory containing the dataset(s)")
-# parser.add_argument('test_data_dir',
-#                     help="Directory containing the dataset(s)")
+parser.add_argument('train_data_dir',
+                    help="Directory containing the dataset(s)")
+parser.add_argument('test_data_dir',
+                    help="Directory containing the dataset(s)")
 parser.add_argument('--log_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/logs/', 
                     help="Directory to save logs")
 parser.add_argument('--output_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/output/', 
@@ -26,14 +21,21 @@ parser.add_argument('--restore_file', default='best',
 parser.add_argument('--expname', default='_exp_default', 
                     help="name of the experiment name")
 
-if __name__ == '__main__':
-    args = parser.parse_args()
+def local_test(args):
+    # if testing locally
+    sys.path.append('../../../')
+    sys.path.append('../../util/')
+    from run import *
 
-    train_data_dir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
-    test_data_dir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
-    patient='id001_bt'
+    # train_data_dir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
+    # test_data_dir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
+    # patient='id001_bt'
 
-    print(args)
+def hpc_run(args):
+    sys.path.append('../')
+    sys.path.append('./util/')
+    from run import *
+
     testpat = args.patient_to_loo
     log_data_dir = args.log_data_dir
     output_data_dir = args.output_data_dir
@@ -77,3 +79,10 @@ if __name__ == '__main__':
     resultfilename = '{}_endmodel.ckpt'.format(testpat)
     trainer = testmodel(trainer, resultfilename)
 
+if __name__ == '__main__':
+    args = parser.parse_args()
+    print(args)
+    
+    hpc_run(args)
+
+    # local_test(args)
