@@ -52,7 +52,7 @@ nvidia-smi
 ################### SETUP SINGULARITY CONTAINER  ####################
 # redefine SINGULARITY_HOME to mount current working directory to base $HOME
 export SINGULARITY_HOME=$PWD:/home/$USER
-# singularity pull --name pytorch.simg shub://marcc-hpc/pytorch:latest
+singularity pull --name pytorch.simg shub://marcc-hpc/pytorch:latest
 
 echo $PWD
 echo "Running training model"
@@ -61,6 +61,7 @@ echo "Running training model"
 
 # run training here in this
 pycmd="python ./slurm/exp001/main.py ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}"
-singularity exec -B /scratch/ --nv ./pytorch.simg python ./exp/exp001/main.py ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}
+# ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}
+singularity exec -B /scratch/ --nv ./pytorch.simg python ./exp/exp001/main.py ${traindatadir} ${testdatadir} ${outputdatadir} ${logdatadir} ${patient} ${expname}
 
 exit
