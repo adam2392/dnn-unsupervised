@@ -11,6 +11,13 @@
 #---------------------------------------------------------------------
 # SLURM job script to run Singularity Keras/Tflow Training
 #---------------------------------------------------------------------
+
+# POSSIBLE COMMANDS:
+# docker://python:latest
+# singularity options: 
+# -vvv -d = very verbose / debugging mode
+# -B = bind path /scratch /work /data
+
 ############################# LOAD IN MODULES AND UNLOAD #############
 module unload git
 # ml anaconda-python/3.6
@@ -28,7 +35,7 @@ ml singularity
 # export CPATH PATH LD_LIBRARY_PATH CUDA_HOME
 
 # cd to the scratch location 
-cd /scratch/users/$USER/dnn-unsupervised/bin_main/
+cd /scratch/users/$USER/dnn-unsupervised/bin_main/exp/
 
 ########################## DEBUG OUTPUT  ###########################
 # grep for SLURM_EXPORT_ENV
@@ -48,17 +55,13 @@ export SINGULARITY_HOME=$PWD:/home/$USER
 
 echo $PWD
 echo "Running training model"
-# docker://python:latest
-# singularity options: 
-# -vvv -d = very verbose / debugging mode
-# -B = bind path /scratch /work /data
 # echo "This is the command being run: singularity exec -B /scratch/ --nv ../pytorch.simg python ./trainfragaux/main_refactored.py \
 # ${outputdatadir} ${logdatadir} ${traindatadir} ${datadir}"
 
 # run training here in this
 singularity pull --name pytorch.simg shub://marcc-hpc/pytorch:latest
 pycmd="python ./slurm/exp001/main.py ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}"
-singularity exec -B /scratch/ --nv ./pytorch.simg python ./slurm/exp001/main.py ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}
+singularity exec -B /scratch/ --nv ./pytorch.simg python ./exp001/main.py ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}
 
 # python ./slurm/exp001/main.py ${outputdatadir} ${logdatadir} ${traindatadir} ${testdatadir} ${patient}
 # singularity pull --name pytorch.simg shub://marcc-hpc/pytorch

@@ -69,9 +69,9 @@ expname=${expname} "
 
 	# build a scavenger job, gpu job, or other job
 	echo "Sbatch should run now"
-	echo $sbatcomm $exvars ./slurm/run_train_pytorch.sbatch
+	echo $sbatchcomm $exvars ./exp/run_train_pytorch.sbatch
 
-	${sbatcomm} $exvars ./slurm/run_train_pytorch.sbatch
+	${sbatchcomm} $exvars ./exp/run_train_pytorch.sbatch
 
 	read -p "Continuing in 0.5 Seconds...." -t 0.5
 	echo "Continuing ...."
