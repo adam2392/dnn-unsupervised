@@ -13,19 +13,19 @@ parser.add_argument('train_data_dir',
                     help="Directory containing the dataset(s)")
 parser.add_argument('test_data_dir',
                     help="Directory containing the dataset(s)")
-parser.add_argument('--log_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/logs/', 
-                    help="Directory to save logs")
 parser.add_argument('--output_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/output/', 
+                    help="Directory to save logs")
+parser.add_argument('--log_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/logs/', 
                     help="Directory to save logs")
 parser.add_argument('--patient_to_loo', default='id001_bt',
                     help="Patient to leave one out on.")
+parser.add_argument('--expname', default='_exp_default', 
+                    help="name of the experiment name")
 parser.add_argument('--model_dir', default='experiments/base_model', 
                     help="Directory containing params.json")
 parser.add_argument('--restore_file', default='best', 
                     help="name of the file in --model_dir \
                      containing weights to load")
-parser.add_argument('--expname', default='_exp_default', 
-                    help="name of the experiment name")
 
 def local_test(args):
     train_data_dir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
@@ -36,14 +36,14 @@ def hpc_run(args):
     testpat = args.patient_to_loo
     log_data_dir = args.log_data_dir
     output_data_dir = args.output_data_dir
-    # train_data_dir = args.train_data_dir
-    # test_data_dir = args.test_data_dir
+    train_data_dir = args.train_data_dir
+    test_data_dir = args.test_data_dir
     expname = args.expname
 
     log_data_dir='./'
     output_data_dir='./'
-    train_data_dir=os.path.expanduser("~/Downloads/tngpipeline/freqimg/fft/")
-    test_data_dir=os.path.expanduser("~/Downloads/tngpipeline/freqimg/fft/")
+    # train_data_dir=os.path.expanduser("~/Downloads/tngpipeline/freqimg/fft/")
+    # test_data_dir=os.path.expanduser("~/Downloads/tngpipeline/freqimg/fft/")
 
     num_classes = 2
     data_procedure='loo'
@@ -77,6 +77,7 @@ def hpc_run(args):
     trainer = testmodel(trainer, resultfilename)
 
 if __name__ == '__main__':
+    print("Inside main!")
     args = parser.parse_args()
     print(args)
     
