@@ -4,8 +4,8 @@ import argparse
 sys.path.append('../')
 sys.path.append('./util/')
 # if testing locally
-sys.path.append('../../../')
-sys.path.append('../../util/')
+# sys.path.append('../../../')
+# sys.path.append('../../util/')
 from run import *
 
 parser = argparse.ArgumentParser()
@@ -13,13 +13,13 @@ parser.add_argument('train_data_dir',
                     help="Directory containing the dataset(s)")
 parser.add_argument('test_data_dir',
                     help="Directory containing the dataset(s)")
-parser.add_argument('--output_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/output/', 
+parser.add_argument('output_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/output/', 
                     help="Directory to save logs")
-parser.add_argument('--log_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/logs/', 
+parser.add_argument('log_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/logs/', 
                     help="Directory to save logs")
-parser.add_argument('--patient_to_loo', default='id001_bt',
+parser.add_argument('patient_to_loo', default='id001_bt',
                     help="Patient to leave one out on.")
-parser.add_argument('--expname', default='_exp_default', 
+parser.add_argument('expname', default='_exp_default', 
                     help="name of the experiment name")
 parser.add_argument('--model_dir', default='experiments/base_model', 
                     help="Directory containing params.json")
