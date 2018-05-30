@@ -44,33 +44,13 @@ echo "Output datadir: $outputdatadir "
 echo "Results datadir: $datadir "
 echo "Testing datadir is: $testdatadir"
 
-#### Create all logging directories if needed
-outdir=_out
-# create output directory 
-if [ -d "$outdir" ]; then  
-	echo "Out log directory exists!\n\n"
-else
-	mkdir $outdir
-fi
+# run setup of a slurm job
+setup="./config/slurm/setup.sh"
+. $setup
 
 ########################### 2. Define Slurm Parameters ###########################
-NUM_PROCSPERNODE=6  	# number of processors per node (1-24). Use 24 for GNU jobs.
-NUM_NODES=1				# number of nodes to request
-NUM_CPUPERTASK=1
-
-# set the parameters for the GPU partition
-partition=gpu 	# debug, shared, unlimited, parallel, gpu, lrgmem, scavenger
-numgpus=1
-gpu="gpu:$numgpus"
-echo $gpu
-
-# set jobname
-jobname="train_${patient}_${expname}.log"
-## job reqs
-walltime=5:00:0
-
-# partition=gpu
-walltime=0:30:0
+gpu_debg_config="./config/slurm/gpu_debug_jobs.txt"
+gpu_config="./config/slurm/gpu_jobs.txt"
 
 for patient in $patients; do
 	# create export commands
@@ -81,15 +61,11 @@ testdatadir=${testdatadir},\
 patient=${patient},\
 expname=${expname} "
 
-	# build basic sbatch command with all params parametrized
-	sbatcomm="sbatch \
-	 --time=${walltime} \
-	 --nodes=${NUM_NODES} \
-	 --cpus-per-task=${NUM_CPUPERTASK} \
-	 --job-name=${jobname} \
-	 --ntasks-per-node=${NUM_PROCSPERNODE} \
-	 --partition=${partition} \
-	 --gres=${gpu} "
+	# build a scavenger job, gpu job, or other job
+	# set jobname
+	jobname="train_${patient}_${expname}.log"
+	sbatchcomm=$(cat $gpu_debug_config)
+	sbatchcomm="$sbatchcomm --job-name=${jobname}"
 
 	# build a scavenger job, gpu job, or other job
 	echo "Sbatch should run now"
