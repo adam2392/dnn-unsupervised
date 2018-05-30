@@ -12,7 +12,7 @@ else
 fi
 # create log directory 
 if [ -d "$logdir" ]; then  
-	echo "log directory for GNU resume runs exists!\n\n"
+	echo "log directory for runs exists!\n\n"
 else
 	mkdir $logdir
 fi

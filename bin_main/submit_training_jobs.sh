@@ -49,10 +49,12 @@ setup="./config/slurm/setup.sh"
 . $setup
 
 ########################### 2. Define Slurm Parameters ###########################
-gpu_debg_config="./config/slurm/gpu_debug_jobs.txt"
+gpu_debug_config="./config/slurm/gpu_debug_jobs.txt"
 gpu_config="./config/slurm/gpu_jobs.txt"
 
 for patient in $patients; do
+	echo $patient 
+
 	# create export commands
 	exvars="--export=logdatadir=${logdatadir},\
 outputdatadir=${outputdatadir},\
