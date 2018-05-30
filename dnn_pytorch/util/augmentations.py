@@ -1,10 +1,13 @@
 import torch
 from torchvision import transforms
-import cv2
 import numpy as np
 import types
 from numpy import random
-
+try:
+    import cv2
+except:
+    print("Can't import opencv!")
+    
 class Rescale(object):
     """Rescale the image in a sample to a given size.
 

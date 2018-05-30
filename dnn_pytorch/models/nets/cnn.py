@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-import torchvision
 
 from dnn_pytorch.util.layer import Flatten, PrintLayer
 from dnn_pytorch.base.constants.config import Config
