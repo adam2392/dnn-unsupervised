@@ -1,6 +1,12 @@
 import sys
 import os
 import argparse
+sys.path.append('../')
+sys.path.append('./util/')
+# if testing locally
+sys.path.append('../../../')
+sys.path.append('../../util/')
+from run import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument('train_data_dir',
@@ -22,20 +28,13 @@ parser.add_argument('--expname', default='_exp_default',
                     help="name of the experiment name")
 
 def local_test(args):
-    # if testing locally
-    sys.path.append('../../../')
-    sys.path.append('../../util/')
-    from run import *
+
 
     # train_data_dir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
     # test_data_dir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
     # patient='id001_bt'
 
 def hpc_run(args):
-    sys.path.append('../')
-    sys.path.append('./util/')
-    from run import *
-
     testpat = args.patient_to_loo
     log_data_dir = args.log_data_dir
     output_data_dir = args.output_data_dir
