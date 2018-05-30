@@ -1,18 +1,11 @@
 import torch
 import torch.nn as nn
 import torchvision
-from torchsummary import summary
 
 from dnn_pytorch.util.layer import Flatten, PrintLayer
 from dnn_pytorch.base.constants.config import Config
 from dnn_pytorch.base.utils.log_error import initialize_logger
 
-"""
-TODO:
-- checkpoint: https://github.com/IBM/pytorch-seq2seq/blob/master/seq2seq/util/checkpoint.py
-- use with tensorboard: https://github.com/yunjey/pytorch-tutorial/tree/master/tutorials/04-utils/tensorboard
-- 
-"""
 class ConvNet(nn.Module):
     def __init__(self, num_classes, imsize, n_colors, config=None):
         super(ConvNet, self).__init__()
@@ -83,6 +76,7 @@ class ConvNet(nn.Module):
         return output, x
 
 if __name__ == '__main__':
+    from torchsummary import summary
     # Device configuration
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 

@@ -1,8 +1,6 @@
 import torch
 import torch.nn as nn
 import torchvision
-from torchvision import transforms, utils
-from torchsummary import summary
 
 from dnn_pytorch.util.layer import Flatten, PrintLayer
 from dnn_pytorch.base.constants.config import Config
@@ -171,6 +169,7 @@ class Train(object):
         torch.save(self.net.state_dict(), 'model.ckpt')
 
 if __name__ == '__main__':
+    from torchsummary import summary
     # Device configuration
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 

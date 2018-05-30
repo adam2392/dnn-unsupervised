@@ -71,9 +71,6 @@ def load_data(traindir, testdir, data_procedure='loo', testpat=None):
     reader.loadfiles(mode=constants.TRAIN)
     reader.loadfiles(mode=constants.TEST)
 
-    # print(reader.trainfilepaths)
-    # print(reader.testfilepaths)
-
     # create the dataset objects
     train_X = reader.X_train
     train_y = reader.y_train

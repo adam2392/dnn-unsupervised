@@ -1,15 +1,16 @@
 import os
-import numpy as np 
-import pandas as pd 
-import mne
 import json
 import sys
+import numpy as np 
+import pandas as pd 
+
+import mne
 from .utils import utils
 from .utils import seegrecording
 from .readers.read_connectivity import LoadConn
 
-from fragility.base.constants.config import Config
-from fragility.base.utils.log_error import initialize_logger
+from dnn_pytorch.base.constants.config import Config
+from dnn_pytorch.base.utils.log_error import initialize_logger
 from datetime import date
 import warnings
 

@@ -15,8 +15,11 @@ import dnn_pytorch.base.constants.model_constants as constants
 from dnn_pytorch.models.regularizer.post_class_regularizer import Postalarm
 
 # import tensorboard for writing stuff
-from tensorboardX import SummaryWriter
-from tqdm import trange
+try:
+    from tensorboardX import SummaryWriter
+    from tqdm import trange
+except:
+    print("Can't import tensorboardX and tqdm!")
 
 class Trainer(BaseTrainer):
     metric_comp = BinaryClassifierMetric()
@@ -130,6 +133,11 @@ class Trainer(BaseTrainer):
         self.scheduler = scheduler
         self.optimizer = optimizer
         self.criterion = criterion
+
+        # if grad_clip:
+        #     nn.utils.clip_grad_norm(self.net.parameters(), grad_clip)
+        #     for p in self.net.parameters():
+        #         p.data.add_(-self.learning_rate, p.grad.data)
 
         # log model
         self._log_model_tboard()

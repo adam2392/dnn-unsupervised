@@ -3,10 +3,10 @@ import zipfile
 import scipy.io
 import os
 import pandas as pd
-from fragility.base.dataobjects.connectivity import Connectivity
-from fragility.base.dataobjects.sensors import Sensors
-from fragility.base.utils.log_error import initialize_logger
-from fragility.base.utils.data_structures_utils import ensure_list
+from dnn_pytorch.base.dataobjects.connectivity import Connectivity
+from dnn_pytorch.base.dataobjects.sensors import Sensors
+from dnn_pytorch.base.utils.log_error import initialize_logger
+from dnn_pytorch.base.utils.data_structures_utils import ensure_list
 import h5py
 
 from enum import Enum
