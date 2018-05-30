@@ -1,1 +1,1 @@
-sbatch --time=3:00:0 --nodes=1 --ntasks-per-node=24 --cpus-per-task=1 --gres=4 --partition=gpu
+sbatch --time=3:00:0 --nodes=1 --ntasks-per-node=24 --cpus-per-task=1 --gres=gpu:4 --partition=gpu
