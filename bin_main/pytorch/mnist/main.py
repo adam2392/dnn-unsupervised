@@ -10,12 +10,9 @@ from torch.autograd import Variable
 import sys
 import os
 print("Before everything!")
-print(sys.path)
-# sys.path.append('../../exp/')
+sys.path.append('/scratch/users/ali39@jhu.edu/dnn-unsupervised/')
 print("about to import run fucntions!")
-# sys.path.append('../../../')
 print("inside main here!")
-from run import *
 import dnn_pytorch
 
 # Training settings
