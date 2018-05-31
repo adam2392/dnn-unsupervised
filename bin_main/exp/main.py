@@ -1,33 +1,27 @@
 import sys
 import os
-print("Before everything!")
-sys.path.append('../')
-# sys.path.append('./util/')
-# if testing locally
-# sys.path.append('../../../')
-# sys.path.append('../../util/')
-print("about to import run fucntions!")
+sys.path.append('/scratch/users/ali39@jhu.edu/dnn-unsupervised/')
 from run import *
 import argparse
-print("inside main here!")
-# parser = argparse.ArgumentParser()
-# parser.add_argument('train_data_dir',
-#                     help="Directory containing the dataset(s)")
-# parser.add_argument('test_data_dir',
-#                     help="Directory containing the dataset(s)")
-# parser.add_argument('output_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/output/', 
-#                     help="Directory to save logs")
-# parser.add_argument('log_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/logs/', 
-#                     help="Directory to save logs")
-# parser.add_argument('patient_to_loo', default='id001_bt',
-#                     help="Patient to leave one out on.")
-# parser.add_argument('expname', default='_exp_default', 
-#                     help="name of the experiment name")
-# parser.add_argument('--model_dir', default='experiments/base_model', 
-#                     help="Directory containing params.json")
-# parser.add_argument('--restore_file', default='best', 
-#                     help="name of the file in --model_dir \
-#                      containing weights to load")
+
+parser = argparse.ArgumentParser()
+parser.add_argument('train_data_dir',
+                    help="Directory containing the dataset(s)")
+parser.add_argument('test_data_dir',
+                    help="Directory containing the dataset(s)")
+parser.add_argument('output_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/output/', 
+                    help="Directory to save logs")
+parser.add_argument('log_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/logs/', 
+                    help="Directory to save logs")
+parser.add_argument('patient_to_loo', default='id001_bt',
+                    help="Patient to leave one out on.")
+parser.add_argument('expname', default='_exp_default', 
+                    help="name of the experiment name")
+parser.add_argument('--model_dir', default='experiments/base_model', 
+                    help="Directory containing params.json")
+parser.add_argument('--restore_file', default='best', 
+                    help="name of the file in --model_dir \
+                     containing weights to load")
 
 def local_test(args):
     train_data_dir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
