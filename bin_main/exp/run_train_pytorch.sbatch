@@ -24,7 +24,7 @@ ml cuda/9.0
 ml singularity 
 
 # cd to the scratch location 
-cd /scratch/users/$USER/dnn-unsupervised/bin_main/
+cd /scratch/users/$USER/dnn-unsupervised/bin_main/exp/
 
 ########################## DEBUG OUTPUT  ###########################
 # grep for SLURM_EXPORT_ENV
@@ -52,7 +52,7 @@ echo "Running training model"
 # run training here in this
 # pycmd="python ./slurm/exp001/main.py ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}"
 # ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}
-singularity -v exec -B /scratch/ --nv ./pytorch.simg python ./exp/main.py ${traindatadir} ${testdatadir} ${outputdatadir} ${logdatadir} ${patient} ${expname}
+singularity -v exec -B /scratch/ --nv ./pytorch.simg python main.py ${traindatadir} ${testdatadir} ${outputdatadir} ${logdatadir} ${patient} ${expname}
 # singularity -vvv -d exec -B /scratch/ --nv ./pytorch.simg python ./exp/exp001/main.py ${traindatadir} ${testdatadir} ${outputdatadir} ${logdatadir} ${patient} ${expname}
 
 # exit
