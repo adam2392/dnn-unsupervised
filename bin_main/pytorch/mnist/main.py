@@ -10,12 +10,12 @@ from torch.autograd import Variable
 import sys
 import os
 print("Before everything!")
-# sys.path.append('../../exp/')
-# sys.path.append('../../../')
+sys.path.append('../../exp/')
 print("about to import run fucntions!")
-# from run import *
+sys.path.append('../../../')
 print("inside main here!")
-
+from run import *
+import dnn_pytorch
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
 parser.add_argument('--batch-size', type=int, default=64, metavar='N',
