@@ -4,6 +4,7 @@
 #SBATCH -p gpu
 #SBATCH --gres=gpu:1
 #SBATCH -t 1:0:0
+#SBATCH --error=%A.err
 
 module load cuda/9.0
 module load singularity

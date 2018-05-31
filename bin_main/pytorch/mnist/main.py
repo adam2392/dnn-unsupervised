@@ -10,10 +10,10 @@ from torch.autograd import Variable
 import sys
 import os
 print("Before everything!")
-sys.path.append('../../exp/')
-sys.path.append('../../../')
+# sys.path.append('../../exp/')
+# sys.path.append('../../../')
 print("about to import run fucntions!")
-from run import *
+# from run import *
 print("inside main here!")
 
 # Training settings
