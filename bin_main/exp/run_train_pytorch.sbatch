@@ -20,25 +20,15 @@
 
 ############################# LOAD IN MODULES AND UNLOAD #############
 module unload git
-# ml anaconda-python/3.6
 ml cuda/9.0
 ml singularity 
-
-# activate our conda environment
-# source activate dnn
-
-# add CUDA paths
-# CPATH="/usr/local/cuda/include:$CPATH"
-# PATH="/usr/local/cuda/bin:$PATH"
-# LD_LIBRARY_PATH="/usr/local/cuda/lib64:$LD_LIBRARY_PATH"
-# CUDA_HOME="/usr/local/cuda"
-# export CPATH PATH LD_LIBRARY_PATH CUDA_HOME
 
 # cd to the scratch location 
 cd /scratch/users/$USER/dnn-unsupervised/bin_main/
 
 ########################## DEBUG OUTPUT  ###########################
 # grep for SLURM_EXPORT_ENV
+grep $SLURM_EXPORT_ENV
 echo "log data dir is : ${logdatadir}"
 echo "Output data dir is: ${outputdatadir}"
 echo "Train data dir is: ${traindatadir}"
@@ -60,8 +50,9 @@ echo "Running training model"
 # ${outputdatadir} ${logdatadir} ${traindatadir} ${datadir}"
 
 # run training here in this
-pycmd="python ./slurm/exp001/main.py ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}"
+# pycmd="python ./slurm/exp001/main.py ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}"
 # ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}
-singularity -vvv -d exec -B /scratch/ --nv ./pytorch.simg python ./exp/exp001/main.py ${traindatadir} ${testdatadir} ${outputdatadir} ${logdatadir} ${patient} ${expname}
+singularity -vvv -d exec --nv ./pytorch.simg python ./exp/exp001/main.py ${traindatadir} ${testdatadir} ${outputdatadir} ${logdatadir} ${patient} ${expname}
+# singularity -vvv -d exec -B /scratch/ --nv ./pytorch.simg python ./exp/exp001/main.py ${traindatadir} ${testdatadir} ${outputdatadir} ${logdatadir} ${patient} ${expname}
 
-exit
+# exit
