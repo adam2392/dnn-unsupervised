@@ -1,6 +1,5 @@
 import sys
 import os
-import argparse
 sys.path.append('../')
 sys.path.append('./util/')
 # if testing locally
@@ -8,6 +7,7 @@ sys.path.append('./util/')
 # sys.path.append('../../util/')
 print("about to import run fucntions!")
 from run import *
+import argparse
 print("inside main here!")
 # parser = argparse.ArgumentParser()
 # parser.add_argument('train_data_dir',

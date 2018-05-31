@@ -27,6 +27,7 @@ def createmodel(num_classes, imsize, n_colors):
     model = ConvNet(num_classes=num_classes,
                     imsize=imsize,
                     n_colors=n_colors)
+    model.buildcnn()
     return model
 
 def trainmodel(model, train_dataset, test_dataset, logdatadir, outputdatadir, device=None):

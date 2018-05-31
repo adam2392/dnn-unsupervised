@@ -52,7 +52,7 @@ nvidia-smi
 ################### SETUP SINGULARITY CONTAINER  ####################
 # redefine SINGULARITY_HOME to mount current working directory to base $HOME
 export SINGULARITY_HOME=$PWD:/home/$USER
-singularity pull --name pytorch.simg shub://marcc-hpc/pytorch:latest
+singularity pull --name pytorch.simg shub://marcc-hpc/pytorch
 
 echo $PWD
 echo "Running training model"

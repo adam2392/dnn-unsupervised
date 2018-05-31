@@ -12,6 +12,7 @@ class ConvNet(nn.Module):
         self.config = config or Config()
         self.logger = initialize_logger(self.__class__.__name__, self.config.out.FOLDER_LOGS)
 
+    def buildcnn(self):
         # VGG params
         w_init = True
         n_layers = (4,2,1)
