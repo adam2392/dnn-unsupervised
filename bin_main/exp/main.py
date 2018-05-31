@@ -1,7 +1,8 @@
 import sys
 import os
+print("Before everything!")
 sys.path.append('../')
-sys.path.append('./util/')
+# sys.path.append('./util/')
 # if testing locally
 # sys.path.append('../../../')
 # sys.path.append('../../util/')
