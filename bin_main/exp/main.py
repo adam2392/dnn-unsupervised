@@ -50,8 +50,8 @@ def hpc_run(args):
     num_classes = 2
     data_procedure='loo'
 
-    logdatadir = os.path.join(log_data_dir, expname, patient)
-    outputdatadir = os.path.join(output_data_dir, expname, patient)
+    logdatadir = os.path.join(log_data_dir, expname, testpat)
+    outputdatadir = os.path.join(output_data_dir, expname, testpat)
     # create the output and temporary saving directories
     if not os.path.exists(outputdatadir):
         os.makedirs(outputdatadir)

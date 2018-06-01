@@ -44,12 +44,10 @@ singularity pull --name pytorch.simg shub://marcc-hpc/pytorch
 
 echo $PWD
 echo "Running training model"
-# echo "This is the command being run: singularity exec -B /scratch/ --nv ../pytorch.simg python ./trainfragaux/main_refactored.py \
-# ${outputdatadir} ${logdatadir} ${traindatadir} ${datadir}"
 
 # run training here in this
-# pycmd="python ./slurm/exp001/main.py ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}"
+pycmd="python ./slurm/exp001/main.py ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}"
 # singularity -v exec -B /scratch/ --nv ./pytorch.simg python main.py ${traindatadir} ${testdatadir} ${outputdatadir} ${logdatadir} ${patient} ${expname}
-singularity -v -d exec --nv ./pytorch.simg python main.py ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}
+singularity exec --nv ./pytorch.simg python main.py ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}
 
-# exit
+exit
