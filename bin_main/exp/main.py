@@ -14,13 +14,13 @@ parser.add_argument('train_data_dir',
                     help="Directory containing the dataset(s)")
 parser.add_argument('test_data_dir',
                     help="Directory containing the dataset(s)")
-parser.add_argument('output_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/output/', 
+parser.add_argument('--output_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/output/', 
                     help="Directory to save logs")
-parser.add_argument('log_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/logs/', 
+parser.add_argument('--log_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/logs/', 
                     help="Directory to save logs")
-parser.add_argument('patient_to_loo', default='id001_bt',
+parser.add_argument('--patient_to_loo', default='id001_bt',
                     help="Patient to leave one out on.")
-parser.add_argument('expname', default='_exp_default', 
+parser.add_argument('--expname', default='_exp_default', 
                     help="name of the experiment name")
 parser.add_argument('--model_dir', default='experiments/base_model', 
                     help="Directory containing params.json")
@@ -34,6 +34,7 @@ def local_test(args):
     patient='id001_bt'
 
 def hpc_run(args):
+    # read in the parsed arguments
     testpat = args.patient_to_loo
     log_data_dir = args.log_data_dir
     output_data_dir = args.output_data_dir
@@ -41,11 +42,11 @@ def hpc_run(args):
     test_data_dir = args.test_data_dir
     expname = args.expname
 
+    # assign log directories and output for saving model training
     log_data_dir='./'
     output_data_dir='./'
-    # train_data_dir=os.path.expanduser("~/Downloads/tngpipeline/freqimg/fft/")
-    # test_data_dir=os.path.expanduser("~/Downloads/tngpipeline/freqimg/fft/")
 
+    # parameters for model
     num_classes = 2
     data_procedure='loo'
 
