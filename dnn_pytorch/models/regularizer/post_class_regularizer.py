@@ -1,8 +1,8 @@
+import numpy as np 
 from dnn_pytorch.base.constants.config import Config, OutputConfig
 from dnn_pytorch.base.utils.log_error import initialize_logger
 
 class Postalarm(object):
-
     def __init__(self, winsize, stepsize, config=None):
         self.config = config or Config()
         self.logger = initialize_logger(self.__class__.__name__, self.config.out.FOLDER_LOGS)

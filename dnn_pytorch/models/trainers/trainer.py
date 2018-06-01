@@ -1,5 +1,4 @@
 import os
-
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -12,14 +11,14 @@ from dnn_pytorch.models.metrics.classifier import BinaryClassifierMetric
 import dnn_pytorch.base.constants.model_constants as constants
 
 # import regularizers
-from dnn_pytorch.models.regularizer.post_class_regularizer import Postalarm
+# from dnn_pytorch.models.regularizer.post_class_regularizer import Postalarm
 
+from tensorboardX import SummaryWriter
 # import tensorboard for writing stuff
-try:
-    from tensorboardX import SummaryWriter
-    from tqdm import trange
-except:
-    print("Can't import tensorboardX and tqdm!")
+# try:
+#     from tqdm import trange
+# except:
+#     print("Can't import tensorboardX and tqdm!")
 
 class Trainer(BaseTrainer):
     metric_comp = BinaryClassifierMetric()
