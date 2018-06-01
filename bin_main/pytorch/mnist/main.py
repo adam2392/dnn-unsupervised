@@ -14,25 +14,25 @@ sys.path.append('/scratch/users/ali39@jhu.edu/dnn-unsupervised/')
 print("about to import run fucntions!")
 print("inside main here!")
 import dnn_pytorch
+# import dnn_pytorch.base.constants.model_constants as constants
 # from dnn_pytorch.models.trainers.trainer import Trainer
 # from dnn_pytorch.models.nets.cnn import ConvNet
 
 # from dnn_pytorch.io.read_dataset import Reader
 # from dnn_pytorch.base.dataset.fftdataset import FFT2DImageDataset
-# import dnn_pytorch.base.constants.model_constants as constants
 
 # # preprocessing data
-# from sklearn.model_selection import train_test_split
-# from sklearn.preprocessing import scale
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import scale
 
-# # metrics for postprocessing of the results
-# from sklearn.metrics import confusion_matrix
-# from sklearn.metrics import accuracy_score
-# from sklearn.metrics import precision_score, \
-#     recall_score, classification_report, \
-#     f1_score, roc_auc_score
+# metrics for postprocessing of the results
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import precision_score, \
+    recall_score, classification_report, \
+    f1_score, roc_auc_score
 
-if __name_ == '__main__':
+if __name__ == '__main__':
     # Training settings
     parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
     parser.add_argument('--batch-size', type=int, default=64, metavar='N',
