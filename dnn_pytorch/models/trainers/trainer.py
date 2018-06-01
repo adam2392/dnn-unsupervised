@@ -13,7 +13,7 @@ import dnn_pytorch.base.constants.model_constants as constants
 # import regularizers
 # from dnn_pytorch.models.regularizer.post_class_regularizer import Postalarm
 
-from tensorboardX import SummaryWriter
+# from tensorboardX import SummaryWriter
 from tqdm import trange
 # import tensorboard for writing stuff
 # try:
@@ -58,15 +58,15 @@ class Trainer(BaseTrainer):
         # set tensorboard writer
         if tboard_log_name is None: 
             tboard_log_name = 'tboard_logs'
-            # self.writer = SummaryWriter(os.path.join(self.config.tboard.FOLDER_LOGS, tboard_log_name),
-                                    # comment=comment)
+
         # set where to log outputs of explog
         if explogdir is None:
             self.explogdir = os.path.join(self.config.tboard.FOLDER_LOGS, 'explogs')
         else:
             self.explogdir = explogdir
-        self.writer = SummaryWriter(os.path.join(explogdir, tboard_log_name),
-                                                comment=comment)
+        
+        # self.writer = SummaryWriter(os.path.join(explogdir, tboard_log_name),
+                                                # comment=comment)
 
     def composedatasets(self, train_dataset_obj, test_dataset_obj):
         self.train_loader = DataLoader(train_dataset_obj, 

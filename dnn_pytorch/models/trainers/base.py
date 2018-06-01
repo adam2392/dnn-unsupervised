@@ -34,45 +34,50 @@ class BaseTrainer(object):
     # ================================================================== #
     #                        Tensorboard Logging                         #
     # ================================================================== #
-    def _tboard_metrics(self, loss, metrics, step, mode=constants.TRAIN):
-         # compute mean of all metrics in summary
-        metrics_mean = {metric:np.mean([x[metric] for x in summ]) for metric in summ[0]} 
-        # 1. Log scalar values (scalar summary)
-        info = {metric: metrics[metric] for metric in metrics.keys()}
-        info['loss'] = loss.item()
+    def _tboard_metrics(self, loss, metrics, step, mode=constants.TRAIN, on=False):
+        if on:
+            # compute mean of all metrics in summary
+            metrics_mean = {metric:np.mean([x[metric] for x in summ]) for metric in summ[0]} 
+            # 1. Log scalar values (scalar summary)
+            info = {metric: metrics[metric] for metric in metrics.keys()}
+            info['loss'] = loss.item()
 
-        # log each item
-        for tag, value in info.items():
-            self.writer.add_scalar(tag+'/'+mode, value, step+1)
+            # log each item
+            for tag, value in info.items():
+                self.writer.add_scalar(tag+'/'+mode, value, step+1)
 
-    def _tboard_grad(self, step):
-        # 2. Log values and gradients of the parameters (histogram summary)
-        for tag, value in self.net.named_parameters():
-            tag = tag.replace('.', '/')
-            self.writer.add_histogram(tag, value.data.cpu().numpy(), step+1)
-            self.writer.add_histogram(tag+'/grad', value.grad.data.cpu().numpy(), step+1)
+    def _tboard_grad(self, step, on=False):
+        if on:
+            # 2. Log values and gradients of the parameters (histogram summary)
+            for tag, value in self.net.named_parameters():
+                tag = tag.replace('.', '/')
+                self.writer.add_histogram(tag, value.data.cpu().numpy(), step+1)
+                self.writer.add_histogram(tag+'/grad', value.grad.data.cpu().numpy(), step+1)
 
-    def _tboard_input(self, images, step):
-        # 3. Log training images (image summary)
-        info = { 
-                'images': images.view(-1, self.imsize, self.imsize)[:5].cpu().numpy() 
-            }
-        for tag, images in info.items():
-            self.writer.add_image(tag, images, step+1)
+    def _tboard_input(self, images, step, on=False):
+        if on:
+            # 3. Log training images (image summary)
+            info = { 
+                    'images': images.view(-1, self.imsize, self.imsize)[:5].cpu().numpy() 
+                }
+            for tag, images in info.items():
+                self.writer.add_image(tag, images, step+1)
 
-    def _tboard_features(self, images, label, step, name='default'):
-        # 4. add embedding:
-        self.writer.add_embedding(images.ravel(), 
+    def _tboard_features(self, images, label, step, name='default', on=False):
+        if on:
+            # 4. add embedding:
+            self.writer.add_embedding(images.ravel(), 
                                 metadata=label, 
                                 label_img=images.unsqueeze(1), 
                                 global_step=step+1,
                                 name=name)
 
-    def _log_model_tboard(self):
-        # log model to tensorboard
-        expected_image_shape = (self.batch_size, self.n_colors, self.imsize, self.imsize)
-        input_tensor = torch.autograd.Variable(torch.rand(*expected_image_shape),
-                                    requires_grad=True)
-        # this call will invoke all registered forward hooks
-        # res = self.net(input_tensor)
-        self.writer.add_graph(self.net, input_tensor)
+    def _log_model_tboard(self, on=False):
+        if on:
+            # log model to tensorboard
+            expected_image_shape = (self.batch_size, self.n_colors, self.imsize, self.imsize)
+            input_tensor = torch.autograd.Variable(torch.rand(*expected_image_shape),
+                                        requires_grad=True)
+            # this call will invoke all registered forward hooks
+            # res = self.net(input_tensor)
+            self.writer.add_graph(self.net, input_tensor)
