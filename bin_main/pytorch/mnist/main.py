@@ -15,9 +15,8 @@ print("about to import run fucntions!")
 print("inside main here!")
 import dnn_pytorch
 import dnn_pytorch.base.constants.model_constants as constants
-# from dnn_pytorch.models.trainers.trainer import Trainer
-# from dnn_pytorch.models.nets.cnn import ConvNet
-
+from dnn_pytorch.models.trainers.trainer import Trainer
+from dnn_pytorch.models.nets.cnn import ConvNet
 # from dnn_pytorch.io.read_dataset import Reader
 # from dnn_pytorch.base.dataset.fftdataset import FFT2DImageDataset
 
