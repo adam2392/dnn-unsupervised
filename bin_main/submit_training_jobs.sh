@@ -73,7 +73,7 @@ expname=${expname} "
 	echo "Sbatch should run now"
 	echo $sbatchcomm $exvars ./exp/run_train_pytorch.sbatch
 
-	cd /scratch/users/$USER/dnn-unsupervised/bin_main/exp/
+	# cd /scratch/users/$USER/dnn-unsupervised/bin_main/exp/
 	${sbatchcomm} $exvars ./exp/run_train_pytorch.sbatch
 
 	read -p "Continuing in 0.5 Seconds...." -t 0.5
