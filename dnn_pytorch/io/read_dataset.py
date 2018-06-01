@@ -7,6 +7,7 @@ from dnn_pytorch.base.constants.config import Config
 from dnn_pytorch.base.utils.log_error import initialize_logger
 import dnn_pytorch.base.constants.model_constants as constants
 from sklearn.utils import compute_class_weight
+import tqdm
 
 class Reader(object):
     root_dir = None
@@ -85,15 +86,14 @@ class Reader(object):
         else:
             self.logger.info("Loading files from user passed in files!")
 
-        # print(self.trainfilepaths)
-        # print(self.testfilepaths)
+        print(self.trainfilepaths)
+        print(self.testfilepaths)
         '''     LOAD DATA      '''
-        try:
-            import tqdm
-            filerange = enumerate(tqdm.tqdm(filelist))
-        except Exception as e:
-            filerange = enumerate(filelist)
-            print(e)
+        # try:
+        filerange = enumerate(tqdm.tqdm(filelist))
+        # except Exception as e:
+        #     filerange = enumerate(filelist)
+        #     print(e)
 
         for idx, datafile in filerange:
             if not datafile.endswith('.npz'):
