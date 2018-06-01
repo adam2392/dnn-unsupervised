@@ -11,7 +11,6 @@ import sys
 import os
 print("Before everything!")
 sys.path.append('/scratch/users/ali39@jhu.edu/dnn-unsupervised/')
-sys.path.append('../../')
 print("about to import run fucntions!")
 print("inside main here!")
 import dnn_pytorch

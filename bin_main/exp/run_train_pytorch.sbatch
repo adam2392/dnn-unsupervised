@@ -1,5 +1,4 @@
 #!/bin/bash
-
 #SBATCH
 #SBATCH --mail-type=end
 #SBATCH --mail-user=ali39@jhu.edu
@@ -19,7 +18,7 @@
 # -B = bind path /scratch /work /data
 
 ############################# LOAD IN MODULES AND UNLOAD #############
-module unload git
+# module unload git
 ml cuda/9.0
 ml singularity 
 
@@ -27,8 +26,7 @@ ml singularity
 cd /scratch/users/$USER/dnn-unsupervised/bin_main/exp/
 
 ########################## DEBUG OUTPUT  ###########################
-# grep for SLURM_EXPORT_ENV
-grep $SLURM_EXPORT_ENV
+# grep $SLURM_EXPORT_ENV
 echo "log data dir is : ${logdatadir}"
 echo "Output data dir is: ${outputdatadir}"
 echo "Train data dir is: ${traindatadir}"

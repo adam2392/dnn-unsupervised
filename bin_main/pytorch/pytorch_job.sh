@@ -18,4 +18,4 @@ cd /scratch/users/$USER/dnn-unsupervised/bin_main/pytorch/mnist/
 export SINGULARITY_HOME=$PWD:/home/$USER
 
 singularity pull --name pytorch.simg shub://marcc-hpc/pytorch
-singularity exec -B /scratch/ --nv ./pytorch.simg python main.py
+singularity exec -B /scratch/ --nv ./pytorch.simg python main.py ${traindatadir} ${testdatadir} ${outputdatadir}
