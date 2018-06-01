@@ -12,19 +12,18 @@ class ConvNet(nn.Module):
         self.config = config or Config()
         self.logger = initialize_logger(self.__class__.__name__, self.config.out.FOLDER_LOGS)
 
+        self.num_classes = num_classes
+        self.n_colors = n_colors
+        self.imsize = imsize
     def buildcnn(self):
         # VGG params
-        w_init = True
         n_layers = (4,2,1)
         poolsize = 2
         n_filters = 32
         filter_size = 3
-        self.num_classes = num_classes
-        self.n_colors = n_colors
-        self.imsize = imsize
         self._buildvgg(w_init, n_layers, poolsize, n_filters, filter_size)
 
-    def _buildvgg(self, w_init=True, n_layers=(4,2,1), poolsize=2, n_filters=32, filter_size=3):
+    def _buildvgg(self, n_layers=(4,2,1), poolsize=2, n_filters=32, filter_size=3):
         '''
         Model function for building up the VGG style CNN.
 
