@@ -17,7 +17,6 @@ import dnn_pytorch
 import dnn_pytorch.base.constants.model_constants as constants
 from dnn_pytorch.io.read_dataset import Reader
 from dnn_pytorch.base.dataset.fftdataset import FFT2DImageDataset
-from dnn_pytorch.models.trainers.trainer import Trainer
 from dnn_pytorch.models.nets.cnn import ConvNet
 
 # # preprocessing data
@@ -54,6 +53,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     args.cuda = not args.no_cuda and torch.cuda.is_available()
 
+    from dnn_pytorch.models.trainers.trainer import Trainer
     torch.manual_seed(args.seed)
     if args.cuda:
         torch.cuda.manual_seed(args.seed)

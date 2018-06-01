@@ -14,9 +14,10 @@ import dnn_pytorch.base.constants.model_constants as constants
 # from dnn_pytorch.models.regularizer.post_class_regularizer import Postalarm
 
 from tensorboardX import SummaryWriter
+from tqdm import trange
 # import tensorboard for writing stuff
 # try:
-#     from tqdm import trange
+#     
 # except:
 #     print("Can't import tensorboardX and tqdm!")
 
