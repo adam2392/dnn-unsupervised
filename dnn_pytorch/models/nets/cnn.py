@@ -6,6 +6,10 @@ from dnn_pytorch.base.constants.config import Config
 from dnn_pytorch.base.utils.log_error import initialize_logger
 
 class ConvNet(nn.Module):
+    imsize = None
+    n_colors = None
+    num_classes = None
+    
     def __init__(self, num_classes, imsize, n_colors, config=None):
         super(ConvNet, self).__init__()
 
@@ -15,13 +19,14 @@ class ConvNet(nn.Module):
         self.num_classes = num_classes
         self.n_colors = n_colors
         self.imsize = imsize
+
     def buildcnn(self):
         # VGG params
         n_layers = (4,2,1)
         poolsize = 2
         n_filters = 32
         filter_size = 3
-        self._buildvgg(w_init, n_layers, poolsize, n_filters, filter_size)
+        self._buildvgg(n_layers, poolsize, n_filters, filter_size)
 
     def _buildvgg(self, n_layers=(4,2,1), poolsize=2, n_filters=32, filter_size=3):
         '''
