@@ -1,27 +1,3 @@
-import sys
-import os
-sys.path.append('/scratch/users/ali39@jhu.edu/dnn-unsupervised/')
-import argparse
-
-parser = argparse.ArgumentParser()
-parser.add_argument('train_data_dir',
-                    help="Directory containing the dataset(s)")
-parser.add_argument('test_data_dir',
-                    help="Directory containing the dataset(s)")
-parser.add_argument('output_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/output/', 
-                    help="Directory to save logs")
-parser.add_argument('log_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/logs/', 
-                    help="Directory to save logs")
-parser.add_argument('patient_to_loo', default='id001_bt',
-                    help="Patient to leave one out on.")
-parser.add_argument('expname', default='_exp_default', 
-                    help="name of the experiment name")
-parser.add_argument('--model_dir', default='experiments/base_model', 
-                    help="Directory containing params.json")
-parser.add_argument('--restore_file', default='best', 
-                    help="name of the file in --model_dir \
-                     containing weights to load")
-
 import numpy as np
 import torch
 import torch.nn as nn
@@ -45,6 +21,30 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score, \
     recall_score, classification_report, \
     f1_score, roc_auc_score
+print("inside main")
+import sys
+import os
+sys.path.append('/scratch/users/ali39@jhu.edu/dnn-unsupervised/')
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('train_data_dir',
+                    help="Directory containing the dataset(s)")
+parser.add_argument('test_data_dir',
+                    help="Directory containing the dataset(s)")
+parser.add_argument('output_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/output/', 
+                    help="Directory to save logs")
+parser.add_argument('log_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/logs/', 
+                    help="Directory to save logs")
+parser.add_argument('patient_to_loo', default='id001_bt',
+                    help="Patient to leave one out on.")
+parser.add_argument('expname', default='_exp_default', 
+                    help="name of the experiment name")
+parser.add_argument('--model_dir', default='experiments/base_model', 
+                    help="Directory containing params.json")
+parser.add_argument('--restore_file', default='best', 
+                    help="name of the file in --model_dir \
+                     containing weights to load")
     
 def createmodel(num_classes, imsize, n_colors):
     # 1) create the model - cnn
@@ -173,5 +173,4 @@ if __name__ == '__main__':
     print(args)
     
     hpc_run(args)
-
     # local_test(args)
