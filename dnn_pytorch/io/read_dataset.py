@@ -6,7 +6,8 @@ import os
 from dnn_pytorch.base.constants.config import Config
 from dnn_pytorch.base.utils.log_error import initialize_logger
 import dnn_pytorch.base.constants.model_constants as constants
-import sklearn
+from sklearn.utils import compute_class_weight
+
 class Reader(object):
     root_dir = None
     patients = None
@@ -113,7 +114,7 @@ class Reader(object):
         invert_y = 1 - ylabels
         ylabels = np.concatenate((invert_y, ylabels), axis=1)
         # format the data correctly
-        class_weight = sklearn.utils.compute_class_weight('balanced',
+        class_weight = compute_class_weight('balanced',
                                                           np.unique(
                                                               ylabels).astype(int),
                                                           np.argmax(ylabels, axis=1))

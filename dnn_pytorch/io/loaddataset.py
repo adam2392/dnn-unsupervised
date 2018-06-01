@@ -4,13 +4,13 @@ import sys
 import numpy as np 
 import pandas as pd 
 
-import mne
-from .utils import utils
-from .utils import seegrecording
-from .readers.read_connectivity import LoadConn
-
+from dnn_pytorch.io.readers.read_connectivity import LoadConn
 from dnn_pytorch.base.constants.config import Config
 from dnn_pytorch.base.utils.log_error import initialize_logger
+
+# from dnn_pytorch.io.utils import seegrecording
+# from dnn_pytorch.io.utils import utils
+# import mne
 from datetime import date
 import warnings
 

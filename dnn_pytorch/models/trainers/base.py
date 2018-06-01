@@ -1,7 +1,6 @@
 import torch
 from dnn_pytorch.base.constants.config import Config, OutputConfig
 from dnn_pytorch.base.utils.log_error import initialize_logger
-
 import dnn_pytorch.base.constants.model_constants as constants
 
 class TrainMetrics(object):
