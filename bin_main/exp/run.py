@@ -6,7 +6,6 @@ import torch.nn as nn
 import dnn_pytorch
 from dnn_pytorch.models.trainers.trainer import Trainer
 from dnn_pytorch.models.nets.cnn import ConvNet
-
 from dnn_pytorch.io.read_dataset import Reader
 from dnn_pytorch.base.dataset.fftdataset import FFT2DImageDataset
 import dnn_pytorch.base.constants.model_constants as constants

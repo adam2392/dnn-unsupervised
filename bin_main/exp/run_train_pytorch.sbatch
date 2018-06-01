@@ -49,7 +49,6 @@ echo "Running training model"
 
 # run training here in this
 # pycmd="python ./slurm/exp001/main.py ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}"
-# ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}
 # singularity -v exec -B /scratch/ --nv ./pytorch.simg python main.py ${traindatadir} ${testdatadir} ${outputdatadir} ${logdatadir} ${patient} ${expname}
 singularity -v -d exec --nv ./pytorch.simg python main.py ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}
 
