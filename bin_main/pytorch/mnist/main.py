@@ -14,7 +14,7 @@ sys.path.append('/scratch/users/ali39@jhu.edu/dnn-unsupervised/')
 print("about to import run fucntions!")
 print("inside main here!")
 import dnn_pytorch
-# import dnn_pytorch.base.constants.model_constants as constants
+import dnn_pytorch.base.constants.model_constants as constants
 # from dnn_pytorch.models.trainers.trainer import Trainer
 # from dnn_pytorch.models.nets.cnn import ConvNet
 
