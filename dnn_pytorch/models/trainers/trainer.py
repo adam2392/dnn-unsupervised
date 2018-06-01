@@ -60,10 +60,7 @@ class Trainer(BaseTrainer):
             tboard_log_name = 'tboard_logs'
 
         # set where to log outputs of explog
-        if explogdir is None:
-            self.explogdir = os.path.join(self.config.tboard.FOLDER_LOGS, 'explogs')
-        else:
-            self.explogdir = explogdir
+        self.explogdir = os.path.join(self.config.tboard.FOLDER_LOGS, explogdir)
         
         # self.writer = SummaryWriter(os.path.join(explogdir, tboard_log_name),
                                                 # comment=comment)
