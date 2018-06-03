@@ -7,8 +7,8 @@ import dnn_pytorch
 from dnn_pytorch.io.read_dataset import Reader
 from dnn_pytorch.base.dataset.fftdataset import FFT2DImageDataset
 import dnn_pytorch.base.constants.model_constants as constants
-# from dnn_pytorch.models.trainers.trainer import Trainer
-# from dnn_pytorch.models.nets.cnn import ConvNet
+from dnn_pytorch.models.nets.cnn import ConvNet
+from dnn_pytorch.models.trainers.trainer import CNNTrainer
 
 # preprocessing data
 from sklearn.model_selection import train_test_split
@@ -47,7 +47,7 @@ def trainmodel(model, train_dataset, test_dataset, logdatadir, outputdatadir, de
     print(device)
 
     # 1) create the trainer
-    trainer = Trainer(model, num_epochs, batch_size, device=device, explogdir=logdatadir)
+    trainer = CNNTrainer(model, num_epochs, batch_size, device=device, explogdir=logdatadir)
     trainer.composedatasets(train_dataset, test_dataset)
     trainer.run_config()
 

@@ -12,11 +12,10 @@ import dnn_pytorch.base.constants.model_constants as constants
 
 # import regularizers
 # from dnn_pytorch.models.regularizer.post_class_regularizer import Postalarm
-
 from tensorboardX import SummaryWriter
 from tqdm import trange
 
-class Trainer(BaseTrainer):
+class CNNTrainer(BaseTrainer):
     metric_comp = BinaryClassifierMetric()
     post_regularizer = None
 
@@ -36,7 +35,7 @@ class Trainer(BaseTrainer):
                 dropout=constants.DROPOUT,
                 shuffle=constants.SHUFFLE,
                 config=None):
-        super(Trainer, self).__init__(net=net,
+        super(CNNTrainer, self).__init__(net=net,
                                       device=device,
                                       config=config)
 
