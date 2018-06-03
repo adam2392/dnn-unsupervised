@@ -15,11 +15,6 @@ import dnn_pytorch.base.constants.model_constants as constants
 
 from tensorboardX import SummaryWriter
 from tqdm import trange
-# import tensorboard for writing stuff
-# try:
-#     
-# except:
-#     print("Can't import tensorboardX and tqdm!")
 
 class Trainer(BaseTrainer):
     metric_comp = BinaryClassifierMetric()
