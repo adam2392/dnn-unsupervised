@@ -106,7 +106,7 @@ class Reader(object):
                 image_tensors = np.zeros((len(filelist)*1000, *tuple(_image_tensor.shape[1:])))
                 ylabels = np.zeros((len(filelist)*1000, *tuple(_ylabels.shape[1:])))
                 wins = [0, 0+_ylabels.shape[0]]
-                prevwin = win[-1]
+                prevwin = wins[-1]
 
                 image_tensors[wins[0]:wins[1],...] = _image_tensor
                 ylabels[wins[0]:wins[1],...] = _ylabels
