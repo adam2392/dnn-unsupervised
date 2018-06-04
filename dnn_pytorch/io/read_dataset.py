@@ -114,7 +114,7 @@ class Reader(object):
                 # ylabels = _ylabels
             else:
                 wins = [prevwin, prevwin+_ylabels.shape[0]]
-                prevwin = win[-1]
+                prevwin = wins[-1]
 
                 if prevwin > image_tensors.shape[0]:
                     new_image_tensors = np.zeros((image_tensors.shape[0]*2, *tuple(image_tensors.shape[1:])))
