@@ -103,13 +103,37 @@ class Reader(object):
             _ylabels = imagedata['ylabels']
 
             if idx == 0:
-                image_tensors = _image_tensor
-                ylabels = _ylabels
+                image_tensors = np.zeros((len(filelist)*1000, _image_tensor.shape[1:]))
+                ylabels = np.zeros((len(filelist)*1000, _ylabels.shape[1:]))
+                wins = [0, 0+_ylabels.shape[0]]
+                prevwin = win[-1]
+
+                image_tensors[wins[0]:wins[1],...] = _image_tensor
+                ylabels[wins[0]:wins[1],...] = _ylabels
+                # image_tensors = _image_tensor
+                # ylabels = _ylabels
             else:
-                image_tensors = np.append(image_tensors, _image_tensor, axis=0)
-                ylabels = np.append(ylabels, _ylabels, axis=0)
+                wins = [prevwin, prevwin+_ylabels.shape[0]]
+                prevwin = win[-1]
+
+                if prevwin > image_tensors.shape[0]:
+                    new_image_tensors = np.zeros((image_tensors.shape[0]*2, image_tensors.shape[1:]))
+                    new_ylabels = np.zeros((ylabels.shape[0]*2, ylabels.shape[1:]))
+                    new_image_tensors[0:image_tensors.shape[0], ...] = image_tensors
+                    new_ylabels[0:ylabels.shape[0], ...] = ylabels
+                    image_tensors = new_image_tensors
+                    ylabels = new_ylabels
+
+                image_tensors[wins[0]:wins[1],...] = _image_tensor
+                ylabels[wins[0]:wins[1],...] = _ylabels
+                # image_tensors = np.append(image_tensors, _image_tensor, axis=0)
+                # ylabels = np.append(ylabels, _ylabels, axis=0)
 
             # break
+        # get rid of the extra batches
+        image_tensors[prevwin:,...] = []
+        ylabels[prevwin:,...] = []
+
         # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
         invert_y = 1 - ylabels
         ylabels = np.concatenate((invert_y, ylabels), axis=1)
