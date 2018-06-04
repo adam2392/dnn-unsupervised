@@ -130,10 +130,15 @@ class Reader(object):
                 # ylabels = np.append(ylabels, _ylabels, axis=0)
 
             # break
+        print(wins)
+        print(image_tensors.shape)
+        print(ylabels.shape)
         # get rid of the extra batches
-        image_tensors[prevwin:,...] = []
-        ylabels[prevwin:,...] = []
-
+        deleterange = np.arange(prevwin,len(image_tensors))
+        image_tensors = np.delete(image_tensors, deleterange, axis=0)
+        ylabels = np.delete(ylabels, deleterange, axis=0)
+        print(image_tensors.shape)
+        print(ylabels.shape)
         # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
         invert_y = 1 - ylabels
         ylabels = np.concatenate((invert_y, ylabels), axis=1)
