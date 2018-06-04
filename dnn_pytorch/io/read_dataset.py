@@ -103,8 +103,8 @@ class Reader(object):
             _ylabels = imagedata['ylabels']
 
             if idx == 0:
-                image_tensors = np.zeros((len(filelist)*1000, _image_tensor.shape[1:]))
-                ylabels = np.zeros((len(filelist)*1000, _ylabels.shape[1:]))
+                image_tensors = np.zeros((len(filelist)*1000, *tuple(_image_tensor.shape[1:])))
+                ylabels = np.zeros((len(filelist)*1000, *tuple(_ylabels.shape[1:])))
                 wins = [0, 0+_ylabels.shape[0]]
                 prevwin = win[-1]
 
@@ -117,8 +117,8 @@ class Reader(object):
                 prevwin = win[-1]
 
                 if prevwin > image_tensors.shape[0]:
-                    new_image_tensors = np.zeros((image_tensors.shape[0]*2, image_tensors.shape[1:]))
-                    new_ylabels = np.zeros((ylabels.shape[0]*2, ylabels.shape[1:]))
+                    new_image_tensors = np.zeros((image_tensors.shape[0]*2, *tuple(image_tensors.shape[1:])))
+                    new_ylabels = np.zeros((ylabels.shape[0]*2, *tuple(ylabels.shape[1:])))
                     new_image_tensors[0:image_tensors.shape[0], ...] = image_tensors
                     new_ylabels[0:ylabels.shape[0], ...] = ylabels
                     image_tensors = new_image_tensors
