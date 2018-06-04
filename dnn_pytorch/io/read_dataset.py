@@ -109,7 +109,7 @@ class Reader(object):
                 image_tensors = np.append(image_tensors, _image_tensor, axis=0)
                 ylabels = np.append(ylabels, _ylabels, axis=0)
 
-            break
+            # break
         # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
         invert_y = 1 - ylabels
         ylabels = np.concatenate((invert_y, ylabels), axis=1)

@@ -43,8 +43,8 @@ def hpc_run(args):
     expname = args.expname
 
     # assign log directories and output for saving model training
-    log_data_dir=''
-    output_data_dir=''
+    # log_data_dir=''
+    # output_data_dir=''
 
     # parameters for model
     num_classes = 2
