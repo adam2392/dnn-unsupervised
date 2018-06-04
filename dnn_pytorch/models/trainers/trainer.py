@@ -29,8 +29,9 @@ class CNNTrainer(BaseTrainer):
 
     def __init__(self, net, num_epochs, batch_size, 
                 device=None,                            # device(s) to train on
-                tboard_log_name=None, comment='',       # for tensorboard logging
-                explogdir=None,                         # for gen. experiment logging
+                tboardlogdir=None,
+                explogdir=None,
+                expname=None,                         # for gen. experiment logging
                 learning_rate=constants.LEARNING_RATE,
                 dropout=constants.DROPOUT,
                 shuffle=constants.SHUFFLE,
@@ -48,17 +49,26 @@ class CNNTrainer(BaseTrainer):
         # hyper parameters - dataset
         self.shuffle = shuffle 
 
-        '''         SET LOGGING DIRECTORIES: MODEL, TENSORBOARD         '''
-        # set tensorboard writer
-        if tboard_log_name is None: 
-            tboard_log_name = 'tboard_logs'
-
+        '''         SET LOGGING DIRECTORIES: MODEL, TENSORBOARD         '''        
+        self.expname = expname
         # set where to log outputs of explog
-        self.explogdir = os.path.join(self.config.tboard.FOLDER_LOGS, explogdir)
+        if explogdir is None:
+            self.explogdir = os.path.join(self.config.tboard.FOLDER_LOGS, expname, 'logs')
+        else:
+            self.explogdir = explogdir
         if not os.path.exists(self.explogdir):
-            os.makedirs(explogdir)
-        # self.writer = SummaryWriter(os.path.join(explogdir, tboard_log_name),
-                                                # comment=comment)
+            os.makedirs(self.explogdir)
+        if tboardlogdir is None:
+            self.tboardlogdir = os.path.join(self.config.tboard.FOLDER_LOGS, expname, 'tensorboard')
+        else:
+            self.tboardlogdir = tboardlogdir
+        if not os.path.exists(self.tboardlogdir):
+            os.makedirs(self.tboardlogdir)
+        # set tensorboard writer
+        self.writer = SummaryWriter(tboardlogdir)
+
+        self.logger.info("Logging experimental data at: {}".format(self.explogdir))
+        self.logger.info("Logging tensorboard data at: {}".format(self.tboardlogdir))
 
     def composedatasets(self, train_dataset_obj, test_dataset_obj):
         self.train_loader = DataLoader(train_dataset_obj, 

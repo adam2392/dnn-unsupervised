@@ -50,8 +50,12 @@ def hpc_run(args):
     num_classes = 2
     data_procedure='loo'
 
-    logdatadir = os.path.join(log_data_dir, expname, testpat)
-    outputdatadir = os.path.join(output_data_dir, expname, testpat)
+    # tboard_log_name=None, 
+    # comment='',       # for tensorboard logging
+
+    logdatadir = os.path.join(log_data_dir, 'logs', testpat)
+    tboardlogdir = os.path.join(log_data_dir, 'tensorboard', testpat)
+    outputdatadir = os.path.join(output_data_dir, testpat)
     # create the output and temporary saving directories
     if not os.path.exists(outputdatadir):
         os.makedirs(outputdatadir)
@@ -72,8 +76,8 @@ def hpc_run(args):
     print(model)
     
     # train model
-    trainer = trainmodel(model, train_dataset, test_dataset, logdatadir, outputdatadir)
-
+    trainer = trainmodel(model, train_dataset, test_dataset, 
+        logdatadir=logdatadir, tboardlogdir=tboardlogdir, outputdatadir=outputdatadir)
     # # test model
     resultfilename = '{}_endmodel.ckpt'.format(testpat)
     trainer = testmodel(trainer, resultfilename)

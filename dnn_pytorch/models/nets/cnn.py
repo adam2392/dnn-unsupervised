@@ -20,13 +20,27 @@ class ConvNet(nn.Module):
         self.n_colors = n_colors
         self.imsize = imsize
 
+        # initialize a dropout layer
+        self.dropout = nn.Dropout(p=0.5)
+
     def buildcnn(self):
         # VGG params
         n_layers = (4,2,1)
         poolsize = 2
         n_filters = 32
         filter_size = 3
-        self._buildvgg(n_layers, poolsize, n_filters, filter_size)
+        cnn = self._buildvgg(n_layers, poolsize, n_filters, filter_size)
+        return cnn
+        
+    def buildoutput(self):
+        # create the output linear classification layers
+        self.out = nn.Sequential()
+        fc = nn.Linear(128*6*6, 512)
+        self.out.add_module('fc',fc)
+        self.out.add_module('dropout', self.dropout)
+        fc2 = nn.Linear(512, self.num_classes)
+        self.out.add_module('fc2',fc2)    
+        self.out.add_module('dropout', self.dropout)
 
     def _buildvgg(self, n_layers=(4,2,1), poolsize=2, n_filters=32, filter_size=3):
         '''
@@ -63,19 +77,12 @@ class ConvNet(nn.Module):
                 self.net.add_module('norm{}_{}'.format(idx,ilay), nn.BatchNorm2d(num_features=prevfilter))   # apply batch normalization
                 self.net.add_module('activate{}_{}'.format(idx,ilay), nn.ReLU())                                    # apply relu activation
             self.net.add_module('pool{}'.format(idx), nn.MaxPool2d(kernel_size=poolsize, stride=poolsize)) # choose max value in poolsize area
-
-        # create the output linear classification layers
-        self.out = nn.Sequential()
-        fc = nn.Linear(128*6*6, 512)
-        self.out.add_module('fc',fc)
-        self.out.add_module('dropout', nn.Dropout(p=0.5))
-        fc2 = nn.Linear(512, self.num_classes)
-        self.out.add_module('fc2',fc2)    
-        self.out.add_module('dropout',nn.Dropout(p=0.5))
+        return self.net
 
     def forward(self, x):
-        x = self.net(x)
+        x = self.cnns(x)
         x = x.view(x.size(0), -1) # to get the intermediate output
+        x = self.lstm(x, hidden)
         output = self.out(x)
         return output, x
 

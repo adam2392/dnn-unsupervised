@@ -86,8 +86,8 @@ class Reader(object):
         else:
             self.logger.info("Loading files from user passed in files!")
 
-        print(self.trainfilepaths)
-        print(self.testfilepaths)
+        # print(self.trainfilepaths)
+        # print(self.testfilepaths)
         '''     LOAD DATA      '''
         # try:
         filerange = enumerate(tqdm.tqdm(filelist))
