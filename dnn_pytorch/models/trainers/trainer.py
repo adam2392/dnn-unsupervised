@@ -12,7 +12,7 @@ import dnn_pytorch.base.constants.model_constants as constants
 
 # import regularizers
 # from dnn_pytorch.models.regularizer.post_class_regularizer import Postalarm
-from tensorboardX import SummaryWriter
+import tensorboardX  #import SummaryWriter
 from tqdm import trange
 
 class CNNTrainer(BaseTrainer):
@@ -65,7 +65,7 @@ class CNNTrainer(BaseTrainer):
         if not os.path.exists(self.tboardlogdir):
             os.makedirs(self.tboardlogdir)
         # set tensorboard writer
-        self.writer = SummaryWriter(tboardlogdir)
+        self.writer = tensorboardX.SummaryWriter(tboardlogdir)
 
         self.logger.info("Logging experimental data at: {}".format(self.explogdir))
         self.logger.info("Logging tensorboard data at: {}".format(self.tboardlogdir))

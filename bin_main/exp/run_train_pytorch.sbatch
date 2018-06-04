@@ -41,7 +41,7 @@ echo ${CUDA_VISIBLE_DEVICES}
 # redefine SINGULARITY_HOME to mount current working directory to base $HOME
 export SINGULARITY_HOME=$PWD:/home/$USER
 # singularity pull --name pytorch.simg shub://marcc-hpc/pytorch
-singularity pull --name pytorch.simg shub://adam2392/deeplearning_hubs
+singularity pull --name pytorch.simg shub://adam2392/deeplearning_hubs:latest
 
 echo $PWD
 echo "Running training model"
