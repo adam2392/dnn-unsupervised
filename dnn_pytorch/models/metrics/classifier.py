@@ -39,7 +39,7 @@ class BinaryClassifierMetric(BaseMetric):
     def fpr(self, fp, tn, totaltime):
         return fp/(fp+tn)
 
-    def _recall(self, y_true, y_pred, sample_weight):
+    def _recall(self, y_true, y_pred, sample_weight=None):
         '''
         AKA Sensitivity
         '''
@@ -47,17 +47,17 @@ class BinaryClassifierMetric(BaseMetric):
                                         pos_label=1,
                                         sample_weight=sample_weight)
         return recall
-    def _precision(self, y_true, y_pred, sample_weight):
+    def _precision(self, y_true, y_pred, sample_weight=None):
         precision = metrics.precision_score(y_true, y_pred, 
                                         pos_label=1,
                                         sample_weight=sample_weight)
         return precision
-    def _accuracy(self, y_true, y_pred, sample_weight):
-        _accuracy = metrics.accuracy_score(y_true, y_pred, 
+    def _accuracy(self, y_true, y_pred, sample_weight=None):
+        accuracy = metrics.accuracy_score(y_true, y_pred, 
                                         normalize=True,
                                         sample_weight=sample_weight)
         return accuracy
-    def _fp(self,y_true, y_pred, sample_weight):
+    def _fp(self,y_true, y_pred, sample_weight=None):
         _, fp, _, _ = metrics.confusion_matrix(y_true, y_pred).ravel()
         return fp
 

@@ -53,7 +53,7 @@ def trainmodel(model, train_dataset, test_dataset, logdatadir, outputdatadir, de
     trainer.run_config()
 
     print(trainer)
-    # trainer.train()
+    trainer.train()
     return trainer
 
 def testmodel(trainer, resultfilename):

@@ -31,13 +31,33 @@ class BaseTrainer(object):
         self.logger.info("Setting the device to be {}".format(self.device))
 
         self.net = net
+
+    def _summarize(self, outputs, labels, loss, regularize=False):
+        # extract data from torch Variable, move to cpu, convert to numpy arrays
+        output_batch = outputs.data.cpu().numpy()
+        labels_batch = labels.data.cpu().numpy()
+
+        # ensure that metrics only take in the predicted labels
+        # labels_batch = np.argmax(labels_batch,1)
+        output_batch = np.argmax(output_batch,1)
+
+        # regularize the output
+        if self.post_regularizer is not None and regularize is True:
+            self.post_regularizer.load_predictions(output_batch)
+            alarm_inds = self.post_regularizer.temporal_smooth(thresh=0.5)
+            output_batch[:] = 0
+            output_batch[alarm_inds] = 1
+
+        # compute all metrics on this batch
+        summary_batch = {metric:self.metrics[metric](output_batch, labels_batch)
+                         for metric in self.metrics}
+        summary_batch['loss'] = loss.data.item() 
+        return summary_batch
     # ================================================================== #
     #                        Tensorboard Logging                         #
     # ================================================================== #
-    def _tboard_metrics(self, loss, metrics, step, mode=constants.TRAIN, on=False):
+    def _tboard_metrics(self, loss, metrics, step, mode=constants.TRAIN, on=True):
         if on:
-            # compute mean of all metrics in summary
-            metrics_mean = {metric:np.mean([x[metric] for x in summ]) for metric in summ[0]} 
             # 1. Log scalar values (scalar summary)
             info = {metric: metrics[metric] for metric in metrics.keys()}
             info['loss'] = loss.item()
@@ -46,7 +66,7 @@ class BaseTrainer(object):
             for tag, value in info.items():
                 self.writer.add_scalar(tag+'/'+mode, value, step+1)
 
-    def _tboard_grad(self, step, on=False):
+    def _tboard_grad(self, step, on=True):
         if on:
             # 2. Log values and gradients of the parameters (histogram summary)
             for tag, value in self.net.named_parameters():
@@ -54,7 +74,7 @@ class BaseTrainer(object):
                 self.writer.add_histogram(tag, value.data.cpu().numpy(), step+1)
                 self.writer.add_histogram(tag+'/grad', value.grad.data.cpu().numpy(), step+1)
 
-    def _tboard_input(self, images, step, on=False):
+    def _tboard_input(self, images, step, on=True):
         if on:
             # 3. Log training images (image summary)
             info = { 
@@ -63,7 +83,7 @@ class BaseTrainer(object):
             for tag, images in info.items():
                 self.writer.add_image(tag, images, step+1)
 
-    def _tboard_features(self, images, label, step, name='default', on=False):
+    def _tboard_features(self, images, label, step, name='default', on=True):
         if on:
             # 4. add embedding:
             self.writer.add_embedding(images.ravel(), 
@@ -72,7 +92,7 @@ class BaseTrainer(object):
                                 global_step=step+1,
                                 name=name)
 
-    def _log_model_tboard(self, on=False):
+    def _log_model_tboard(self, on=True):
         if on:
             # log model to tensorboard
             expected_image_shape = (self.batch_size, self.n_colors, self.imsize, self.imsize)

@@ -33,14 +33,23 @@ class ConvNet(nn.Module):
         return cnn
         
     def buildoutput(self):
+        n_size = self._get_conv_output((self.n_colors, self.imsize, self.imsize))
         # create the output linear classification layers
         self.out = nn.Sequential()
-        fc = nn.Linear(128*6*6, 512)
+        fc = nn.Linear(n_size, 512)
         self.out.add_module('fc',fc)
         self.out.add_module('dropout', self.dropout)
         fc2 = nn.Linear(512, self.num_classes)
         self.out.add_module('fc2',fc2)    
         self.out.add_module('dropout', self.dropout)
+
+    # generate input sample and forward to get shape
+    def _get_conv_output(self, shape):
+        bs = 1
+        input = torch.autograd.Variable(torch.rand(bs, *shape))
+        output_feat = self._forward_features(input)
+        n_size = output_feat.data.view(bs, -1).size(1)
+        return n_size
 
     def _buildvgg(self, n_layers=(4,2,1), poolsize=2, n_filters=32, filter_size=3):
         '''
@@ -79,10 +88,14 @@ class ConvNet(nn.Module):
             self.net.add_module('pool{}'.format(idx), nn.MaxPool2d(kernel_size=poolsize, stride=poolsize)) # choose max value in poolsize area
         return self.net
 
-    def forward(self, x):
-        x = self.cnns(x)
+    def _forward_features(self, x):
+        x = self.net(x)
         x = x.view(x.size(0), -1) # to get the intermediate output
-        x = self.lstm(x, hidden)
+        return x
+
+    def forward(self, x):
+        output = None
+        x = self._forward_features(x)
         output = self.out(x)
         return output, x
 
@@ -98,12 +111,12 @@ if __name__ == '__main__':
     #     print('i:',i,'weights:',weights.size())
 
     ## PRINT FINAL OUTPUT USING A VARIABLE RUN THROUGH THE NETWORK
-    expected_image_shape = (4, 28, 28)
+    expected_image_shape = (4, 64, 64)
     input_tensor = torch.autograd.Variable(torch.rand(1, *expected_image_shape))
     # this call will invoke all registered forward hooks
     output_tensor, x = cnn(input_tensor)
-    print(x.shape)
-    print(output_tensor.shape)
+    print("X shape: ", x.shape)
+    # print(output_tensor.shape)
     print(cnn)
 
     ## SUMMARIZE NETWORK USING KERAS STYLE SUMMARY

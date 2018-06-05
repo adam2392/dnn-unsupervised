@@ -42,25 +42,11 @@ def hpc_run(args):
     test_data_dir = args.test_data_dir
     expname = args.expname
 
-    # assign log directories and output for saving model training
-    # log_data_dir=''
-    # output_data_dir=''
-
     # parameters for model
     num_classes = 2
     data_procedure='loo'
 
-    # tboard_log_name=None, 
-    # comment='',       # for tensorboard logging
-
-    logdatadir = os.path.join(log_data_dir, 'logs', testpat)
-    tboardlogdir = os.path.join(log_data_dir, 'tensorboard', testpat)
-    outputdatadir = os.path.join(output_data_dir, testpat)
-    # create the output and temporary saving directories
-    if not os.path.exists(outputdatadir):
-        os.makedirs(outputdatadir)
-    if not os.path.exists(logdatadir):
-        os.makedirs(logdatadir)
+    testpatdir = os.path.join(log_data_dir, testpat)
 
     # get the datasets
     train_dataset, test_dataset = load_data(train_data_dir, test_data_dir, data_procedure=data_procedure, testpat=testpat)
@@ -68,16 +54,14 @@ def hpc_run(args):
     imsize = train_dataset.imsize
     n_colors = train_dataset.n_colors
     print("Image size is {} with {} colors".format(imsize, n_colors))
-    print(train_data_dir)
-    print(test_data_dir)
     
     # create model
     model = createmodel(num_classes, imsize, n_colors)
     print(model)
     
     # train model
-    trainer = trainmodel(model, train_dataset, test_dataset, 
-        logdatadir=logdatadir, tboardlogdir=tboardlogdir, outputdatadir=outputdatadir)
+    trainer = trainmodel(model, train_dataset, test_dataset,
+                        testpatdir=testpatdir,  expname=expname)
     # # test model
     resultfilename = '{}_endmodel.ckpt'.format(testpat)
     trainer = testmodel(trainer, resultfilename)

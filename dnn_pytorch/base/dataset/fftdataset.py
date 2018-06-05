@@ -78,8 +78,8 @@ class FFT2DImageDataset(Dataset):
             chanmeans.append(np.mean(chandata))
             chanstd.append(np.std(chandata))
 
-        self.chanmeans = chanmeans
-        self.chanstd = chanstd
+        self.chanmeans = torch.from_numpy(np.array(chanmeans)).float()
+        self.chanstd = torch.from_numpy(np.array(chanstd)).float()
 
     def _setdefaulttransforms(self):
         transforms_to_use = [
@@ -101,8 +101,7 @@ class FFT2DImageDataset(Dataset):
         6. to tensor data struct
         '''
         transforms_to_use = [
-            transforms.ToPILImage(), #mode='RGBA'),
-            augmentations.RandomLightingNoise(),
+            transforms.ToPILImage(mode='RGBA'),
             transforms.RandomHorizontalFlip(p=0.5),
             transforms.RandomVerticalFlip(p=0.5),
             transforms.RandomRotation(degrees=5, 
@@ -122,6 +121,7 @@ class FFT2DImageDataset(Dataset):
             transforms_to_use.append(transforms.Normalize(mean=self.chanmeans,    # apply normalization along channel axis
                                                          std=self.chanstd))
         # apply image level noise to tensor
+        transforms_to_use.append(augmentations.RandomLightingNoise())
         transforms_to_use.append(augmentations.InjectNoise())
 
         # compose the transformations
@@ -161,8 +161,8 @@ if __name__ == '__main__':
                                 resample=False, 
                                 fillcolor=0),
         transforms.ToTensor(),
-        transforms.Normalize(mean=chanmeans,    # apply normalization along channel axis
-                             std=chanstd),
+        # transforms.Normalize(mean=chanmeans,    # apply normalization along channel axis
+        #                      std=chanstd),
     ])
 
     test_transform = transforms.Compose([

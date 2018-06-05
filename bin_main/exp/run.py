@@ -30,7 +30,7 @@ def createmodel(num_classes, imsize, n_colors):
     model.buildoutput()
     return model
 
-def trainmodel(model, train_dataset, test_dataset, logdatadir, tboardlogdir, outputdatadir, device=None):
+def trainmodel(model, train_dataset, test_dataset, testpatdir, expname, device=None):
     # training parameters 
     num_epochs = 100
     batch_size = 64
@@ -48,13 +48,13 @@ def trainmodel(model, train_dataset, test_dataset, logdatadir, tboardlogdir, out
     print(device)
     
     # 1) create the trainer
-    trainer = CNNTrainer(model, num_epochs, batch_size, device=device, 
-                        tboardlogdir=tboardlogdir, explogdir=logdatadir)
+    trainer = CNNTrainer(model, num_epochs, batch_size, 
+                        device=device, testpatdir=testpatdir, expname=expname)
     trainer.composedatasets(train_dataset, test_dataset)
     trainer.run_config()
 
     print(trainer)
-    # trainer.train()
+    # trainer.train_and_evaluate()
     return trainer
 
 def testmodel(trainer, resultfilename):

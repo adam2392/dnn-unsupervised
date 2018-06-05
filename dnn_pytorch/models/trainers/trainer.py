@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -10,8 +11,8 @@ from dnn_pytorch.models.evaluate import evaluate
 from dnn_pytorch.models.metrics.classifier import BinaryClassifierMetric
 import dnn_pytorch.base.constants.model_constants as constants
 
-# import regularizers
-# from dnn_pytorch.models.regularizer.post_class_regularizer import Postalarm
+from dnn_pytorch.base.constants.config import Config, OutputConfig
+from dnn_pytorch.models.regularizer.post_class_regularizer import Postalarm
 import tensorboardX  #import SummaryWriter
 from tqdm import trange
 
@@ -29,13 +30,14 @@ class CNNTrainer(BaseTrainer):
 
     def __init__(self, net, num_epochs, batch_size, 
                 device=None,                            # device(s) to train on
-                tboardlogdir=None,
-                explogdir=None,
+                testpatdir=None,
                 expname=None,                         # for gen. experiment logging
                 learning_rate=constants.LEARNING_RATE,
-                dropout=constants.DROPOUT,
-                shuffle=constants.SHUFFLE,
+                dropout=constants.DROPOUT,shuffle=constants.SHUFFLE,
                 config=None):
+        '''         SET LOGGING DIRECTORIES: MODEL, TENSORBOARD         '''        
+        self.expname = expname
+        self.testpatdir = testpatdir
         super(CNNTrainer, self).__init__(net=net,
                                       device=device,
                                       config=config)
@@ -45,30 +47,37 @@ class CNNTrainer(BaseTrainer):
         self.dropout = dropout
         self.num_epochs = num_epochs
         self.batch_size = batch_size
+        self.save_summary_steps = 10
 
         # hyper parameters - dataset
         self.shuffle = shuffle 
 
-        '''         SET LOGGING DIRECTORIES: MODEL, TENSORBOARD         '''        
-        self.expname = expname
-        # set where to log outputs of explog
-        if explogdir is None:
-            self.explogdir = os.path.join(self.config.tboard.FOLDER_LOGS, expname, 'logs')
-        else:
-            self.explogdir = explogdir
-        if not os.path.exists(self.explogdir):
-            os.makedirs(self.explogdir)
-        if tboardlogdir is None:
-            self.tboardlogdir = os.path.join(self.config.tboard.FOLDER_LOGS, expname, 'tensorboard')
-        else:
-            self.tboardlogdir = tboardlogdir
-        if not os.path.exists(self.tboardlogdir):
-            os.makedirs(self.tboardlogdir)
         # set tensorboard writer
-        self.writer = tensorboardX.SummaryWriter(tboardlogdir)
+        self._setdirs() # set directories for all logging
+        self.writer = tensorboardX.SummaryWriter(self.tboardlogdir)
 
+        self.logger.info("Logging output data to: {}".format(self.outputdatadir))
         self.logger.info("Logging experimental data at: {}".format(self.explogdir))
         self.logger.info("Logging tensorboard data at: {}".format(self.tboardlogdir))
+
+
+    def _setdirs(self):
+        # set where to log outputs of explog
+        if self.testpatdir is None:
+            self.explogdir = os.path.join(self.config.tboard.FOLDER_LOGS, self.expname, 'traininglogs')
+            self.tboardlogdir = os.path.join(self.config.tboard.FOLDER_LOGS, self.expname, 'tensorboard')
+            self.outputdatadir = os.path.join(self.config.tboard.FOLDER_LOGS, self.expname, 'output')
+        else:
+            self.explogdir = os.path.join(self.testpatdir, 'traininglogs')
+            self.tboardlogdir = os.path.join(self.testpatdir, 'tensorboard')
+            self.outputdatadir = os.path.join(self.testpatdir, 'output')
+
+        if not os.path.exists(self.explogdir):
+                os.makedirs(self.explogdir)
+        if not os.path.exists(self.tboardlogdir):
+            os.makedirs(self.tboardlogdir)
+        if not os.path.exists(self.outputdatadir):
+            os.makedirs(self.outputdatadir)
 
     def composedatasets(self, train_dataset_obj, test_dataset_obj):
         self.train_loader = DataLoader(train_dataset_obj, 
@@ -82,7 +91,11 @@ class CNNTrainer(BaseTrainer):
         # get input characteristics
         self.imsize = train_dataset_obj.imsize
         self.n_colors = train_dataset_obj.n_colors
+        # size of training/testing set
+        self.train_size = len(train_dataset_obj)
+        self.val_size = len(test_dataset_obj)
 
+        self.logger.info("Each training epoch is {} steps and each validation is {} steps.".format(self.train_size, self.val_size))
         self.logger.info("Setting the datasets for training/testing in trainer object!")
         self.logger.info("Image size is {} with {} colors".format(self.imsize, self.n_colors))
 
@@ -125,11 +138,11 @@ class CNNTrainer(BaseTrainer):
         # post-predictive regularizer
         # winsize = 5                 # each image being 5/2.5 seconds => 12.5 seconds
         # stepsize = 1                # step at an image per time
-        # post_regularizer = Postalarm(winsize, stepsize, samplerate)
+        # self.post_regularizer = Postalarm(winsize, stepsize, samplerate)
         # winsize_persamp = 5000
         # stepsize_persamp = 2500
         # numsamples = len(self.test_loader)
-        # post_regularizer.compute_timepoints(winsize_persamp, stepsize_persamp, numsamples)
+        # self.post_regularizer.compute_timepoints(winsize_persamp, stepsize_persamp, numsamples)
 
         # set lr scheduler, optimizer and loss function
         self.scheduler = scheduler
@@ -140,9 +153,9 @@ class CNNTrainer(BaseTrainer):
         #     nn.utils.clip_grad_norm(self.net.parameters(), grad_clip)
         #     for p in self.net.parameters():
         #         p.data.add_(-self.learning_rate, p.grad.data)
-
         # log model
         self._log_model_tboard()
+
     def train(self, num_steps):
         """
         Main training function for pytorch
@@ -159,12 +172,18 @@ class CNNTrainer(BaseTrainer):
         # t = range(num_steps)
 
         for step in t:
-            (images, labels) = next(self.train_loader)
+            (images, labels) = iter(self.train_loader).next() #next(self.train_loader)
             images = images.to(self.device)
             labels = labels.to(self.device)
-            
+
             # Forward pass -> get outputs and loss and get the loss
-            outputs = self.net(images)
+            outputs, _ = self.net(images)
+            
+            labels = labels.long()
+            labels = torch.max(labels, 1)[1]
+            # print(labels.shape)
+            # print(outputs.shape)
+
             loss = self.criterion(outputs, labels)
             # clear the optimizer's holding of gradients and compute backprop grad
             self.optimizer.zero_grad()
@@ -172,41 +191,26 @@ class CNNTrainer(BaseTrainer):
 
             # step the optimizer and scheduler
             self.optimizer.step()
-            self.scheduler.step()
 
             # Evaluate summaries only once in a while
-            if step % params.save_summary_steps == 0:
-                # extract data from torch Variable, move to cpu, convert to numpy arrays
-                output_batch = outputs.data.cpu().numpy()
-                labels_batch = labels.data.cpu().numpy()
-
-                # compute all metrics on this batch
-                summary_batch = {metric:self.metrics[metric](output_batch, labels_batch)
-                                 for metric in self.metrics}
-                summary_batch['loss'] = loss.data[0]
-                summ.append(summary_batch)
+            if step % self.save_summary_steps == 0:
+                summ.append(self._summarize(outputs, labels, loss, regularize=False))
 
             # update the average loss
-            loss_avg.update(loss.data[0])
+            loss_avg.update(loss.data.item())
             t.set_postfix(loss='{:05.3f}'.format(loss_avg()))
 
         # compute mean of all metrics in summary
         metrics_mean = {metric:np.mean([x[metric] for x in summ]) for metric in summ[0]} 
         metrics_string = " ; ".join("{}: {:05.3f}".format(k, v) for k, v in metrics_mean.items())
-        self.logging.info("- Train metrics: " + metrics_string)
-        return metrics_mean
+        self.logger.info("- Train metrics: " + metrics_string)
+        return metrics_mean, images, loss
 
     def evaluate(self, num_steps):
         """Evaluate the model on `num_steps` batches.
         Args:
-            model: (torch.nn.Module) the neural network
-            loss_fn: a function that takes batch_output and batch_labels and computes the loss for the batch
-            data_iterator: (generator) a generator that generates batches of data and labels
-            metrics: (dict) a dictionary of functions that compute a metric using the output and labels of each batch
-            params: (Params) hyperparameters
             num_steps: (int) number of batches to train on, each of size params.batch_size
         """
-
         # set model to evaluation mode
         self.net.eval()
 
@@ -214,51 +218,40 @@ class CNNTrainer(BaseTrainer):
         summ = []
 
         # compute metrics over the dataset
-        for _ in range(num_steps):
+        for i in range(num_steps):
             # fetch the next evaluation batch
-            data_batch, labels_batch = next(self.test_loader)
+            data_batch, labels_batch = iter(self.test_loader).next() #next(self.test_loader)
             data_batch = data_batch.to(self.device)
             labels_batch = labels_batch.to(self.device)
-            
+
             # compute model output
-            output_batch = self.net(data_batch)
+            output_batch, _ = self.net(data_batch)
+
+            labels_batch = torch.max(labels_batch, 1)[1]
+            labels_batch = labels_batch.long()
+
+            # output_batch = output_batch.long()
             loss = self.criterion(output_batch, labels_batch)
 
-            # extract data from torch Variable, move to cpu, convert to numpy arrays
-            output_batch = output_batch.data.cpu().numpy()
-            labels_batch = labels_batch.data.cpu().numpy()
-
-            # regularize the output
-            if post_regularizer is not None:
-                post_regularizer.load_predictions(output_batch)
-                alarm_inds = post_regularizer.temporal_smooth(thresh=0.5)
-                output_batch[:] = 0
-                output_batch[alarm_inds] = 1
-
-            # compute all metrics on this batch
-            summary_batch = {metric: self.metrics[metric](output_batch, labels_batch)
-                             for metric in self.metrics}
-            summary_batch['loss'] = loss.data[0]
-            summ.append(summary_batch)
+            summ.append(self._summarize(output_batch, labels_batch, loss, regularize=True))
 
         # compute mean of all metrics in summary
-        metrics_mean = {metric:np.mean([x[metric] for x in summ]) for metric in summ[0]} 
+        metrics_mean = {}
+        for metric in summ[0]:
+            metrics_mean[metric] = np.mean([x[metric] for x in summ]) 
+
         metrics_string = " ; ".join("{}: {:05.3f}".format(k, v) for k, v in metrics_mean.items())
-        self.logging.info("- Eval metrics : " + metrics_string)
-        return metrics_mean
+        self.logger.info("- Eval metrics : " + metrics_string)
+        return metrics_mean, loss
 
     def train_and_evaluate(self, restore_file=None):
         # reload weights from restore_file if specified
         if restore_file is not None:
             restore_path = os.path.join(args.model_dir, args.restore_file + '.pth.tar')
-            self.logging.info("Restoring parameters from {}".format(restore_path))
+            self.logger.info("Restoring parameters from {}".format(restore_path))
             utils.load_checkpoint(restore_path, model, optimizer)
 
         best_val_acc = 0.0
-
-        # size of training/testing set
-        train_size = len(self.train_loader)
-        val_size = len(self.test_loader)
 
         # tensorboard the initial convolutional layers
         # self._tboard_features(images, label, epoch, name='default')
@@ -266,43 +259,47 @@ class CNNTrainer(BaseTrainer):
         # run model through epochs / passes of the data
         for epoch in range(self.num_epochs):
             # Run one epoch
-            self.logging.info("Epoch {}/{}".format(epoch + 1, params.num_epochs))
+            self.logger.info("Epoch {}/{}".format(epoch + 1, self.num_epochs))
 
             ######################## 1. pass thru training ########################
             # compute number of batches in one epoch (one full pass over the training set)
-            num_steps_epoch = (train_size + 1) // self.batch_size
-            train_metrics = self.train(num_steps_epoch)
+            num_steps_epoch = (self.train_size + 1) // self.batch_size
+            self.logger.info("Running training for {} steps".format(num_steps_epoch))
+            train_metrics, images, train_loss = self.train(num_steps_epoch)
 
-            self.logger.info('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}' 
-                       .format(epoch+1, self.num_epochs, step+1, total_step, loss.item()))
+            self.logger.info('Epoch [{}/{}], Loss: {:.4f}' 
+                       .format(epoch+1, self.num_epochs, train_loss.item()))
             self.logger.info('Acc: {:.2f}, Prec: {:.2f}, Recall: {:.2f}, FPR: {:.2f}' 
                    .format(train_metrics['accuracy'], train_metrics['precision'], train_metrics['recall'], train_metrics['fp']))
 
             ######################## 2. pass thru validation ########################
              # Evaluate for one epoch on validation set
-            num_steps = (val_size + 1) // self.batch_size
-            val_metrics = self.evaluate(num_steps=num_steps)
+            num_steps = (self.val_size + 1) // self.batch_size
+            self.logger.info("Running validation for {} steps".format(num_steps))
+            val_metrics, val_loss = self.evaluate(num_steps=num_steps)
             
+            # determine if we should reduce lr based on validation
+            self.scheduler.step(val_metrics['accuracy'])
+
             # get the metric we want to track over epochs
             val_acc = val_metrics['accuracy']
             is_best = val_acc >= best_val_acc
-            self.logger.info('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}' 
-                   .format(epoch+1, self.num_epochs, step+1, total_step, loss.item()))
+            self.logger.info('Epoch [{}/{}], Loss: {:.4f}' 
+                   .format(epoch+1, self.num_epochs, val_loss.item()))
             self.logger.info('Acc: {:.2f}, Prec: {:.2f}, Recall: {:.2f}, FPR: {:.2f}' 
                    .format(val_metrics['accuracy'], val_metrics['precision'], val_metrics['recall'], val_metrics['fp']))
-
 
             ######################## 3. Run post processing, checkpoints ########################
             # Save weights
             utils.save_checkpoint({'epoch': epoch + 1,
-                                   'state_dict': model.state_dict(),
-                                   'optim_dict' : optimizer.state_dict()}, 
+                                   'state_dict': self.net.state_dict(),
+                                   'optim_dict' : self.optimizer.state_dict()}, 
                                    is_best=is_best,
-                                   checkpoint=self.explogdir)
+                                   checkpointdir=self.explogdir)
 
             # If best_eval, best_save_path        
             if is_best:
-                self.logging.info("- Found new best accuracy")
+                self.logger.info("- Found new best accuracy")
                 best_val_acc = val_acc
                 
                 # Save best val metrics in a json file in the model directory
@@ -315,12 +312,12 @@ class CNNTrainer(BaseTrainer):
 
             ######################## 4. TENSORBOARD LOGGING ########################
             # TENSORBOARD: loss, accuracy, precision, recall, fpr, values and gradients
-            self._tboard_metrics(loss, train_metrics, epoch, mode=constants.TRAIN)
-            self._tboard_metrics(loss, val_metrics, epoch, mode=constants.VALIDATE)
+            self._tboard_metrics(train_loss, train_metrics, epoch, mode=constants.TRAIN)
+            self._tboard_metrics(val_loss, val_metrics, epoch, mode=constants.VALIDATE)
             self._tboard_grad(epoch)
 
             # log output and the input everyevery <step> epochs
-            if (epoch+1) % 10 == 0:
+            if (epoch+1) % self.save_summary_steps == 0:
                 self._tboard_input(images, epoch)
                 
         # tensorboard the convolutional layers after training
@@ -328,8 +325,8 @@ class CNNTrainer(BaseTrainer):
         self.logger.info("Finished training!")
 
     def save(self, resultfilename):
-        if self.explogdir not in resultfilename:
-            resultfilename = os.path.join(self.explogdir, resultfilename)
+        if self.outputdatadir not in resultfilename:
+            resultfilename = os.path.join(self.outputdatadir, resultfilename)
         # Save the model checkpoint
         torch.save(self.net.state_dict(), resultfilename)
 

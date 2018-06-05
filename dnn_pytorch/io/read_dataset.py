@@ -134,6 +134,11 @@ class Reader(object):
         print(image_tensors.shape)
         print(ylabels.shape)
         # get rid of the extra batches
+        # new_image_tensors = image_tensors[0:prevwin, ...]
+        # new_ylabels = ylabels[0:prevwin,...]
+        # image_tensors = new_image_tensors
+        # ylabels = new_ylabels
+
         deleterange = np.arange(prevwin,len(image_tensors))
         image_tensors = np.delete(image_tensors, deleterange, axis=0)
         ylabels = np.delete(ylabels, deleterange, axis=0)
