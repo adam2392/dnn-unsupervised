@@ -4,10 +4,7 @@ import sys
 import os
 sys.path.append('/scratch/users/ali39@jhu.edu/dnn-unsupervised/')
 import argparse
-import numpy as np
-import torch
-import torch.nn as nn
-from run import *
+from run_util import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument('train_data_dir',

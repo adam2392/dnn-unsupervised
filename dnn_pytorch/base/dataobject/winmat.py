@@ -4,10 +4,12 @@ import numpy as np
 from fragility.base.utils.data_structures_utils import reg_dict, formal_repr, sort_dict, labels_to_inds
 from fragility.base.computations.math_utils import normalize_weights
 
+
 class WinmatH5Field(object):
     STATE_TRANSITION_MATRIX = "win_matrix"
     LABELS = "labels"
     TIMEPOINTS = "timepoints"
+
 
 class Winmat(object):
     file_path = None
@@ -15,10 +17,10 @@ class Winmat(object):
     labels = None
     timepoints = None
 
-    def __init__(self, file_path, 
-                win_matrix, 
-                labels=np.array([]), 
-                timepoints=np.array([])):
+    def __init__(self, file_path,
+                 win_matrix,
+                 labels=np.array([]),
+                 timepoints=np.array([])):
         self.file_path = file_path
         self.win_matrix = win_matrix
         self.labels = labels

@@ -76,13 +76,15 @@ def set_logger(log_path):
     if not logger.handlers:
         # Logging to a file
         file_handler = logging.FileHandler(log_path)
-        file_handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s: %(message)s'))
+        file_handler.setFormatter(logging.Formatter(
+            '%(asctime)s:%(levelname)s: %(message)s'))
         logger.addHandler(file_handler)
 
         # Logging to console
         stream_handler = logging.StreamHandler()
         stream_handler.setFormatter(logging.Formatter('%(message)s'))
         logger.addHandler(stream_handler)
+
 
 def save_dict_to_json(d, json_path):
     """Saves dict of floats in json file
@@ -91,7 +93,8 @@ def save_dict_to_json(d, json_path):
         json_path: (string) path to json file
     """
     with open(json_path, 'w') as f:
-        # We need to convert the values to float for json (it doesn't accept np.array, np.float, )
+        # We need to convert the values to float for json (it doesn't accept
+        # np.array, np.float, )
         d = {k: float(v) for k, v in d.items()}
         json.dump(d, f, indent=4)
 
@@ -106,7 +109,8 @@ def save_checkpoint(state, is_best, checkpointdir):
     """
     filepath = os.path.join(checkpointdir, 'last.pth.tar')
     if not os.path.exists(checkpointdir):
-        print("Checkpoint Directory does not exist! Making directory {}".format(checkpointdir))
+        print("Checkpoint Directory does not exist! Making directory {}".format(
+            checkpointdir))
         os.mkdir(checkpointdir)
     else:
         print("Checkpoint Directory exists! ")

@@ -4,6 +4,7 @@ import os
 import numpy as np
 import torch
 
+
 def evaluate(model, device, loss_fn, data_iterator, metrics, num_steps):
     """Evaluate the model on `num_steps` batches.
     Args:
@@ -27,12 +28,13 @@ def evaluate(model, device, loss_fn, data_iterator, metrics, num_steps):
         data_batch, labels_batch = next(data_iterator)
         data_batch = data_batch.to(device)
         labels_batch = labels_batch.to(device)
-        
+
         # compute model output
         output_batch = model(data_batch)
         loss = loss_fn(output_batch, labels_batch)
 
-        # extract data from torch Variable, move to cpu, convert to numpy arrays
+        # extract data from torch Variable, move to cpu, convert to numpy
+        # arrays
         output_batch = output_batch.data.cpu().numpy()
         labels_batch = labels_batch.data.cpu().numpy()
 
@@ -43,8 +45,10 @@ def evaluate(model, device, loss_fn, data_iterator, metrics, num_steps):
         summ.append(summary_batch)
 
     # compute mean of all metrics in summary
-    metrics_mean = {metric:np.mean([x[metric] for x in summ]) for metric in summ[0]} 
-    metrics_string = " ; ".join("{}: {:05.3f}".format(k, v) for k, v in metrics_mean.items())
+    metrics_mean = {metric: np.mean([x[metric]
+                                     for x in summ]) for metric in summ[0]}
+    metrics_string = " ; ".join("{}: {:05.3f}".format(k, v)
+                                for k, v in metrics_mean.items())
     logging.info("- Eval metrics : " + metrics_string)
     return metrics_mean
 
@@ -56,7 +60,8 @@ if __name__ == '__main__':
     # Load the parameters
     args = parser.parse_args()
     json_path = os.path.join(args.model_dir, 'params.json')
-    assert os.path.isfile(json_path), "No json configuration file found at {}".format(json_path)
+    assert os.path.isfile(
+        json_path), "No json configuration file found at {}".format(json_path)
     params = utils.Params(json_path)
 
     # use GPU if available
@@ -64,8 +69,9 @@ if __name__ == '__main__':
 
     # Set the random seed for reproducible experiments
     torch.manual_seed(230)
-    if params.cuda: torch.cuda.manual_seed(230)
-        
+    if params.cuda:
+        torch.cuda.manual_seed(230)
+
     # Get the logger
     utils.set_logger(os.path.join(args.model_dir, 'evaluate.log'))
 
@@ -85,17 +91,31 @@ if __name__ == '__main__':
 
     # Define the model
     model = net.Net(params).cuda() if params.cuda else net.Net(params)
-    
+
     loss_fn = net.loss_fn
     metrics = net.metrics
-    
+
     logging.info("Starting evaluation")
 
     # Reload weights from the saved file
-    utils.load_checkpoint(os.path.join(args.model_dir, args.restore_file + '.pth.tar'), model)
+    utils.load_checkpoint(
+        os.path.join(
+            args.model_dir,
+            args.restore_file +
+            '.pth.tar'),
+        model)
 
     # Evaluate
     num_steps = (params.test_size + 1) // params.batch_size
-    test_metrics = evaluate(model, loss_fn, test_data_iterator, metrics, params, num_steps)
-    save_path = os.path.join(args.model_dir, "metrics_test_{}.json".format(args.restore_file))
+    test_metrics = evaluate(
+        model,
+        loss_fn,
+        test_data_iterator,
+        metrics,
+        params,
+        num_steps)
+    save_path = os.path.join(
+        args.model_dir,
+        "metrics_test_{}.json".format(
+            args.restore_file))
     utils.save_dict_to_json(test_metrics, save_path)

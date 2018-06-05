@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import nibabel as nib
 import mne
-import json 
+import json
 
 from .elecs import Contacts
 from . import nifti
@@ -25,6 +25,7 @@ rawdata = patloader.loadrawdata(filename)
 
 '''
 
+
 class LoadPat(object):
     '''
     A class describing a dataset that is within our framework. This object will help set up the
@@ -43,6 +44,7 @@ class LoadPat(object):
 
     Will need to reformat for other type of EEG files.
     '''
+
     def __init__(self, filepath):
         self.filepath = filepath
 
@@ -63,7 +65,7 @@ class LoadPat(object):
         try:
             # copyfile(sensorsfile, newsensorsfile)
             os.rename(sensorsfile, newsensorsfile)
-        except:
+        except BaseException:
             print("Already renamed seeg.xyz possibly!")
 
         seegfile = os.path.join(self.filepath, 'elec/seeg.txt')
@@ -85,11 +87,12 @@ class LoadPat(object):
         try:
             # copyfile(sensorsfile, newsensorsfile)
             os.rename(sensorsfile, newsensorsfile)
-        except:
+        except BaseException:
             print("Already renamed seeg.xyz possibly!")
 
         contacts_file = os.path.join(self.filepath, 'elec/seeg.txt')
-        label_volume_file = os.path.join(self.filepath, 'dwi/label_in_T1.nii.gz')
+        label_volume_file = os.path.join(
+            self.filepath, 'dwi/label_in_T1.nii.gz')
 
         contacts = Contacts(contacts_file)
         label_vol = nib.load(label_volume_file)
@@ -97,7 +100,8 @@ class LoadPat(object):
         contact_regs = []
         for contact in contacts.names:
             coords = contacts.get_coords(contact)
-            region_ind = nifti.point_to_brain_region(coords, label_vol, tol=3.0) - 1   # Minus one to account for the shift
+            region_ind = nifti.point_to_brain_region(
+                coords, label_vol, tol=3.0) - 1   # Minus one to account for the shift
             contact_regs.append(region_ind)
 
         contact_regs = np.array(contact_regs)
@@ -109,13 +113,14 @@ class LoadPat(object):
 
         rawdata.load_data()
         if reference == 'avg':
-            rawdata, ref_data = mne.set_eeg_reference(rawdata, ref_channels='average')
+            rawdata, ref_data = mne.set_eeg_reference(
+                rawdata, ref_channels='average')
         elif reference == 'bipolar':
             print('NOT IMPLEMENTED YET')
             # rawdata = mne.set_bipolar_reference(rawdata)
         elif reference == 'monopolar':
             rawdata, ref_data = mne.set_eeg_reference(rawdata, ref_channels=[])
-        
+
         return rawdata
 
     def _clipdata(self, rawdata):
@@ -137,8 +142,8 @@ class LoadPat(object):
                 60 *
                 self.samplerate)
         else:
-            endind = firstind + 60*1000
-            
+            endind = firstind + 60 * 1000
+
         # firstind and endind needs to be within the rawdata bounds
         self.firstind = firstind
         self.endind = endind

@@ -17,10 +17,11 @@ import tensorboardX  # import SummaryWriter
 from tqdm import trange
 
 
-class CNNTrainer(BaseTrainer):
+class RCNNTrainer(BaseTrainer):
     metric_comp = BinaryClassifierMetric()
     post_regularizer = None
 
+    break
     # create a dictionary of metrics with their corresponding "lambda"
     # functions
     metrics = {
@@ -33,14 +34,14 @@ class CNNTrainer(BaseTrainer):
     def __init__(self, net, num_epochs, batch_size,
                  # device(s) to train on
                  device=None,
-                 testpatdir=None,
+                 testoutputdir=None,
                  expname=None,                         # for gen. experiment logging
                  learning_rate=constants.LEARNING_RATE,
                  dropout=constants.DROPOUT, shuffle=constants.SHUFFLE,
                  config=None):
         '''         SET LOGGING DIRECTORIES: MODEL, TENSORBOARD         '''
         self.expname = expname
-        self.testpatdir = testpatdir
+        self.testoutputdir = testoutputdir
         super(CNNTrainer, self).__init__(net=net,
                                          device=device,
                                          config=config)
@@ -71,7 +72,7 @@ class CNNTrainer(BaseTrainer):
 
     def _setdirs(self):
         # set where to log outputs of explog
-        if self.testpatdir is None:
+        if self.testoutputdir is None:
             self.explogdir = os.path.join(
                 self.config.tboard.FOLDER_LOGS,
                 self.expname,
@@ -81,9 +82,9 @@ class CNNTrainer(BaseTrainer):
             self.outputdatadir = os.path.join(
                 self.config.tboard.FOLDER_LOGS, self.expname, 'output')
         else:
-            self.explogdir = os.path.join(self.testpatdir, 'traininglogs')
-            self.tboardlogdir = os.path.join(self.testpatdir, 'tensorboard')
-            self.outputdatadir = os.path.join(self.testpatdir, 'output')
+            self.explogdir = os.path.join(self.testoutputdir, 'traininglogs')
+            self.tboardlogdir = os.path.join(self.testoutputdir, 'tensorboard')
+            self.outputdatadir = os.path.join(self.testoutputdir, 'output')
 
         if not os.path.exists(self.explogdir):
             os.makedirs(self.explogdir)
@@ -376,6 +377,8 @@ class CNNTrainer(BaseTrainer):
         # tensorboard the convolutional layers after training
         # self._tboard_features(images, label, epoch, name='default')
         self.logger.info("Finished training!")
+
+    
 
 if __name__ == '__main__':
     from dnn_pytorch.models.nets.cnn import ConvNet

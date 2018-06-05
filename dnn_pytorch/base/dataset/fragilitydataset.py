@@ -10,12 +10,15 @@ import warnings
 from dnn_pytorch.base.constants.config import Config
 from dnn_pytorch.base.utils.log_error import initialize_logger
 
+
 class FragilityImageDataset(Dataset):
     '''
     Uses pytorch abstract class for representing our Fragility image dataset.
 
     '''
-    def __init__(self, root_dir, datasetnames=None, transform=None, config=None):
+
+    def __init__(self, root_dir, datasetnames=None,
+                 transform=None, config=None):
         """
         Args:
             root_dir (string): directory with all the data
@@ -24,7 +27,9 @@ class FragilityImageDataset(Dataset):
             on a sample
         """
         self.config = config or Config()
-        self.logger = initialize_logger(self.__class__.__name__, self.config.out.FOLDER_LOGS)
+        self.logger = initialize_logger(
+            self.__class__.__name__,
+            self.config.out.FOLDER_LOGS)
 
         self.root_dir = root_dir
         self.datasetnames = datasetnames
@@ -53,7 +58,7 @@ class FragilityImageDataset(Dataset):
         # datastruct = np.load(datafile)
         # sample = datastruct['image_tensor']
         # metadata = datastruct['metadata'].item()
-        
+
         # # get the necessary data
         # ylabels = metadata['ylabels']
 
@@ -74,8 +79,8 @@ class FragilityImageDataset(Dataset):
         #     sample = self.transform(sample)
 
         # return sample, ylabels
-        sample = self.X_train[idx,...]
-        ylabels = self.y_train[idx,...]
+        sample = self.X_train[idx, ...]
+        ylabels = self.y_train[idx, ...]
 
         # apply transformation
         if self.transform:
@@ -112,6 +117,7 @@ class FragilityImageDataset(Dataset):
         self.y_train = ylabels
         self.class_weight = class_weight
 
+
 if __name__ == '__main__':
     from skimage import io, transform
     import matplotlib.pyplot as plt
@@ -128,21 +134,21 @@ if __name__ == '__main__':
 
     data_transform = transforms.Compose([
         transforms.ToPILImage(mode='RGBA'),
-    #     transforms.RandomApply(transforms, p=0.5),
-    #     augmentations.RandomLightingNoise(),
-    #     transforms.RandomSizedCrop(2),  
-    #     transforms.CenterCrop(3),
+        #     transforms.RandomApply(transforms, p=0.5),
+        #     augmentations.RandomLightingNoise(),
+        #     transforms.RandomSizedCrop(2),
+        #     transforms.CenterCrop(3),
         transforms.RandomHorizontalFlip(p=0.5),
         transforms.RandomVerticalFlip(p=0.5),
-        transforms.RandomRotation(degrees=5, 
-                                resample=False, 
-                                expand=False, 
-                                center=None),
-        transforms.RandomAffine(degrees=5, 
-                                translate=(0.1,0.1), 
-                                scale=None, 
-                                shear=5, 
-                                resample=False, 
+        transforms.RandomRotation(degrees=5,
+                                  resample=False,
+                                  expand=False,
+                                  center=None),
+        transforms.RandomAffine(degrees=5,
+                                translate=(0.1, 0.1),
+                                scale=None,
+                                shear=5,
+                                resample=False,
                                 fillcolor=0),
         transforms.ToTensor(),
         transforms.Normalize(mean=chanmeans,    # apply normalization along channel axis

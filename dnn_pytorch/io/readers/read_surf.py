@@ -2,6 +2,7 @@ import numpy as np
 import zipfile
 import os
 
+
 class LoadSurface():
     def loadsurfdata(self, directory, use_subcort=False):
         '''

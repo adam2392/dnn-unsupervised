@@ -3,18 +3,21 @@
 import numpy as np
 from enum import Enum
 from fragility.base.utils.data_structures_utils import reg_dict, formal_repr, \
-                                                    sort_dict, labels_to_inds
+    sort_dict, labels_to_inds
 from fragility.base.computations.math_utils import normalize_weights
 from fragility.base.model.fragilitymodel import FragilityModel
 import fragility.base.constants.model_constants as constants
 
+
 class HeatmapTypes(Enum):
     TYPE_FRAGILITY = 'FRAGILITY'
     TYPE_POWERSPECT = "POWERSPECTRUM"
-    
+
+
 class HeatmapH5Field(object):
     FRAGILITY = "fragility"
     LABELS = "region_labels"
+
 
 class Heatmap(object):
     TYPE_FRAGILITY = HeatmapTypes.TYPE_FRAGILITY.value
@@ -46,7 +49,8 @@ class Heatmap(object):
         #     self.freqband = freqband
         # elif h_type is TYPE_FRAGILITY:
         self.minnorm_perturbation = matrix_over_time
-        self.fragility = FragilityModel.compute_fragilitymetric(minnorm_perturbation)
+        self.fragility = FragilityModel.compute_fragilitymetric(
+            minnorm_perturbation)
 
     @property
     def number_of_regions(self):
@@ -77,6 +81,5 @@ class Heatmap(object):
     @staticmethod
     def threshmap(mat, thresh):
         mat = mat.copy()
-        mat[mat<thresh] = 0
+        mat[mat < thresh] = 0
         return mat
-
