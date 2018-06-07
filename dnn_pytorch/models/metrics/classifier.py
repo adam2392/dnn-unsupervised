@@ -65,7 +65,7 @@ class BinaryClassifierMetric(BaseMetric):
         return accuracy
 
     def _fp(self, y_true, y_pred, sample_weight=None):
-        _, fp, _, _ = metrics.confusion_matrix(y_true, y_pred).ravel()
+        _, fp, _, _ = metrics.confusion_matrix(y_true, y_pred, labels=[0,1]).ravel()
         return fp
 
     def _confusion(self, y_true, y_pred, sample_weight):

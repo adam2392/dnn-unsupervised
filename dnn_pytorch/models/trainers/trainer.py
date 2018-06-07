@@ -13,7 +13,9 @@ import dnn_pytorch.base.constants.model_constants as constants
 
 from dnn_pytorch.base.constants.config import Config, OutputConfig
 from dnn_pytorch.models.regularizer.post_class_regularizer import Postalarm
-import tensorboardX  # import SummaryWriter
+
+from dnn_pytorch.models.trainers.history import history
+# import tensorboardX  # import SummaryWriter
 from tqdm import trange
 
 # set the random seed
@@ -31,6 +33,8 @@ class CNNTrainer(BaseTrainer):
         'precision': metric_comp._precision,
         'fp': metric_comp._fp
     }
+
+    history = history.History()
 
     def __init__(self, net, num_epochs, batch_size,
                  # device(s) to train on
@@ -61,7 +65,7 @@ class CNNTrainer(BaseTrainer):
 
         # set tensorboard writer
         self._setdirs()  # set directories for all logging
-        self.writer = tensorboardX.SummaryWriter(self.tboardlogdir)
+        # self.writer = tensorboardX.SummaryWriter(self.tboardlogdir)
 
         self.logger.info(
             "Logging output data to: {}".format(
@@ -112,6 +116,9 @@ class CNNTrainer(BaseTrainer):
         self.train_size = len(train_dataset_obj)
         self.val_size = len(test_dataset_obj)
 
+        self.train_size = 2#len(train_dataset_obj)
+        self.val_size = 2#len(test_dataset_obj)
+        
         self.logger.info(
             "Each training epoch is {} steps and each validation is {} steps.".format(
                 self.train_size, self.val_size))
@@ -167,7 +174,7 @@ class CNNTrainer(BaseTrainer):
         #     for p in self.net.parameters():
         #         p.data.add_(-self.learning_rate, p.grad.data)
         # log model
-        self._log_model_tboard()
+        # self._log_model_tboard()
 
     def train(self, num_steps):
         """
@@ -227,8 +234,7 @@ class CNNTrainer(BaseTrainer):
                 t.set_postfix(loss='{:05.3f}'.format(loss_avg()))
 
         # compute mean of all metrics in summary
-        metrics_mean = {metric: np.mean(
-            [x[metric] for x in summ]) for metric in summ[0]}
+        metrics_mean = {metric:np.mean([x[metric] for x in summ]) for metric in summ[0]} 
         metrics_string = " ; ".join(
             "{}: {:05.3f}".format(
                 k, v) for k, v in metrics_mean.items())
@@ -280,7 +286,7 @@ class CNNTrainer(BaseTrainer):
         # compute mean of all metrics in summary
         metrics_mean = {}
         for metric in summ[0]:
-            metrics_mean[metric] = np.mean([x[metric] for x in summ])
+            metrics_mean[metric] = np.mean([x[metric] for x in summ]) 
 
         metrics_string = " ; ".join(
             "{}: {:05.3f}".format(
@@ -318,7 +324,7 @@ class CNNTrainer(BaseTrainer):
             train_metrics, images, train_loss = self.train(num_steps_epoch)
 
             self.logger.info('Epoch [{}/{}], Loss: {:.4f}'
-                             .format(epoch + 1, self.num_epochs, train_loss.item()))
+                             .format(epoch + 1, self.num_epochs, train_loss))
             self.logger.info('Acc: {:.2f}, Prec: {:.2f}, Recall: {:.2f}, FPR: {:.2f}'
                              .format(train_metrics['accuracy'], train_metrics['precision'], train_metrics['recall'], train_metrics['fp']))
             ######################## 2. pass thru validation ##################
@@ -335,7 +341,7 @@ class CNNTrainer(BaseTrainer):
             val_acc = val_metrics['accuracy']
             is_best = val_acc >= best_val_acc
             self.logger.info('Epoch [{}/{}], Loss: {:.4f}'
-                             .format(epoch + 1, self.num_epochs, val_loss.item()))
+                             .format(epoch + 1, self.num_epochs, val_loss))
             self.logger.info('Acc: {:.2f}, Prec: {:.2f}, Recall: {:.2f}, FPR: {:.2f}'
                              .format(val_metrics['accuracy'], val_metrics['precision'], val_metrics['recall'], val_metrics['fp']))
             ######################## 3. Run post processing, checkpoints ######
@@ -361,19 +367,24 @@ class CNNTrainer(BaseTrainer):
                 self.explogdir, "metrics_val_last_weights.json")
             utils.save_dict_to_json(val_metrics, last_json_path)
 
+            ######################## 3.5. HISTORY LOGGING ###################
+            train_metrics['loss'] = train_loss
+            val_metrics['loss'] = val_loss
+            self.history.update(train_metrics, val_metrics)
+
             ######################## 4. TENSORBOARD LOGGING ###################
             # TENSORBOARD: loss, accuracy, precision, recall, fpr, values and
             # gradients
-            self._tboard_metrics(
-                train_loss,
-                train_metrics,
-                epoch,
-                mode=constants.TRAIN)
-            self._tboard_metrics(
-                val_loss,
-                val_metrics,
-                epoch,
-                mode=constants.VALIDATE)
+            # self._tboard_metrics(
+            #     train_loss,
+            #     train_metrics,
+            #     epoch,
+            #     mode=constants.TRAIN)
+            # self._tboard_metrics(
+            #     val_loss,
+            #     val_metrics,
+            #     epoch,
+            #     mode=constants.VALIDATE)
 
             # log output and the input everyevery <step> epochs
             if (epoch + 1) % self.save_summary_steps == 0:
@@ -383,6 +394,12 @@ class CNNTrainer(BaseTrainer):
         # tensorboard the convolutional layers after training
         # self._tboard_features(images, label, epoch, name='default')
         self.logger.info("Finished training!")
+
+    def save_history(self, historyfilename):
+        if self.outputdatadir not in historyfilename:
+            historyfilename = os.path.join(self.outputdatadir, historyfilename)
+        self.history.save(historyfilename)
+        
     def save(self, resultfilename):
         if self.outputdatadir not in resultfilename:
             resultfilename = os.path.join(self.outputdatadir, resultfilename)

@@ -5,10 +5,9 @@ import types
 from numpy import random
 try:
     import cv2
-except BaseException:
+except:
     print("Can't import opencv!")
-
-
+    
 class Rescale(object):
     """Rescale the image in a sample to a given size.
 
@@ -44,7 +43,6 @@ class Rescale(object):
 
         return {'image': img, 'landmarks': landmarks}
 
-
 class RandomCrop(object):
     """Crop randomly the image in a sample.
 
@@ -77,7 +75,6 @@ class RandomCrop(object):
 
         return {'image': image, 'landmarks': landmarks}
 
-
 class ToTensor(object):
     """Convert ndarrays in sample to Tensors."""
 
@@ -88,7 +85,6 @@ class ToTensor(object):
         # torch image: C X H X W
         image = image.transpose((2, 0, 1))
         return image
-
 
 def preprocess_imgwithnoise(image_tensor):
     # preprocessing_function: function that will be implied on each input.
@@ -102,20 +98,25 @@ def preprocess_imgwithnoise(image_tensor):
     imsize = image_tensor.shape[1]
     numchans = image_tensor.shape[0]
     for i in range(numchans):
-        feat = image_tensor[i, ...].ravel()
+        feat = image_tensor[i,...].ravel()
         noise_add = np.random.normal(
-            scale=stdmult * np.std(feat), size=feat.size).reshape(imsize, imsize)
-        image_tensor[i, ...] = image_tensor[i, ...] + noise_add
+            scale=stdmult*np.std(feat), size=feat.size).reshape(imsize, imsize)
+        image_tensor[i,...] = image_tensor[i,...] + noise_add
 
     image_tensor = torch.from_numpy(image_tensor)
+    image_tensor = image_tensor.float()
     return image_tensor
 
-
 class InjectNoise(object):
-    def __call__(self, img):
-        img = preprocess_imgwithnoise(img)
+    def __call__(self, image, boxes=None, labels=None):
+        # print(image)
+        # try:
+        #     print(image.shape)
+        # except:
+        #     image = image[0]
+        # print(image.shape)
+        img = preprocess_imgwithnoise(image)
         return img
-
 
 def intersect(box_a, box_b):
     max_xy = np.minimum(box_a[:, 2:], box_b[2:])
@@ -136,10 +137,10 @@ def jaccard_numpy(box_a, box_b):
         jaccard overlap: Shape: [box_a.shape[0], box_a.shape[1]]
     """
     inter = intersect(box_a, box_b)
-    area_a = ((box_a[:, 2] - box_a[:, 0]) *
-              (box_a[:, 3] - box_a[:, 1]))  # [A,B]
-    area_b = ((box_b[2] - box_b[0]) *
-              (box_b[3] - box_b[1]))  # [A,B]
+    area_a = ((box_a[:, 2]-box_a[:, 0]) *
+              (box_a[:, 3]-box_a[:, 1]))  # [A,B]
+    area_b = ((box_b[2]-box_b[0]) *
+              (box_b[3]-box_b[1]))  # [A,B]
     union = area_a + area_b - inter
     return inter / union  # [A,B]
 
@@ -218,7 +219,7 @@ class Resize(object):
 
     def __call__(self, image, boxes=None, labels=None):
         image = cv2.resize(image, (self.size,
-                                   self.size))
+                                 self.size))
         return image, boxes, labels
 
 
@@ -248,12 +249,11 @@ class RandomHue(object):
             image[:, :, 0][image[:, :, 0] < 0.0] += 360.0
         return image, boxes, labels
 
-
 class RandomLightingNoise(object):
     def __init__(self):
-        self.perms = ((0, 1, 2), (0, 2, 1),
-                      (1, 0, 2), (1, 2, 0),
-                      (2, 0, 1), (2, 1, 0))
+        self.perms = ((0, 1, 2, 3), (0, 2, 3, 1),
+                      (1, 3, 0, 2), (1, 2, 3, 0),
+                      (3, 2, 0, 1), (2, 1, 0, 3))
 
     def __call__(self, image, boxes=None, labels=None):
         if random.randint(2):
@@ -261,7 +261,6 @@ class RandomLightingNoise(object):
             shuffle = SwapChannels(swap)  # shuffle channels
             image = shuffle(image)
         return image, boxes, labels
-
 
 class SwapChannels(object):
     """Transforms a tensorized image by swapping the channels in the order
@@ -285,9 +284,8 @@ class SwapChannels(object):
         #     image = image.data.cpu().numpy()
         # else:
         #     image = np.array(image)
-        image = image[:, :, self.swaps]
+        image = image[self.swaps, :, :]
         return image
-
 
 class ConvertColor(object):
     def __init__(self, current='BGR', transform='HSV'):
@@ -339,8 +337,7 @@ class ToCV2Image(object):
 
 class ToTensor(object):
     def __call__(self, cvimage, boxes=None, labels=None):
-        return torch.from_numpy(cvimage.astype(
-            np.float32)).permute(2, 0, 1), boxes, labels
+        return torch.from_numpy(cvimage.astype(np.float32)).permute(2, 0, 1), boxes, labels
 
 
 class RandomSampleCrop(object):
@@ -356,7 +353,6 @@ class RandomSampleCrop(object):
             boxes (Tensor): the adjusted bounding boxes in pt form
             labels (Tensor): the class labels for each bbox
     """
-
     def __init__(self):
         self.sample_options = (
             # using entire original input image
@@ -399,8 +395,7 @@ class RandomSampleCrop(object):
                 top = random.uniform(height - h)
 
                 # convert to integer rect x1,y1,x2,y2
-                rect = np.array(
-                    [int(left), int(top), int(left + w), int(top + h)])
+                rect = np.array([int(left), int(top), int(left+w), int(top+h)])
 
                 # calculate IoU (jaccard overlap) b/t the cropped and gt boxes
                 overlap = jaccard_numpy(boxes, rect)
@@ -459,11 +454,11 @@ class Expand(object):
 
         height, width, depth = image.shape
         ratio = random.uniform(1, 4)
-        left = random.uniform(0, width * ratio - width)
-        top = random.uniform(0, height * ratio - height)
+        left = random.uniform(0, width*ratio - width)
+        top = random.uniform(0, height*ratio - height)
 
         expand_image = np.zeros(
-            (int(height * ratio), int(width * ratio), depth),
+            (int(height*ratio), int(width*ratio), depth),
             dtype=image.dtype)
         expand_image[:, :, :] = self.mean
         expand_image[int(top):int(top + height),
@@ -529,3 +524,4 @@ class SSDAugmentation(object):
 
     def __call__(self, img, boxes, labels):
         return self.augment(img, boxes, labels)
+

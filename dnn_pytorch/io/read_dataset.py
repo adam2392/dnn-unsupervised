@@ -46,8 +46,8 @@ class Reader(object):
             self.testfilepaths = []
             for root, dirs, files in os.walk(testdir):
                 for file in files:
-                    file = file.split('.')[0]
-                    if testname in file:
+                    # file = file.split('.')[0]
+                    if testname in file and file.endswith('.npz'):
                         self.testfilepaths.append(os.path.join(root, file))
 
             self.logger.info("Reading training data directory %s " % traindir)
@@ -55,8 +55,8 @@ class Reader(object):
             self.trainfilepaths = []
             for root, dirs, files in os.walk(traindir):
                 for file in files:
-                    file = file.split('.')[0]
-                    if testname not in file:
+                    # file = file.split('.')[0]
+                    if testname in file and file.endswith('.npz'):
                         self.trainfilepaths.append(os.path.join(root, file))
         else:
             ''' Get list of file paths '''
@@ -141,20 +141,11 @@ class Reader(object):
                 # ylabels = np.append(ylabels, _ylabels, axis=0)
 
             # break
-        print(wins)
-        print(image_tensors.shape)
-        print(ylabels.shape)
-        # get rid of the extra batches
-        # new_image_tensors = image_tensors[0:prevwin, ...]
-        # new_ylabels = ylabels[0:prevwin,...]
-        # image_tensors = new_image_tensors
-        # ylabels = new_ylabels
 
         deleterange = np.arange(prevwin, len(image_tensors))
         image_tensors = np.delete(image_tensors, deleterange, axis=0)
         ylabels = np.delete(ylabels, deleterange, axis=0)
-        print(image_tensors.shape)
-        print(ylabels.shape)
+
         # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
         invert_y = 1 - ylabels
         ylabels = np.concatenate((invert_y, ylabels), axis=1)

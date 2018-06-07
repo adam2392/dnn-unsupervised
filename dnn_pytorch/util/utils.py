@@ -57,6 +57,7 @@ class RunningAverage():
 
     def item(self):
         return self.total / float(self.steps)
+        
     def __call__(self):
         return self.total / float(self.steps)
 

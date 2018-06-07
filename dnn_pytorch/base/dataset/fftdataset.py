@@ -12,7 +12,6 @@ from dnn_pytorch.base.constants.config import Config
 from dnn_pytorch.base.utils.log_error import initialize_logger
 import dnn_pytorch.base.constants.model_constants as constants
 
-
 class FFT2DImageDataset(Dataset):
     '''
     Uses pytorch abstract class for representing our FFT image dataset.
@@ -23,8 +22,7 @@ class FFT2DImageDataset(Dataset):
     imsize = None
     n_colors = None
 
-    def __init__(self, data_tensor, ylabels, mode=constants.TRAIN,
-                 transform=None, config=None):
+    def __init__(self, data_tensor, ylabels, mode=constants.TRAIN, transform=None, config=None):
         """
         Args:
             root_dir (string): directory with all the data
@@ -33,9 +31,7 @@ class FFT2DImageDataset(Dataset):
             on a sample
         """
         self.config = config or Config()
-        self.logger = initialize_logger(
-            self.__class__.__name__,
-            self.config.out.FOLDER_LOGS)
+        self.logger = initialize_logger(self.__class__.__name__, self.config.out.FOLDER_LOGS)
 
         assert len(data_tensor) == len(ylabels)
         self.data_tensor = data_tensor
@@ -54,8 +50,8 @@ class FFT2DImageDataset(Dataset):
         return len(self.data_tensor)
 
     def __getitem__(self, idx):
-        sample = self.data_tensor[idx, ...]
-        ylabels = self.ylabels[idx, ...]
+        sample = torch.from_numpy(self.data_tensor[idx,...])
+        ylabels = torch.from_numpy(self.ylabels[idx,...])
 
         # apply transformations to the dataset
         if self.transform:
@@ -87,7 +83,7 @@ class FFT2DImageDataset(Dataset):
 
     def _setdefaulttransforms(self):
         transforms_to_use = [
-            transforms.ToPILImage(),  # mode='RGBA'),
+            transforms.ToPILImage(),#mode='RGBA'),
             transforms.ToTensor()
         ]
         # compose the transformations
@@ -108,36 +104,36 @@ class FFT2DImageDataset(Dataset):
             transforms.ToPILImage(mode='RGBA'),
             transforms.RandomHorizontalFlip(p=0.5),
             transforms.RandomVerticalFlip(p=0.5),
-            transforms.RandomRotation(degrees=5,
-                                      resample=False,
-                                      expand=False,
-                                      center=None),
-            transforms.RandomAffine(degrees=5,
-                                    translate=(0.1, 0.1),
-                                    scale=None,
-                                    shear=5,
-                                    resample=False,
+            transforms.RandomRotation(degrees=5, 
+                                    resample=False, 
+                                    expand=False, 
+                                    center=None),
+            transforms.RandomAffine(degrees=5, 
+                                    translate=(0.1,0.1), 
+                                    scale=None, 
+                                    shear=5, 
+                                    resample=False, 
                                     fillcolor=0),
             transforms.ToTensor()
         ]
         # apply normalization to tensor if available
         if self.chanmeans is not None and self.chanstd is not None:
             transforms_to_use.append(transforms.Normalize(mean=self.chanmeans,    # apply normalization along channel axis
-                                                          std=self.chanstd))
+                                                         std=self.chanstd))
         # apply image level noise to tensor
-        transforms_to_use.append(augmentations.RandomLightingNoise())
         transforms_to_use.append(augmentations.InjectNoise())
+        # transforms_to_use.append(augmentations.RandomLightingNoise())
 
         # compose the transformations
         data_transform = transforms.Compose(transforms_to_use)
         self.transform = data_transform
-
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
     from util import augmentations
     import torchvision
     from torchvision import transforms, utils
+    
 
     root_dir = '/Volumes/ADAM LI/pydata/'
     datasetnames = []
@@ -149,24 +145,24 @@ if __name__ == '__main__':
     data_transform = transforms.Compose([
         transforms.ToPILImage(),
         #     transforms.RandomApply(transforms, p=0.5),
-        #     augmentations.RandomLightingNoise(),
-        transforms.RandomSizedCrop(2),
+    #     augmentations.RandomLightingNoise(),
+        transforms.RandomSizedCrop(2),  
         transforms.RandomHorizontalFlip(p=0.5),
         transforms.RandomVerticalFlip(p=0.5),
         transforms.CenterCrop(3),
-        transforms.RandomRotation(degrees=5,
-                                  resample=False,
-                                  expand=False,
-                                  center=None),
-        transforms.RandomAffine(degrees=5,
-                                translate=(0.1, 0.1),
-                                scale=None,
-                                shear=5,
-                                resample=False,
+        transforms.RandomRotation(degrees=5, 
+                                resample=False, 
+                                expand=False, 
+                                center=None),
+        transforms.RandomAffine(degrees=5, 
+                                translate=(0.1,0.1), 
+                                scale=None, 
+                                shear=5, 
+                                resample=False, 
                                 fillcolor=0),
         transforms.ToTensor(),
-        # transforms.Normalize(mean=chanmeans,    # apply normalization along channel axis
-        #                      std=chanstd),
+        transforms.Normalize(mean=chanmeans,    # apply normalization along channel axis
+                             std=chanstd),
     ])
 
     test_transform = transforms.Compose([
@@ -174,25 +170,26 @@ if __name__ == '__main__':
         transforms.ToTensor()
     ])
 
+
     dataset = FFT2DImageDataset(root_dir, datasetnames, transform=None)
-    dataloader = DataLoader(dataset,
-                            batch_size=4,
-                            shuffle=True,
-                            num_workers=3)
+    dataloader = DataLoader(dataset, 
+                        batch_size=4,
+                        shuffle=True, 
+                        num_workers=3)
 
     # Helper function to show a batch
     def show_landmarks_batch(sample_batched):
         """Show image with landmarks for a batch of samples."""
         images_batch, ylabels = sample_batched[0], sample_batched[1]
-
+        
         # get the batch size and imsize
         batch_size = len(images_batch)
         im_size = images_batch.size(2)
         print("Batch size and im size are: %s %s" % (batch_size, im_size))
 
-        images_batch = images_batch[0, 0, ...]
-        images_batch = np.swapaxes(images_batch, 0, 2)
-        images_batch = images_batch[:, np.newaxis, ...]
+        images_batch = images_batch[0,0,...]
+        images_batch = np.swapaxes(images_batch, 0,2)
+        images_batch = images_batch[:,np.newaxis,...]
         images_batch = [im for im in images_batch]
         grid = utils.make_grid(images_batch, normalize=True)
         print(grid.shape)

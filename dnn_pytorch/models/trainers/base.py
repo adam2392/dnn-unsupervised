@@ -64,6 +64,7 @@ class BaseTrainer(object):
                          for metric in self.metrics}
         summary_batch['loss'] = loss.data.item()
         return summary_batch
+        
     def loadmetrics(self, y_true, y_pred, metricholder):
         self.metric_comp.compute_scores(y_true, y_pred)
 
