@@ -5,6 +5,7 @@ import os
 sys.path.append('/scratch/users/ali39@jhu.edu/dnn-unsupervised/')
 import argparse
 from run_util import *
+import shutil
 
 parser = argparse.ArgumentParser()
 parser.add_argument('train_data_dir',
@@ -24,11 +25,14 @@ parser.add_argument('--model_dir', default='experiments/base_model',
 parser.add_argument('--restore_file', default='best', 
                     help="name of the file in --model_dir \
                      containing weights to load")
-
-def local_test(args):
-    train_data_dir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
-    test_data_dir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/"
-    patient='id001_bt'
+all_patients = [
+    'id001_bt',
+    'id002_sd',
+    'id003_mg', 'id004_bj', 'id005_ft',
+    'id006_mr', 'id007_rd', 'id008_dmc',
+    'id009_ba', 'id010_cmn', 'id011_gr',
+    'id013_lk', 'id014_vc', 'id015_gjl',
+    'id016_lm', 'id017_mk', 'id018_lo', 'id020_lma']
 
 def hpc_run(args):
     # read in the parsed arguments
@@ -39,34 +43,34 @@ def hpc_run(args):
     test_data_dir = args.test_data_dir
     expname = args.expname
 
+    print("args are: ", args)
+
     # parameters for model
     num_classes = 2
     data_procedure='loo'
 
-    testpatdir = os.path.join(log_data_dir, testpat)
+    for testpat in all_patients:
+        testpatdir = os.path.join(log_data_dir, testpat)
 
-    # get the datasets
-    train_dataset, test_dataset = load_data(train_data_dir, test_data_dir, data_procedure=data_procedure, testpat=testpat)
-    # get the image size and n_colors from the datasets
-    imsize = train_dataset.imsize
-    n_colors = train_dataset.n_colors
-    print("Image size is {} with {} colors".format(imsize, n_colors))
-    
-    # create model
-    model = createmodel(num_classes, imsize, n_colors)
-    print(model)
-    
-    # train model
-    trainer = trainmodel(model, train_dataset, test_dataset,
-                        testpatdir=testpatdir,  expname=expname)
-    # # test model
-    resultfilename = '{}_endmodel.ckpt'.format(testpat)
-    trainer = testmodel(trainer, resultfilename)
+        # get the datasets
+        train_dataset, test_dataset = load_data(train_data_dir, test_data_dir, data_procedure=data_procedure, testpat=testpat)
+        # get the image size and n_colors from the datasets
+        imsize = train_dataset.imsize
+        n_colors = train_dataset.n_colors
+                
+        # create model
+        model = createmodel(num_classes, imsize, n_colors)
+        print("Image size is {} with {} colors".format(imsize, n_colors))
+        print("Model is: {}".format(model))
+        
+        # train model
+        trainer = trainmodel(model, train_dataset, test_dataset,
+                            testpatdir=testpatdir,  expname=expname)
+        # test model
+        resultfilename = '{}_endmodel.ckpt'.format(testpat)
+        trainer = testmodel(trainer, resultfilename)
 
 if __name__ == '__main__':
-    print("Inside main!")
     args = parser.parse_args()
-    # print(sys.args)
     
     hpc_run(args)
-    # local_test(args)

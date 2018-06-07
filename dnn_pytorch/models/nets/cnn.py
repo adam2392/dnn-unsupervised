@@ -5,7 +5,6 @@ from dnn_pytorch.util.layer import Flatten, PrintLayer
 from dnn_pytorch.base.constants.config import Config
 from dnn_pytorch.base.utils.log_error import initialize_logger
 
-
 class ConvNet(nn.Module):
     imsize = None
     n_colors = None
@@ -49,7 +48,7 @@ class ConvNet(nn.Module):
 
     # generate input sample and forward to get shape
     def _get_conv_output(self, shape):
-        bs = 1
+        bs = 1 # example batch size
         input = torch.autograd.Variable(torch.rand(bs, *shape))
         output_feat = self._forward_features(input)
         n_size = output_feat.data.view(bs, -1).size(1)
@@ -117,7 +116,6 @@ class ConvNet(nn.Module):
         x = self._forward_features(x)
         output = self.out(x)
         return output, x
-
 
 if __name__ == '__main__':
     from torchsummary import summary

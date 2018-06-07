@@ -96,11 +96,11 @@ class CNNTrainer(BaseTrainer):
         self.train_loader = DataLoader(train_dataset_obj,
                                        batch_size=self.batch_size,
                                        shuffle=self.shuffle,
-                                       num_workers=1)
+                                       num_workers=0)
         self.test_loader = DataLoader(test_dataset_obj,
                                       batch_size=self.batch_size,
                                       shuffle=self.shuffle,
-                                      num_workers=1)
+                                      num_workers=0)
         # get input characteristics
         self.imsize = train_dataset_obj.imsize
         self.n_colors = train_dataset_obj.n_colors
@@ -116,15 +116,6 @@ class CNNTrainer(BaseTrainer):
         self.logger.info(
             "Image size is {} with {} colors".format(
                 self.imsize, self.n_colors))
-
-    def loadmetrics(self, y_true, y_pred, metricholder):
-        self.metric_comp.compute_scores(y_true, y_pred)
-
-        # add to list for the metrics
-        # self.metricholder.recall_queue.append(self.metrics.recall)
-        # self.metricholder.precision_queue.append(self.metrics.precision)
-        # self.metricholder.fp_queue.append(self.metrics.fp)
-        # self.metricholder.accuracy_queue.append(self.metrics.accuracy)
 
     def run_config(self):
         """
@@ -312,7 +303,8 @@ class CNNTrainer(BaseTrainer):
                              .format(epoch + 1, self.num_epochs, train_loss.item()))
             self.logger.info('Acc: {:.2f}, Prec: {:.2f}, Recall: {:.2f}, FPR: {:.2f}'
                              .format(train_metrics['accuracy'], train_metrics['precision'], train_metrics['recall'], train_metrics['fp']))
-
+            metrics_string = " ; ".join("{}: {:05.3f}".format(k, v) for k, v in train_metrics.items())
+            self.logger.info("- Train metrics : " + metrics_string)
             ######################## 2. pass thru validation ##################
             # Evaluate for one epoch on validation set
             num_steps = (self.val_size + 1) // self.batch_size
@@ -330,7 +322,8 @@ class CNNTrainer(BaseTrainer):
                              .format(epoch + 1, self.num_epochs, val_loss.item()))
             self.logger.info('Acc: {:.2f}, Prec: {:.2f}, Recall: {:.2f}, FPR: {:.2f}'
                              .format(val_metrics['accuracy'], val_metrics['precision'], val_metrics['recall'], val_metrics['fp']))
-
+            metrics_string = " ; ".join("{}: {:05.3f}".format(k, v) for k, v in val_metrics.items())
+            self.logger.info("- Eval metrics : " + metrics_string)
             ######################## 3. Run post processing, checkpoints ######
             # Save weights
             utils.save_checkpoint({'epoch': epoch + 1,
@@ -370,12 +363,17 @@ class CNNTrainer(BaseTrainer):
             self._tboard_grad(epoch)
 
             # log output and the input everyevery <step> epochs
-            if (epoch + 1) % self.save_summary_steps == 0:
-                self._tboard_input(images, epoch)
+            # if (epoch + 1) % self.save_summary_steps == 0:
+            #     self._tboard_input(images, epoch)
 
         # tensorboard the convolutional layers after training
         # self._tboard_features(images, label, epoch, name='default')
         self.logger.info("Finished training!")
+    def save(self, resultfilename):
+        if self.outputdatadir not in resultfilename:
+            resultfilename = os.path.join(self.outputdatadir, resultfilename)
+        # Save the model checkpoint
+        torch.save(self.net.state_dict(), resultfilename)
 
 if __name__ == '__main__':
     from dnn_pytorch.models.nets.cnn import ConvNet

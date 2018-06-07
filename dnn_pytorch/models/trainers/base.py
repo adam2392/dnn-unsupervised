@@ -1,8 +1,10 @@
 import torch
+import numpy as np 
 from dnn_pytorch.base.constants.config import Config, OutputConfig
 from dnn_pytorch.base.utils.log_error import initialize_logger
 import dnn_pytorch.base.constants.model_constants as constants
 
+from dnn_pytorch.models.metrics.classifier import BinaryClassifierMetric
 
 class TrainMetrics(object):
     # metrics
@@ -23,6 +25,8 @@ class TestMetrics(object):
 
 
 class BaseTrainer(object):
+    metric_comp = BinaryClassifierMetric()
+    
     def __init__(self, net, device=None, config=None):
         self.config = config or Config()
         self.logger = initialize_logger(
@@ -60,6 +64,15 @@ class BaseTrainer(object):
                          for metric in self.metrics}
         summary_batch['loss'] = loss.data.item()
         return summary_batch
+    def loadmetrics(self, y_true, y_pred, metricholder):
+        self.metric_comp.compute_scores(y_true, y_pred)
+
+        # add to list for the metrics
+        # self.metricholder.recall_queue.append(self.metrics.recall)
+        # self.metricholder.precision_queue.append(self.metrics.precision)
+        # self.metricholder.fp_queue.append(self.metrics.fp)
+        # self.metricholder.accuracy_queue.append(self.metrics.accuracy)
+        
     # ================================================================== #
     #                        Tensorboard Logging                         #
     # ================================================================== #
@@ -116,9 +129,3 @@ class BaseTrainer(object):
             # this call will invoke all registered forward hooks
             # res = self.net(input_tensor)
             self.writer.add_graph(self.net, input_tensor)
-
-    def save(self, resultfilename):
-        if self.outputdatadir not in resultfilename:
-            resultfilename = os.path.join(self.outputdatadir, resultfilename)
-        # Save the model checkpoint
-        torch.save(self.net.state_dict(), resultfilename)

@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 import torch.nn as nn
 
@@ -43,8 +44,6 @@ def trainmodel(model, train_dataset, test_dataset, testpatdir, expname, device=N
 
     # MOVE THE MODEL ONTO THE DEVICE WE WANT
     model = model.to(device)
-
-    print(device)
     
     # 1) create the trainer
     trainer = CNNTrainer(model, num_epochs, batch_size, 
@@ -52,8 +51,9 @@ def trainmodel(model, train_dataset, test_dataset, testpatdir, expname, device=N
     trainer.composedatasets(train_dataset, test_dataset)
     trainer.run_config()
 
-    print(trainer)
-    # trainer.train_and_evaluate()
+    print("Training on {} ".format(device))
+    print("Training object: {}".format(trainer))
+    trainer.train_and_evaluate()
     return trainer
 
 def testmodel(trainer, resultfilename):
