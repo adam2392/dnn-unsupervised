@@ -82,7 +82,7 @@ class BaseTrainer(object):
         if on:
             # 1. Log scalar values (scalar summary)
             info = {metric: metrics[metric] for metric in metrics.keys()}
-            info['loss'] = loss.item()
+            info['loss'] = loss
 
             # log each item
             for tag, value in info.items():

@@ -16,6 +16,8 @@ from dnn_pytorch.models.regularizer.post_class_regularizer import Postalarm
 import tensorboardX  # import SummaryWriter
 from tqdm import trange
 
+# set the random seed
+torch.manual_seed(constants.NOISE_SEED)
 
 class CNNTrainer(BaseTrainer):
     metric_comp = BinaryClassifierMetric()
@@ -50,7 +52,9 @@ class CNNTrainer(BaseTrainer):
         self.dropout = dropout
         self.num_epochs = num_epochs
         self.batch_size = batch_size
+
         self.save_summary_steps = 10
+        self.gradclip_value = 0.25
 
         # hyper parameters - dataset
         self.shuffle = shuffle
@@ -178,7 +182,7 @@ class CNNTrainer(BaseTrainer):
         '''
         RUN TRAIN LOOP
         '''
-        t = trange(num_steps)
+        t = trange(num_steps, disable=True)
         # t = range(num_steps)
 
         for step in t:
@@ -201,21 +205,26 @@ class CNNTrainer(BaseTrainer):
             self.optimizer.zero_grad()
             loss.backward()
 
+            # `clip_grad_norm` helps prevent the exploding gradient problem in RNNs / LSTMs.
+            # torch.nn.utils.clip_grad_norm(self.net.parameters(), self.gradclip_value)
+            # for p in self.net.parameters():
+            #     p.data.add_(-self.learning_rate, p.grad.data)
+
             # step the optimizer and scheduler
             self.optimizer.step()
 
             # Evaluate summaries only once in a while
-            if step % self.save_summary_steps == 0:
-                summ.append(
-                    self._summarize(
-                        outputs,
-                        labels,
-                        loss,
-                        regularize=False))
+            # if step % self.save_summary_steps == 0:
+            summ.append(self._summarize(
+                            outputs,
+                            labels,
+                            loss,
+                            regularize=False))
 
             # update the average loss
             loss_avg.update(loss.data.item())
-            t.set_postfix(loss='{:05.3f}'.format(loss_avg()))
+            if not t.disable:
+                t.set_postfix(loss='{:05.3f}'.format(loss_avg()))
 
         # compute mean of all metrics in summary
         metrics_mean = {metric: np.mean(
@@ -224,7 +233,9 @@ class CNNTrainer(BaseTrainer):
             "{}: {:05.3f}".format(
                 k, v) for k, v in metrics_mean.items())
         self.logger.info("- Train metrics: " + metrics_string)
-        return metrics_mean, images, loss
+
+        # return mean of metrics and average loss
+        return metrics_mean, images, loss_avg.item()
 
     def evaluate(self, num_steps):
         """Evaluate the model on `num_steps` batches.
@@ -234,11 +245,13 @@ class CNNTrainer(BaseTrainer):
         # set model to evaluation mode
         self.net.eval()
 
+        loss_avg = utils.RunningAverage()
+        t = trange(num_steps, disable=True)
         # summary for current eval loop
         summ = []
 
         # compute metrics over the dataset
-        for i in range(num_steps):
+        for step in t:
             # fetch the next evaluation batch
             data_batch, labels_batch = iter(
                 self.test_loader).next()  # next(self.test_loader)
@@ -261,6 +274,9 @@ class CNNTrainer(BaseTrainer):
                     loss,
                     regularize=True))
 
+            # update the average loss
+            loss_avg.update(loss.data.item())
+
         # compute mean of all metrics in summary
         metrics_mean = {}
         for metric in summ[0]:
@@ -270,7 +286,9 @@ class CNNTrainer(BaseTrainer):
             "{}: {:05.3f}".format(
                 k, v) for k, v in metrics_mean.items())
         self.logger.info("- Eval metrics : " + metrics_string)
-        return metrics_mean, loss
+
+        # return mean of metrics and average loss
+        return metrics_mean, loss_avg.item()
 
     def train_and_evaluate(self, restore_file=None):
         # reload weights from restore_file if specified
@@ -303,8 +321,6 @@ class CNNTrainer(BaseTrainer):
                              .format(epoch + 1, self.num_epochs, train_loss.item()))
             self.logger.info('Acc: {:.2f}, Prec: {:.2f}, Recall: {:.2f}, FPR: {:.2f}'
                              .format(train_metrics['accuracy'], train_metrics['precision'], train_metrics['recall'], train_metrics['fp']))
-            metrics_string = " ; ".join("{}: {:05.3f}".format(k, v) for k, v in train_metrics.items())
-            self.logger.info("- Train metrics : " + metrics_string)
             ######################## 2. pass thru validation ##################
             # Evaluate for one epoch on validation set
             num_steps = (self.val_size + 1) // self.batch_size
@@ -322,8 +338,6 @@ class CNNTrainer(BaseTrainer):
                              .format(epoch + 1, self.num_epochs, val_loss.item()))
             self.logger.info('Acc: {:.2f}, Prec: {:.2f}, Recall: {:.2f}, FPR: {:.2f}'
                              .format(val_metrics['accuracy'], val_metrics['precision'], val_metrics['recall'], val_metrics['fp']))
-            metrics_string = " ; ".join("{}: {:05.3f}".format(k, v) for k, v in val_metrics.items())
-            self.logger.info("- Eval metrics : " + metrics_string)
             ######################## 3. Run post processing, checkpoints ######
             # Save weights
             utils.save_checkpoint({'epoch': epoch + 1,
@@ -360,10 +374,10 @@ class CNNTrainer(BaseTrainer):
                 val_metrics,
                 epoch,
                 mode=constants.VALIDATE)
-            self._tboard_grad(epoch)
 
             # log output and the input everyevery <step> epochs
-            # if (epoch + 1) % self.save_summary_steps == 0:
+            if (epoch + 1) % self.save_summary_steps == 0:
+                self._tboard_grad(epoch)
             #     self._tboard_input(images, epoch)
 
         # tensorboard the convolutional layers after training

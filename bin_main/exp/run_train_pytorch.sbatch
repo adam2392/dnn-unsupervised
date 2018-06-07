@@ -52,12 +52,14 @@ pycmd="python ./slurm/exp001/main.py ${traindatadir} ${testdatadir} --output_dat
 singularity -v -d exec -B /scratch/ --nv ./pytorch.simg python main.py ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}
 
 # to run it as a shell
-# singularity -v -d shell --nv pytorch.simg 
-# traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/pipeline/"
-# testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/pipeline/"
-# patient="id001_bt"
-# expname="exp001"
-# logdatadir="/scratch/users/ali39@jhu.edu/data/dnn/logs/$expname/"
-# outputdatadir="/scratch/users/ali39@jhu.edu/data/dnn/output/$expname/"
-# python main.py ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}
+ml cuda/9.0
+ml singularity 
+singularity -v -d shell --nv pytorch.simg 
+traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/pipeline/"
+testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/pipeline/"
+patient="id001_bt"
+expname="exp001"
+logdatadir="/scratch/users/ali39@jhu.edu/data/dnn/logs/$expname/"
+outputdatadir="/scratch/users/ali39@jhu.edu/data/dnn/output/$expname/"
+python main.py ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}
 # exit

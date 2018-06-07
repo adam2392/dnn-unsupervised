@@ -1,3 +1,14 @@
 lr=1e-4
 batch_size=64
 num_epochs=300
+
+EMSIZE    size of word embeddings
+NHID        number of hidden units per layer
+NLAYERS  number of layers
+CLIP        gradient clipping
+BPTT        sequence length
+DROPOUT  dropout applied to layers (0 = no dropout)
+DECAY      learning rate decay per epoch
+
+  --log-interval N   report interval
+  --save SAVE        path to save the final model

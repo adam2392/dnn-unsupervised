@@ -55,6 +55,8 @@ class RunningAverage():
         self.total += val
         self.steps += 1
 
+    def item(self):
+        return self.total / float(self.steps)
     def __call__(self):
         return self.total / float(self.steps)
 
