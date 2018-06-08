@@ -116,8 +116,8 @@ class CNNTrainer(BaseTrainer):
         self.train_size = len(train_dataset_obj)
         self.val_size = len(test_dataset_obj)
 
-        self.train_size = 2#len(train_dataset_obj)
-        self.val_size = 2#len(test_dataset_obj)
+        # self.train_size = 2#len(train_dataset_obj)
+        # self.val_size = 2#len(test_dataset_obj)
         
         self.logger.info(
             "Each training epoch is {} steps and each validation is {} steps.".format(
@@ -234,7 +234,10 @@ class CNNTrainer(BaseTrainer):
                 t.set_postfix(loss='{:05.3f}'.format(loss_avg()))
 
         # compute mean of all metrics in summary
-        metrics_mean = {metric:np.mean([x[metric] for x in summ]) for metric in summ[0]} 
+        metrics_mean = {}
+        for metric in summ[0]:
+            metrics_mean[metric] = np.mean([x[metric] for x in summ]) 
+
         metrics_string = " ; ".join(
             "{}: {:05.3f}".format(
                 k, v) for k, v in metrics_mean.items())
