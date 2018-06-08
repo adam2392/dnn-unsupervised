@@ -75,6 +75,7 @@ class Reader(object):
                     file = file.split('.')[0]
                     self.trainfilepaths.append(os.path.join(root, file))
 
+        self.logger.info("Found {} training files and {} testing files.".format(len(self.trainfilepaths), len(self.testfilepaths)))
         self.logger.info("Finished reading in data by directories!")
 
     def loadfiles(self, filelist=[], mode=constants.TRAIN):
