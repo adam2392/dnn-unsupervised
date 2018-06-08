@@ -9,9 +9,9 @@ from run_util import *
 import shutil
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--train_data_dir', default='./',
+parser.add_argument('train_data_dir', default='./',
                     help="Directory containing the dataset(s)")
-parser.add_argument('--test_data_dir', default='./',
+parser.add_argument('test_data_dir', default='./',
                     help="Directory containing the dataset(s)")
 parser.add_argument('--output_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/output/', 
                     help="Directory to save logs")

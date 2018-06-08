@@ -49,7 +49,7 @@ echo "Running training model"
 # run training here in this
 pycmd="python ./slurm/exp001/main.py ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}"
 # singularity -v exec -B /scratch/ --nv ./pytorch.simg python main.py ${traindatadir} ${testdatadir} ${outputdatadir} ${logdatadir} ${patient} ${expname}
-singularity -v -d exec -B /scratch/ --nv ./pytorch.simg python main.py ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}
+singularity exec -B /scratch/ --nv ./pytorch.simg python main.py ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}
 
 # to run it as a shell
 # ml cuda/9.0

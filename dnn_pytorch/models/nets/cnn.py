@@ -54,22 +54,37 @@ class ConvNet(nn.Module):
         n_size = output_feat.data.view(bs, -1).size(1)
         return n_size
 
+    def _build_convolutional_block(self, idx, ilay, indim, outdim, ):
+        # keep track of the previous size filter
+        prevfilter = n_filters * (2**idx)
+        conv = nn.Conv2d(in_channels=indim,                         # input height
+                         out_channels=outdim,
+                         kernel_size=self.filter_size,                # filter size
+                         stride=1, padding=2)                    # filter step, padding
+        # apply Glorot/xavier uniform init
+        torch.nn.init.xavier_uniform_(conv.weight)
+        self.net.add_module('conv{}_{}'.format(idx, ilay), conv)
+        self.net.add_module(
+            'norm{}_{}'.format(
+                idx, ilay), nn.BatchNorm2d(
+                num_features=prevfilter))   # apply batch normalization
+        # apply relu activation
+        self.net.add_module(
+            'activate{}_{}'.format(
+                idx, ilay), nn.ReLU())
     def _buildvgg(self, n_layers=(4, 2, 1), poolsize=2,
                   n_filters=32, filter_size=3):
         '''
         Model function for building up the VGG style CNN.
-
-        To Do:
-        - Consider switching code layout to:
-
-            layers = []
-            layers.append(nn.Linear(3, 4))
-            layers.append(nn.Sigmoid())
-            layers.append(nn.Linear(4, 1))
-            layers.append(nn.Sigmoid())
-
-            net = nn.Sequential(*layers)
-
+        
+        if idx == 0 and ilay == 0:
+            indim = self.n_colors
+            self.dilation_size = 1
+            self.padding = 1 #filter_size-1
+        else:
+            indim = self.prevfilter
+            self.dilation_size = self.dilation_size*2
+            self.padding = self.padding*2
         '''
         self.net = nn.Sequential()
 
@@ -81,24 +96,8 @@ class ConvNet(nn.Module):
                     indim = self.n_colors
                 else:
                     indim = prevfilter
-                # keep track of the previous size filter
-                prevfilter = n_filters * (2**idx)
-                conv = nn.Conv2d(in_channels=indim,                         # input height
-                                 out_channels=n_filters * \
-                                 (2**idx),        # n_filters to use
-                                 kernel_size=filter_size,                # filter size
-                                 stride=1, padding=2)                    # filter step, padding
-                # apply Glorot/xavier uniform init
-                torch.nn.init.xavier_uniform_(conv.weight)
-                self.net.add_module('conv{}_{}'.format(idx, ilay), conv)
-                self.net.add_module(
-                    'norm{}_{}'.format(
-                        idx, ilay), nn.BatchNorm2d(
-                        num_features=prevfilter))   # apply batch normalization
-                # apply relu activation
-                self.net.add_module(
-                    'activate{}_{}'.format(
-                        idx, ilay), nn.ReLU())
+                outdim = n_filters * (2**idx),        # n_filters to use
+
             self.net.add_module(
                 'pool{}'.format(idx),
                 nn.MaxPool2d(
