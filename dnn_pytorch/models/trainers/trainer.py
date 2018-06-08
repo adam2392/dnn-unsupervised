@@ -104,11 +104,11 @@ class CNNTrainer(BaseTrainer):
         self.train_loader = DataLoader(train_dataset_obj,
                                        batch_size=self.batch_size,
                                        shuffle=self.shuffle,
-                                       num_workers=0)
+                                       num_workers=4)
         self.test_loader = DataLoader(test_dataset_obj,
                                       batch_size=self.batch_size,
                                       shuffle=self.shuffle,
-                                      num_workers=0)
+                                      num_workers=4)
         # get input characteristics
         self.imsize = train_dataset_obj.imsize
         self.n_colors = train_dataset_obj.n_colors
@@ -186,9 +186,7 @@ class CNNTrainer(BaseTrainer):
         loss_avg = utils.RunningAverage()
         # set model to training mode
         self.net.train()
-        '''
-        RUN TRAIN LOOP
-        '''
+        ''' RUN TRAIN LOOP '''
         # t = trange(num_steps, disable=True)
         t = range(num_steps)
 
@@ -201,14 +199,12 @@ class CNNTrainer(BaseTrainer):
             # Forward pass -> get outputs and loss and get the loss
             outputs, _ = self.net(images)
 
+            # convert to correct format
             labels = labels.long()
             labels = torch.max(labels, 1)[1]
-            # print(labels.shape)
-            # print(outputs.shape)
 
             loss = self.criterion(outputs, labels)
-            # clear the optimizer's holding of gradients and compute backprop
-            # grad
+            # clear the optimizer's holding of gradients and compute backprop grad
             self.optimizer.zero_grad()
             loss.backward()
 
@@ -311,6 +307,11 @@ class CNNTrainer(BaseTrainer):
 
         best_val_acc = 0.0
 
+        # get training/validation step sizes
+        num_steps_epoch = (self.train_size + 1) // self.batch_size
+        num_steps = (self.val_size + 1) // self.batch_size
+        self.logger.info("Running each training epoch for {} steps".format(num_steps_epoch))
+        self.logger.info("Running each validation for {} steps".format(num_steps))
         # tensorboard the initial convolutional layers
         # self._tboard_features(images, label, epoch, name='default')
 
@@ -322,20 +323,10 @@ class CNNTrainer(BaseTrainer):
             ######################## 1. pass thru training ####################
             # compute number of batches in one epoch (one full pass over the
             # training set)
-            num_steps_epoch = (self.train_size + 1) // self.batch_size
-            self.logger.info(
-                "Running training for {} steps".format(num_steps_epoch))
             train_metrics, images, train_loss = self.train(num_steps_epoch)
 
-            self.logger.info('Epoch [{}/{}], Loss: {:.4f}'
-                             .format(epoch + 1, self.num_epochs, train_loss))
-            self.logger.info('Acc: {:.2f}, Prec: {:.2f}, Recall: {:.2f}, FPR: {:.2f}'
-                             .format(train_metrics['accuracy'], train_metrics['precision'], train_metrics['recall'], train_metrics['fp']))
             ######################## 2. pass thru validation ##################
             # Evaluate for one epoch on validation set
-            num_steps = (self.val_size + 1) // self.batch_size
-            self.logger.info(
-                "Running validation for {} steps".format(num_steps))
             val_metrics, val_loss = self.evaluate(num_steps=num_steps)
 
             # determine if we should reduce lr based on validation
@@ -344,10 +335,7 @@ class CNNTrainer(BaseTrainer):
             # get the metric we want to track over epochs
             val_acc = val_metrics['accuracy']
             is_best = val_acc >= best_val_acc
-            self.logger.info('Epoch [{}/{}], Loss: {:.4f}'
-                             .format(epoch + 1, self.num_epochs, val_loss))
-            self.logger.info('Acc: {:.2f}, Prec: {:.2f}, Recall: {:.2f}, FPR: {:.2f}'
-                             .format(val_metrics['accuracy'], val_metrics['precision'], val_metrics['recall'], val_metrics['fp']))
+
             ######################## 3. Run post processing, checkpoints ######
             # Save weights
             utils.save_checkpoint({'epoch': epoch + 1,
@@ -356,6 +344,14 @@ class CNNTrainer(BaseTrainer):
                                   is_best=is_best,
                                   checkpointdir=self.explogdir)
 
+            self.logger.info('Train Epoch [{}/{}], Loss: {:.4f}'
+                             .format(epoch + 1, self.num_epochs, train_loss))
+            self.logger.info('Acc: {:.2f}, Prec: {:.2f}, Recall: {:.2f}, FPR: {:.2f}'
+                             .format(train_metrics['accuracy'], train_metrics['precision'], train_metrics['recall'], train_metrics['fp']))
+            self.logger.info('Validation Epoch [{}/{}], Loss: {:.4f}'
+                             .format(epoch + 1, self.num_epochs, val_loss))
+            self.logger.info('Acc: {:.2f}, Prec: {:.2f}, Recall: {:.2f}, FPR: {:.2f}'
+                             .format(val_metrics['accuracy'], val_metrics['precision'], val_metrics['recall'], val_metrics['fp']))
             # If best_eval, best_save_path
             if is_best:
                 self.logger.info("- Found new best accuracy")
@@ -394,7 +390,7 @@ class CNNTrainer(BaseTrainer):
             # if (epoch + 1) % self.save_summary_steps == 0:
             #     self._tboard_grad(epoch)
             #     self._tboard_input(images, epoch)
-            
+
         # tensorboard the convolutional layers after training
         # self._tboard_features(images, label, epoch, name='default')
         self.logger.info("Finished training!")

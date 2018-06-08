@@ -48,9 +48,12 @@ class BaseTrainer(object):
         output_batch = outputs.data.cpu().numpy()
         labels_batch = labels.data.cpu().numpy()
 
+        # test torch max
+        outputs, indices = torch.max(outputs, 1)
+        labels, indices = torch.max(labels, 1)
         # ensure that metrics only take in the predicted labels
         # labels_batch = np.argmax(labels_batch,1)
-        output_batch = np.argmax(output_batch, 1)
+        # output_batch = np.argmax(output_batch, 1)
 
         # regularize the output
         if self.post_regularizer is not None and regularize is True:
