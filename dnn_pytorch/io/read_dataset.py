@@ -56,7 +56,7 @@ class Reader(object):
             for root, dirs, files in os.walk(traindir):
                 for file in files:
                     # file = file.split('.')[0]
-                    if testname in file and file.endswith('.npz'):
+                    if testname not in file and file.endswith('.npz'):
                         self.trainfilepaths.append(os.path.join(root, file))
         else:
             ''' Get list of file paths '''
