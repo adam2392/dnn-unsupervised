@@ -35,6 +35,24 @@ all_patients = [
     'id013_lk', 'id014_vc', 'id015_gjl',
     'id016_lm', 'id017_mk', 'id018_lo', 'id020_lma']
 
+# TODO: pass this list into the models to allow it to know
+# how to select directories for training
+training_patients = [
+    # updated tngpipeline
+    'id001_bt',
+    'id002_sd',
+    'id003_mg', 'id004_bj', 'id005_ft',
+    'id006_mr', 'id007_rd', 'id008_dmc',
+    'id009_ba', 'id010_cmn', 'id011_gr',
+    'id013_lk', 'id014_vc', 'id015_gjl',
+    'id016_lm', 'id017_mk', 'id018_lo', 'id020_lma' ,
+    'id021_jc', 'id022_te', 'id023_br',
+
+    # old tngpipeline
+    'id001_ac', 'id002_cj', 'id008_gc', 'id010_js', 'id011_ml',
+    'id013_pg', 
+]
+
 def hpc_run(args):
     # read in the parsed arguments
     testpat = args.patient_to_loo
@@ -44,12 +62,13 @@ def hpc_run(args):
     test_data_dir = args.test_data_dir
     expname = args.expname
 
-    train_data_dir = os.path.expanduser('~/Downloads/tngpipeline/freq/freqimg/fft/')
-    test_data_dir = train_data_dir
-    output_data_dir = '.'
-    log_data_dir = '.'
+    # train_data_dir = os.path.expanduser('~/Downloads/tngpipeline/freq/freqimg/fft/')
+    # test_data_dir = train_data_dir
+    # output_data_dir = '.'
+    # log_data_dir = '.'
 
     print("args are: ", args)
+    print("Number of different patients: {}".format(len(training_patients)))
 
     # parameters for model
     num_classes = 2
