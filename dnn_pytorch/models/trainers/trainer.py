@@ -390,8 +390,8 @@ class CNNTrainer(BaseTrainer):
             #     mode=constants.VALIDATE)
 
             # log output and the input everyevery <step> epochs
-            if (epoch + 1) % self.save_summary_steps == 0:
-                self._tboard_grad(epoch)
+            # if (epoch + 1) % self.save_summary_steps == 0:
+            #     self._tboard_grad(epoch)
             #     self._tboard_input(images, epoch)
 
         # tensorboard the convolutional layers after training
