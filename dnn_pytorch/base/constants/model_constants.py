@@ -3,7 +3,7 @@
 import numpy as np
 
 # Default model parameters
-LEARNING_RATE = 1e-4
+LEARNING_RATE = 1e-3
 DROPOUT = True
 SHUFFLE = True
 

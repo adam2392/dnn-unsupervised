@@ -32,7 +32,7 @@ def createmodel(num_classes, imsize, n_colors):
 
 def trainmodel(model, train_dataset, test_dataset, testpatdir, expname, device=None):
     # training parameters 
-    num_epochs = 500
+    num_epochs = 300
     batch_size = 64
 
     if device is None:

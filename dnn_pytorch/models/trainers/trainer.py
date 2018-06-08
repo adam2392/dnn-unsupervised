@@ -16,7 +16,7 @@ from dnn_pytorch.models.regularizer.post_class_regularizer import Postalarm
 
 from dnn_pytorch.models.trainers.history import history
 # import tensorboardX  # import SummaryWriter
-from tqdm import trange
+# from tqdm import trange
 
 # set the random seed
 torch.manual_seed(constants.NOISE_SEED)
@@ -189,8 +189,8 @@ class CNNTrainer(BaseTrainer):
         '''
         RUN TRAIN LOOP
         '''
-        t = trange(num_steps, disable=True)
-        # t = range(num_steps)
+        # t = trange(num_steps, disable=True)
+        t = range(num_steps)
 
         for step in t:
             # next(self.train_loader)
@@ -230,8 +230,8 @@ class CNNTrainer(BaseTrainer):
 
             # update the average loss
             loss_avg.update(loss.data.item())
-            if not t.disable:
-                t.set_postfix(loss='{:05.3f}'.format(loss_avg()))
+            # if not t.disable:
+            #     t.set_postfix(loss='{:05.3f}'.format(loss_avg()))
 
         # compute mean of all metrics in summary
         metrics_mean = {}
@@ -255,7 +255,8 @@ class CNNTrainer(BaseTrainer):
         self.net.eval()
 
         loss_avg = utils.RunningAverage()
-        t = trange(num_steps, disable=True)
+        # t = trange(num_steps, disable=True)
+        t = range(num_steps)
         # summary for current eval loop
         summ = []
 
@@ -393,7 +394,7 @@ class CNNTrainer(BaseTrainer):
             # if (epoch + 1) % self.save_summary_steps == 0:
             #     self._tboard_grad(epoch)
             #     self._tboard_input(images, epoch)
-
+            
         # tensorboard the convolutional layers after training
         # self._tboard_features(images, label, epoch, name='default')
         self.logger.info("Finished training!")
