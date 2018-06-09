@@ -45,24 +45,21 @@ class BaseTrainer(object):
     def _summarize(self, outputs, labels, loss, regularize=False):
         # extract data from torch Variable, move to cpu, convert to numpy
         # arrays
-        output_batch = outputs.data.cpu().numpy()
-        labels_batch = labels.data.cpu().numpy()
+        # output_batch = outputs.data.cpu().numpy()
+        # labels_batch = labels.data.cpu().numpy()
 
-        print("Labels shape: {}".format(labels_batch.shape))
-        print("Output shape: {}".format(output_batch.shape))
-      
         # test torch max
-        # outputs, indices = torch.max(outputs, 1)
+        output_batch, indices = torch.max(outputs, 1)
+        
         # labels, indices = torch.max(labels)
         # ensure that metrics only take in the predicted labels
-        try:
-            labels_batch = np.argmax(labels_batch,1)
-        except:
-            print("can't")
-        output_batch = np.argmax(output_batch, 1)
-
-        print("Labels shape: {}".format(labels_batch.shape))
-        print("Output shape: {}".format(output_batch.shape))
+        # try:
+        #     labels_batch = np.argmax(labels_batch,1)
+        # except:
+        #     print("can't")
+        # output_batch = np.argmax(output_batch, 1)
+        # print("Labels shape: {}".format(labels_batch.shape))
+        # print("Output shape: {}".format(output_batch.shape))
 
         # regularize the output
         if self.post_regularizer is not None and regularize is True:
