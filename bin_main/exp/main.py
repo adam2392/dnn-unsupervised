@@ -75,7 +75,7 @@ def hpc_run(args):
     data_procedure='loo'
 
     # for testpat in all÷_patients:
-    testpatdir = os.path.join(log_data_dir, testpat)
+    testpatdir = os.path.join(output_data_dir, testpat)
 
     print(train_data_dir, test_data_dir)
     # get the datasets

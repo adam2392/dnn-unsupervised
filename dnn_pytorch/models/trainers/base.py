@@ -50,6 +50,7 @@ class BaseTrainer(object):
 
         # test torch max
         output_batch, indices = torch.max(outputs, 1)
+        labels_batch = labels
         
         # labels, indices = torch.max(labels)
         # ensure that metrics only take in the predicted labels
