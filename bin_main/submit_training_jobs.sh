@@ -9,14 +9,13 @@
 
 ################################### 1. READ USER INPUT ###########################################
 patients=(
-'id001_bt')
-# 'id002_sd
-# id003_mg 
-# id004_bj id005_ft
-# id006_mr id007_rd id008_dmc
-# id009_ba id010_cmn 
-# id011_gr id013_lk id014_vc id015_gjl
-# id016_lm id017_mk id018_lo id020_lma')
+	# id003_mg
+'id001_bt id002_sd 
+id004_bj id005_ft
+id006_mr id007_rd id008_dmc
+id009_ba id010_cmn 
+id011_gr id013_lk id014_vc id015_gjl
+id016_lm id017_mk id018_lo id020_lma')
 
 ## load in the modules for this run -> python, matlab, etc.
 # module unload git
@@ -66,7 +65,7 @@ expname=${expname} "
 	# build a scavenger job, gpu job, or other job
 	# set jobname
 	jobname="train_${patient}_${expname}.log"
-	sbatchcomm=$(cat $gpu_debug_config)
+	sbatchcomm=$(cat $gpu_config)
 	sbatchcomm="$sbatchcomm --job-name=${jobname}"
 
 	# build a scavenger job, gpu job, or other job

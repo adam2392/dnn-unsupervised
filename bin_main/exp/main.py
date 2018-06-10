@@ -26,14 +26,14 @@ parser.add_argument('--model_dir', default='experiments/base_model',
 parser.add_argument('--restore_file', default='best', 
                     help="name of the file in --model_dir \
                      containing weights to load")
-all_patients = [
-    'id001_bt',
-    'id002_sd',
-    'id003_mg', 'id004_bj', 'id005_ft',
-    'id006_mr', 'id007_rd', 'id008_dmc',
-    'id009_ba', 'id010_cmn', 'id011_gr',
-    'id013_lk', 'id014_vc', 'id015_gjl',
-    'id016_lm', 'id017_mk', 'id018_lo', 'id020_lma']
+# all_patients = [
+#     'id001_bt',
+#     'id002_sd',
+#     'id003_mg', 'id004_bj', 'id005_ft',
+#     'id006_mr', 'id007_rd', 'id008_dmc',
+#     'id009_ba', 'id010_cmn', 'id011_gr',
+#     'id013_lk', 'id014_vc', 'id015_gjl',
+#     'id016_lm', 'id017_mk', 'id018_lo', 'id020_lma']
 
 # TODO: pass this list into the models to allow it to know
 # how to select directories for training
