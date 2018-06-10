@@ -51,7 +51,6 @@ class BaseTrainer(object):
         # test torch max
         # output_batch, indices = torch.max(outputs, 1)
         # labels_batch = labels
-        
         # ensure that metrics only take in the predicted labels
         # try:
         #     labels_batch = np.argmax(labels_batch,1)
