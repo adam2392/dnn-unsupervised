@@ -20,15 +20,9 @@ id016_lm id017_mk id018_lo id020_lma')
 ## load in the modules for this run -> python, matlab, etc.
 # module unload git
 ml python/3.6.5
-# ml anaconda-python/3.6
-# source activate dnn
 module list
 
-# Pause before running to check
-# printf "About to run on patients (press enter to continue): $patients" 
-# read answer
-
-expname="exp001"
+expname="expdebug"
 ## For training and modeling with the simulated data
 # traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/exp001/"
 traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/pipeline/"
@@ -50,6 +44,7 @@ setup="./config/slurm/setup.sh"
 ########################### 2. Define Slurm Parameters ###########################
 gpu_debug_config="./config/slurm/gpu_debug_jobs.txt"
 gpu_config="./config/slurm/gpu_jobs.txt"
+multi_gpu_config="./config/slurm/multi_gpu_jobs.txt"
 
 for patient in $patients; do
 	echo $patient 

@@ -9,6 +9,9 @@ import dnn_pytorch.base.constants.model_constants as constants
 from sklearn.utils import compute_class_weight
 import tqdm
 
+# preprocessing data
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import scale
 
 class Reader(object):
     root_dir = None

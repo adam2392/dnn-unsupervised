@@ -1,5 +1,9 @@
 from abc import ABCMeta, abstractmethod
 from keras.layers import TimeDistributed, Dense, Dropout, Flatten
+
+from dnn_keras.base.constants.config import Config
+from dnn_keras.base.utils.log_error import initialize_logger
+
 '''
 Base class neural network for our models that we build.
 '''
@@ -7,6 +11,14 @@ Base class neural network for our models that we build.
 
 class BaseNet(metaclass=ABCMeta):
     requiredAttributes = ['DROPOUT', 'num_classes']
+    
+    def __init__(self, config=None):
+        if config is not -1:
+            self.config = config or Config()
+            self.logger = initialize_logger(
+                self.__class__.__name__,
+                self.config.out.FOLDER_LOGS)
+
     # @property
     # def DROPOUT(self):
     #     msg = "All models need to say whether or not they have DROPOUT (True, or False)."
@@ -42,11 +54,15 @@ class BaseNet(metaclass=ABCMeta):
         self.output = Dense(size_fc, activation='relu')(finalmodel)
         if self.DROPOUT:
             self.output = Dropout(0.5)(self.output)
+        self.output = Dense(size_fc/2, activation='relu')(self.output)
+        if self.DROPOUT:
+            self.output = Dropout(0.5)(self.output)
         self.output = Dense(
             self.num_classes, activation='softmax')(self.output)
         if self.DROPOUT:
             self.output = Dropout(0.5)(self.output)
         return self.output
+
     def _build_seq_output(self, size_fc=1024):
         '''
         Creates the final output layers of the sequential model: a fully connected layer
