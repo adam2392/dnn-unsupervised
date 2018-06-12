@@ -62,15 +62,11 @@ def hpc_run(args):
     test_data_dir = args.test_data_dir
     expname = args.expname
 
-    # train_data_dir = os.path.expanduser('~/Downloads/tngpipeline/freq/freqimg/fft/')
-    # test_data_dir = train_data_dir
-    # output_data_dir = '.'
-    # log_data_dir = '.'
-
     print("args are: ", args)
     print("Number of different patients: {}".format(len(training_patients)))
 
     # parameters for model
+    modelname = 'loobasecnn'
     num_classes = 2
     data_procedure='loo'
     # training parameters 
@@ -79,10 +75,13 @@ def hpc_run(args):
 
     # for testpat in all÷_patients:
     testpatdir = os.path.join(output_data_dir, testpat)
-
+    print("Our maint directory to save for loo exp: ", testpatdir)
     print(train_data_dir, test_data_dir)
     # get the datasets
-    train_dataset, test_dataset = load_data(train_data_dir, test_data_dir, data_procedure=data_procedure, testpat=testpat)
+    train_dataset, test_dataset = load_data(train_data_dir, test_data_dir, 
+                            data_procedure=data_procedure, 
+                            testpat=testpat, training_pats=training_patients)
+
     # get the image size and n_colors from the datasets
     imsize = train_dataset.imsize
     n_colors = train_dataset.n_colors
@@ -95,10 +94,8 @@ def hpc_run(args):
     # train model
     trainer = trainmodel(model, train_dataset, test_dataset,
                         testpatdir=testpatdir,  expname=expname)
-    # test model
-    resultfilename = '{}_endmodel.ckpt'.format(testpat)
-    historyfilename = '{}_{}_history.pkl'.format(testpat, data_procedure)
-    trainer = testmodel(trainer, resultfilename, historyfilename)
+    # test and save model
+    trainer = testmodel(trainer, modelname)
 
 if __name__ == '__main__':
     args = parser.parse_args()

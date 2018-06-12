@@ -5,31 +5,46 @@ from keras.utils.training_utils import multi_gpu_model
 
 # Custom Built libraries
 import dnn_keras
-from dnn_pytorch.io.read_dataset import Reader
-from dnn_pytorch.base.dataset.fftdataset import FFT2DImageDataset
-import dnn_pytorch.base.constants.model_constants as constants
-from dnn_pytorch.models.nets.cnn import ConvNet
-from dnn_pytorch.models.trainers.trainer import CNNTrainer
-  
+from dnn_keras.models.nets.cnn import iEEGCNN
+from dnn_keras.io.readerimgdataset import ReaderImgDataset 
+import dnn_keras.base.constants.model_constants as constants
 from tensorflow.python.client import device_lib
+
 def get_available_gpus():
     local_device_protos = device_lib.list_local_devices()
     return [x.name for x in local_device_protos if x.device_type == 'GPU']
 
-def load_data(traindir, testdir, data_procedure='loo', testpat=None):
+def load_data(traindir, testdir, data_procedure='loo', testpat=None, training_pats=None):
     '''
     If LOO training, then we have to trim these into 
     their separate filelists
     '''
-    pass
+        data_procedure = 'loo'
+    testpat = 'id001_bt'
+    traindir = os.path.expanduser('~/Downloads/tngpipeline/freq/fft_img/')
+    testdir = traindir
+    # initialize reader to get the training/testing data
+    reader = ReaderImgDataset()
+    reader.loadbydir(traindir, testdir, procedure=data_procedure, testname=testpat)
+    reader.loadfiles(mode=constants.TRAIN)
+    reader.loadfiles(mode=constants.TEST)
+    
+    # create the dataset objects
+    train_dataset = reader.train_dataset
+    test_dataset = reader.test_dataset
+
+    return train_dataset, test_dataset
 
 def createmodel(num_classes, imsize, n_colors):
-    # 1) create the model - cnn
-    model = ConvNet(num_classes=num_classes,
-                    imsize=imsize,
-                    n_colors=n_colors)
-    model.buildcnn()
-    model.buildoutput()
+    # define model
+    model_params = {
+        'num_classes': 2,
+        'imsize': 64,
+        'n_colors':4,
+    }
+    model = iEEGCNN(**model_params) 
+    model.buildmodel(output=True)
+
     return model
 
 def trainmodel(model, num_epochs, batch_size, train_dataset, test_dataset, 
@@ -41,31 +56,20 @@ def trainmodel(model, num_epochs, batch_size, train_dataset, test_dataset,
         # make the model parallel
         model = multi_gpu_model(model, gpus=len(devices))
 
-    # MOVE THE MODEL ONTO THE DEVICE WE WANT
-    model = model.to(device)
-    
-    # 1) create the trainer
-    trainer = CNNTrainer(model, num_epochs, batch_size, 
-                        device=device, testpatdir=testpatdir, expname=expname)
+    trainer = CNNTrainer(model=model.net, num_epochs=num_epochs, 
+                        batch_size=batch_size,
+                        testpatdir=testpatdir)
     trainer.composedatasets(train_dataset, test_dataset)
-    trainer.run_config()
-
+    trainer.configure()
+    # Train the model
+    trainer.train()
+    print(model.net)
     print("Training on {} ".format(device))
     print("Training object: {}".format(trainer))
-    trainer.train_and_evaluate()
     return trainer
 
-def testmodel(trainer, resultfilename, historyfilename):
-    pass
+def testmodel(trainer, modelname):
+    trainer.saveoutput(modelname=modelname)
+    trainer.savemetricsoutput(modelname=modelname)
     return trainer
 
-def localtest():
-    '''
-    For testing locally
-    '''
-    outputdatadir = './output/'
-    logdatadir = './logs/'
-    testdatadir = './'
-    datadir = './'
-    patient = ''
-    traindatadir = os.path.join(datadir, './')

@@ -1,11 +1,18 @@
-import torch
 import numpy as np 
 from dnn_keras.base.constants.config import Config, OutputConfig
 from dnn_keras.base.utils.log_error import initialize_logger
 import dnn_keras.base.constants.model_constants as constants
 
 from dnn_keras.models.metrics.classifier import BinaryClassifierMetric
-
+from dnn_keras.base.utils.data_structures_utils import NumpyEncoder
+import os
+import json
+import pickle
+import io
+try:
+    to_unicode = unicode
+except NameError:
+    to_unicode = str
 class TrainMetrics(object):
     # metrics
     loss_queue = []
@@ -26,66 +33,65 @@ class TestMetrics(object):
 
 class BaseTrainer(object):
     metric_comp = BinaryClassifierMetric()
-    
-    def __init__(self, net, config=None):
+    model = None 
+    def __init__(self, model, config=None):
         self.config = config or Config()
         self.logger = initialize_logger(
             self.__class__.__name__,
             self.config.out.FOLDER_LOGS)
+        self.model = model
 
-        self.logger.info("Setting the device to be {}".format(self.device))
-        self.net = net
+    def configure(self):
+        msg = "Base trainer configure method is not implemented."
+        raise NotImplementedError(msg)
+
+    def train(self):
+        msg = "Base trainer train method is not implemented."
+        raise NotImplementedError(msg)
 
     def _summarize(self, outputs, labels, loss, regularize=False):
         pass
-         
-    # ================================================================== #
-    #                        Tensorboard Logging                         #
-    # ================================================================== #
-    def _tboard_metrics(self, loss, metrics, step,
-                        mode=constants.TRAIN):
-        # 1. Log scalar values (scalar summary)
-        info = {metric: metrics[metric] for metric in metrics.keys()}
-        info['loss'] = loss
 
-        # log each item
-        for tag, value in info.items():
-            self.writer.add_scalar(tag + '/' + mode, value, step + 1)
+    def _saveoutput(self, modeljson_filepath, history_filepath, finalweights_filepath):
+        # save model
+        if not os.path.exists(modeljson_filepath):
+            # serialize model to JSON
+            model_json = self.model.to_json()
+            self._writejsonfile(model_json, modeljson_filepath)
+            # with open(modeljson_filepath, "w") as json_file:
+            #     json_file.write(model_json)
+            print("Saved model to disk")
 
-    def _tboard_grad(self, step):
-        # 2. Log values and gradients of the parameters (histogram summary)
-        for tag, value in self.net.named_parameters():
-            tag = tag.replace('.', '/')
-            self.writer.add_histogram(
-                tag, value.data.cpu().numpy(), step + 1)
-            self.writer.add_histogram(
-                tag + '/grad', value.grad.data.cpu().numpy(), step + 1)
+        # save history
+        with open(history_filepath, 'wb') as file_pi:
+            pickle.dump(self.HH.history, file_pi)
 
-    def _tboard_input(self, images, step):
-        # 3. Log training images (image summary)
-        info = {
-            'images': images.view(-1, self.imsize, self.imsize)[:5].cpu().numpy()
-        }
-        for tag, images in info.items():
-            self.writer.add_image(tag, images, step + 1)
+        # save final weights
+        self.model.save(finalweights_filepath)
 
-    def _tboard_features(self, images, label, step, name='default'):
-        # 4. add embedding:
-        self.writer.add_embedding(images.ravel(),
-                                  metadata=label,
-                                  label_img=images.unsqueeze(1),
-                                  global_step=step + 1,
-                                  name=name)
+    def _writejsonfile(self, metadata, metafilename):
+        with io.open(metafilename, 'w', encoding='utf8') as outfile:
+            str_ = json.dumps(metadata,
+                              indent=4, sort_keys=True, cls=NumpyEncoder,
+                              separators=(',', ': '), ensure_ascii=False)
+            outfile.write(to_unicode(str_))
 
-    def _log_model_tboard(self):
-        # log model to tensorboard
-        expected_image_shape = (
-            self.batch_size,
-            self.n_colors,
-            self.imsize,
-            self.imsize)
-        input_tensor = torch.autograd.Variable(torch.rand(*expected_image_shape),
-                                               requires_grad=True)
-        # this call will invoke all registered forward hooks
-        # res = self.net(input_tensor)
-        self.writer.add_graph(self.net, input_tensor)
+    def _loadjsonfile(self, metafilename):
+        if not metafilename.endswith('.json'):
+            metafilename += '.json'
+
+        try:
+            with open(metafilename, mode='r', encoding='utf8') as f:
+                metadata = json.load(f)
+            metadata = json.loads(metadata)
+        except Exception as e:
+            print(e)
+            print("can't open metafile: {}".format(metafilename))
+            with io.open(metafilename, encoding='utf-8', mode='r') as fp:
+                json_str = fp.read() #json.loads(
+            metadata = json.loads(json_str)
+
+        self.metadata = metadata
+        return self.metadata
+
+        

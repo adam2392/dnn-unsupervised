@@ -9,8 +9,7 @@
 
 ################################### 1. READ USER INPUT ###########################################
 patients=(
-	# id003_mg
-'id001_bt id002_sd 
+'id001_bt id002_sd id003_mg
 id004_bj id005_ft
 id006_mr id007_rd id008_dmc
 id009_ba id010_cmn 
@@ -22,7 +21,7 @@ id016_lm id017_mk id018_lo id020_lma')
 ml python/3.6.5
 module list
 
-expname="expdebug"
+expname="exp002"
 ## For training and modeling with the simulated data
 # traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/exp001/"
 traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/pipeline/"
