@@ -5,7 +5,7 @@ import os
 sys.path.append('/scratch/users/ali39@jhu.edu/dnn-unsupervised/')
 sys.path.append('../../')
 import argparse
-from run_util import *
+from run_util import MarccHPC
 import shutil
 
 parser = argparse.ArgumentParser()
@@ -73,12 +73,14 @@ def hpc_run(args):
     num_epochs = 150
     batch_size = 32
 
+    hpcrun = MarccHPC()
+
     # for testpat in all÷_patients:
     testpatdir = os.path.join(output_data_dir, testpat)
     print("Our maint directory to save for loo exp: ", testpatdir)
     print(train_data_dir, test_data_dir)
     # get the datasets
-    train_dataset, test_dataset = load_data(train_data_dir, test_data_dir, 
+    train_dataset, test_dataset = hpcrun.load_data(train_data_dir, test_data_dir, 
                             data_procedure=data_procedure, 
                             testpat=testpat, training_pats=training_patients)
 
@@ -87,15 +89,19 @@ def hpc_run(args):
     n_colors = train_dataset.n_colors
             
     # create model
-    model = createmodel(num_classes, imsize, n_colors)
+    model = hpcrun.createmodel(num_classes, imsize, n_colors)
+    # extract the actual model from the object
+    model = model.net
     print("Image size is {} with {} colors".format(imsize, n_colors))
     print("Model is: {}".format(model))
+    print("Model summary: {}".format(model.summary()))
     
     # train model
-    trainer = trainmodel(model, train_dataset, test_dataset,
+    trainer = hpcrun.trainmodel(model=model, num_epochs=num_epochs, batch_size=batch_size, 
+                        train_dataset=train_dataset, test_dataset=test_dataset,
                         testpatdir=testpatdir,  expname=expname)
     # test and save model
-    trainer = testmodel(trainer, modelname)
+    trainer = hpcrun.testmodel(trainer, modelname)
 
 if __name__ == '__main__':
     args = parser.parse_args()
