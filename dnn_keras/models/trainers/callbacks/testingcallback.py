@@ -36,14 +36,13 @@ class MetricsCallback(Callback):
         loss, acc = self.model.evaluate(x, y, verbose=0)
         predicted_probs = self.model.predict(x)
         predicted_probs_positive = predicted_probs[:,1]
-        print(y.shape)
-        print(ytrue.shape)
-        print(predicted_probs.shape)
+        # compute the predicted classes
+        predicted = self.model.predict_classes(x)
             
         # compute roc_auc scores using the predicted probabilties
         self.metrics.compute_roc(ytrue, predicted_probs_positive)
         # extract the receiver operating curve statistics
-        fpr, tpr, thresholds = metrics.roc 
+        fpr, tpr, thresholds = self.metrics.roc 
         self.fpr.append(fpr)
         self.tpr.append(tpr)
         self.thresholds.append(thresholds)
@@ -51,10 +50,7 @@ class MetricsCallback(Callback):
         # compute the AUC score
         self.aucs.append(roc_auc_score(ytrue, predicted_probs_positive))
 
-        # compute the predicted classes
-        predicted = self.model.predict_classes(x)
-
-        metrics.compute_metrics(ytrue, predicted)
+        self.metrics.compute_metrics(ytrue, predicted)
         print('Testing loss: {}, acc: {}'.format(loss, acc))
         print('Mean accuracy score: {}'.format(self.metrics.accuracy))
         print('Recall: {}'.format(self.metrics.recall))
