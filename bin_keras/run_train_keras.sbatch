@@ -39,7 +39,7 @@ echo "Number of CUDA available devices: ${CUDA_VISIBLE_DEVICES}"
 ################### SETUP SINGULARITY CONTAINER  ####################
 # redefine SINGULARITY_HOME to mount current working directory to base $HOME
 export SINGULARITY_HOME=$PWD:/home/$USER
-singularity pull --name tensorflow.simg shub://marcc-hpc/python3-keras-tensorflow
+singularity pull --name tensorflow.simg shub://adam2392/deeplearning_hubs:keras
 
 echo $PWD
 echo "Running training model"
