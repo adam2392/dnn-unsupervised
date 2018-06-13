@@ -44,7 +44,7 @@ class TestDataset(object):
     def n_colors(self):
         return self.X_train.shape[3]
 
-class ReaderImgDataset(object):
+class BaseLoader(object):
     root_dir = None
     patients = None
     testfilepaths = None
