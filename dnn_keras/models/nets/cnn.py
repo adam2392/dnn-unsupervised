@@ -19,7 +19,7 @@ from keras.layers import Conv1D, Conv2D, Conv3D
 from keras.layers import MaxPooling1D, MaxPooling2D, MaxPooling3D
 from keras.layers import AveragePooling1D, AveragePooling2D
 # for general NN behavior
-from keras.layers import Dense, Dropout, Flatten, LeakyReLU
+from keras.layers import Dense, Dropout, Flatten, ReLU, BatchNormalization
 from keras.layers import Input, Concatenate, Permute, Reshape
 
 import pprint
@@ -90,8 +90,15 @@ class iEEGCNN(BaseNet):
                                       dilation_rate=self.dilation,
                                       kernel_initializer=kernel_init,
                                       activation='linear'))
-        self.net.add(LeakyReLU(alpha=0.1))
-        # self.net.add(BatchNorm())
+        # self.net.add(LeakyReLU(alpha=0.1))
+        self.net.add(BatchNormalization(axis=-1, momentum=0.99, 
+            epsilon=0.001, center=True, scale=True, 
+            beta_initializer='zeros', gamma_initializer='ones', 
+            moving_mean_initializer='zeros', moving_variance_initializer='ones', 
+            beta_regularizer=None, gamma_regularizer=None, 
+            beta_constraint=None, gamma_constraint=None))
+        self.net.add(ReLU())
+        
 
     def _build_vgg(self):
         '''

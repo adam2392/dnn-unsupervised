@@ -64,7 +64,7 @@ class MarccHPC(BaseHPC):
         trainer.configure()
         # Train the model
         trainer.train()
-        print(model.net)
+        print(model)
         print("Training on {} ".format(device))
         print("Training object: {}".format(trainer))
         return trainer
