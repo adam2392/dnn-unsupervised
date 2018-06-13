@@ -73,6 +73,7 @@ def hpc_run(args):
     num_epochs = 150
     batch_size = 32
 
+    # initialize hpc trainer object
     hpcrun = MarccHPC()
 
     # for testpat in all÷_patients:

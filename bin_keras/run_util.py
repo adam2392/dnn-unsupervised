@@ -11,6 +11,10 @@ from dnn_keras.io.readerimgdataset import ReaderImgDataset
 import dnn_keras.base.constants.model_constants as constants
 
 class MarccHPC(BaseHPC):
+    '''
+    An implementation specifcally for our MARCC HPC runner that
+    impelements the basehpc functions.
+    '''
     @staticmethod
     def load_data(traindir, testdir, data_procedure='loo', testpat=None, training_pats=None):
         '''
@@ -46,7 +50,7 @@ class MarccHPC(BaseHPC):
     def trainmodel(model, num_epochs, batch_size, train_dataset, test_dataset, 
                         testpatdir, expname, device=None):
         if device is None:
-            devices = self.get_available_gpus()
+            devices = super(MarccHPC, MarccHPC).get_available_gpus()
         if len(devices) > 0:
             print("Let's use {} GPUs!".format(len(devices)))
             # make the model parallel
