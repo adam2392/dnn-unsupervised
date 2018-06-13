@@ -5,6 +5,7 @@ from keras.utils.training_utils import multi_gpu_model
 
 # Custom Built libraries
 import dnn_keras
+from dnn_keras.base.implementation.base import BaseHPC
 from dnn_keras.models.nets.cnn import iEEGCNN
 from dnn_keras.io.readerimgdataset import ReaderImgDataset 
 import dnn_keras.base.constants.model_constants as constants
@@ -19,10 +20,6 @@ def load_data(traindir, testdir, data_procedure='loo', testpat=None, training_pa
     If LOO training, then we have to trim these into 
     their separate filelists
     '''
-        data_procedure = 'loo'
-    testpat = 'id001_bt'
-    traindir = os.path.expanduser('~/Downloads/tngpipeline/freq/fft_img/')
-    testdir = traindir
     # initialize reader to get the training/testing data
     reader = ReaderImgDataset()
     reader.loadbydir(traindir, testdir, procedure=data_procedure, testname=testpat)
