@@ -70,7 +70,7 @@ def hpc_run(args):
     num_classes = 2
     data_procedure='loo'
     # training parameters 
-    num_epochs = 150
+    num_epochs = 2
     batch_size = 32
 
     # initialize hpc trainer object
