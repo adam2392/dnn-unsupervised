@@ -206,7 +206,7 @@ class CNNTrainer(BaseTrainer):
                               callbacks=self.callbacks)
         else:
             print('Using real-time data augmentation.')
-            # self.generator.fit(X_train)
+            self.generator.fit(self.train_dataset.X_train)
             HH = self.model.fit_generator(self.generator.flow(self.train_dataset.X_train, self.train_dataset.y_train, 
                                                                 batch_size=self.batch_size),
                                         steps_per_epoch=self.steps_per_epoch,
