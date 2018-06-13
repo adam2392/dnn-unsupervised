@@ -30,6 +30,7 @@ class MetricsCallback(Callback):
         # access the validatian data
         x = self.validation_data[0]
         y = self.validation_data[1]
+        ytrue = np.argmax(y, axis=1)
 
         # compute loss, and accuracy of model
         loss, acc = self.model.evaluate(x, y, verbose=0)
@@ -46,7 +47,6 @@ class MetricsCallback(Callback):
 
         # compute the predicted classes
         predicted = self.model.predict_classes(x)
-        ytrue = np.argmax(y, axis=1)
 
         metrics.compute_metrics(ytrue, predicted)
         print('Testing loss: {}, acc: {}'.format(loss, acc))
