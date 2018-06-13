@@ -4,12 +4,12 @@ import numpy as np
 import json
 import pandas as pd
 from enum import Enum
-from dnn_keras.base.utils.data_structures_utils import reg_dict, formal_repr, \
+from dnn.base.utils.data_structures_utils import reg_dict, formal_repr, \
     sort_dict, labels_to_inds
-import dnn_keras.base.constants.model_constants as constants
+import dnn.base.constants.model_constants as constants
 
-from dnn_keras.base.constants.config import Config
-from dnn_keras.base.utils.log_error import initialize_logger
+from dnn.base.constants.config import Config
+from dnn.base.utils.log_error import initialize_logger
 
 # np.random.seed(123)
 from sklearn.preprocessing import scale

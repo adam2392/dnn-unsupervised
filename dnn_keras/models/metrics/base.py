@@ -1,9 +1,9 @@
 # Imports necessary for this function
-from dnn_pytorch.base.constants.config import Config
-from dnn_pytorch.base.utils.log_error import initialize_logger
-from dnn_pytorch.base.utils.data_structures_utils import reg_dict, formal_repr, \
+from dnn_keras.base.constants.config import Config
+from dnn_keras.base.utils.log_error import initialize_logger
+from dnn_keras.base.utils.data_structures_utils import reg_dict, formal_repr, \
     sort_dict, NumpyEncoder
-import dnn_pytorch.base.constants.model_constants as constants
+import dnn_keras.base.constants.model_constants as constants
 
 
 class BaseMetric(object):

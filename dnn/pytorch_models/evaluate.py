@@ -4,7 +4,6 @@ import os
 import numpy as np
 import torch
 
-
 def evaluate(model, device, loss_fn, data_iterator, metrics, num_steps):
     """Evaluate the model on `num_steps` batches.
     Args:

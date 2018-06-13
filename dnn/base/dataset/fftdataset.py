@@ -4,10 +4,10 @@ import numpy as np
 
 # Ignore warnings
 import warnings
-from dnn_keras.util import augmentations
-from dnn_keras.base.constants.config import Config
-from dnn_keras.base.utils.log_error import initialize_logger
-import dnn_keras.base.constants.model_constants as constants
+from dnn.util import augmentations
+from dnn.base.constants.config import Config
+from dnn.base.utils.log_error import initialize_logger
+import dnn.base.constants.model_constants as constants
 
 class FFT2DImageDataset(Dataset):
     '''

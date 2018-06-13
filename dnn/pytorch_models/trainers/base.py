@@ -1,10 +1,9 @@
 import torch
 import numpy as np 
-from dnn_pytorch.base.constants.config import Config, OutputConfig
-from dnn_pytorch.base.utils.log_error import initialize_logger
-import dnn_pytorch.base.constants.model_constants as constants
-
-from dnn_pytorch.models.metrics.classifier import BinaryClassifierMetric
+from dnn.base.constants.config import Config, OutputConfig
+from dnn.base.utils.log_error import initialize_logger
+import dnn.base.constants.model_constants as constants
+from dnn.pytorch_models.metrics.classifier import BinaryClassifierMetric
 
 class TrainMetrics(object):
     # metrics

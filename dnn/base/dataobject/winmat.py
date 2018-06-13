@@ -1,8 +1,8 @@
 # coding=utf-8
 
 import numpy as np
-from dnn_keras.base.utils.data_structures_utils import reg_dict, formal_repr, sort_dict, labels_to_inds
-from dnn_keras.base.computations.math_utils import normalize_weights
+from dnn.base.utils.data_structures_utils import reg_dict, formal_repr, sort_dict, labels_to_inds
+from dnn.base.computations.math_utils import normalize_weights
 
 
 class WinmatH5Field(object):

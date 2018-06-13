@@ -7,8 +7,8 @@ import numpy
 import zipfile
 import scipy.io
 import os
-from dnn_pytorch.base.dataobjects.connectivity import Connectivity
-from dnn_pytorch.base.utils.log_error import initialize_logger
+from dnn.base.dataobjects.connectivity import Connectivity
+from dnn.base.utils.log_error import initialize_logger
 
 '''
 

@@ -1,10 +1,10 @@
 import os
 import numpy as np
-import dnn_keras
+import dnn
 from datetime import datetime
 
 class GenericConfig(object):
-    _module_path = os.path.dirname(dnn_keras.__file__)
+    _module_path = os.path.dirname(dnn.__file__)
 
 def walkdir(directory):
     filepaths = []

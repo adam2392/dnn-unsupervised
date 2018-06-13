@@ -5,18 +5,16 @@ from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 from keras.preprocessing.image import ImageDataGenerator
 
-import sys
-sys.path.append('/Users/adam2392/Documents/dnn-unsupervised')
-import dnn_keras
-import dnn_keras.base.constants.model_constants as MODEL_CONSTANTS
-from dnn_keras.models.trainers.base import BaseTrainer
-from dnn_keras.models.trainers.callbacks.testingcallback import MetricsCallback
-from dnn_keras.models.trainers.util.augmentations import Augmentations 
+import dnn
+import dnn.base.constants.model_constants as MODEL_CONSTANTS
+from dnn.keras_models.trainers.base import BaseTrainer
+from dnn.keras_models.trainers.callbacks.testingcallback import MetricsCallback
+from dnn.keras_models.util.keras.augmentations import Augmentations 
 
 
-from dnn_keras.models.metrics.classifier import BinaryClassifierMetric
-from dnn_keras.base.constants.config import Config, OutputConfig
-from dnn_keras.models.regularizer.post_class_regularizer import Postalarm
+from dnn.keras_models.metrics.classifier import BinaryClassifierMetric
+from dnn.base.constants.config import Config, OutputConfig
+from dnn.keras_models.regularizer.post_class_regularizer import Postalarm
 # import tensorboardX  # import SummaryWriter
 # from tqdm import trange
 
@@ -240,9 +238,9 @@ class CNNTrainer(BaseTrainer):
             preprocessing_function=Augmentations.preprocess_imgwithnoise)
 
 if __name__ == '__main__':
-    from dnn_keras.models.nets.cnn import iEEGCNN
-    from dnn_keras.io.readerimgdataset import ReaderImgDataset 
-    import dnn_keras.base.constants.model_constants as constants
+    from dnn.keras_models.nets.cnn import iEEGCNN
+    from dnn.io.readerimgdataset import ReaderImgDataset 
+    import dnn.base.constants.model_constants as constants
 
     data_procedure = 'loo'
     testpat = 'id001_bt'

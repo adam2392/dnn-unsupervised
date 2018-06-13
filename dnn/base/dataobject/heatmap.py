@@ -2,20 +2,20 @@
 
 import numpy as np
 from enum import Enum
-from dnn_keras.base.utils.data_structures_utils import reg_dict, formal_repr, \
+from dnn.base.utils.data_structures_utils import reg_dict, formal_repr, \
     sort_dict, labels_to_inds
-from dnn_keras.base.computations.math_utils import normalize_weights
-from dnn_keras.base.model.fragilitymodel import FragilityModel
-import dnn_keras.base.constants.model_constants as constants
+from dnn.base.computations.math_utils import normalize_weights
+from dnn.base.model.fragilitymodel import FragilityModel
+import dnn.base.constants.model_constants as constants
 
 
 class HeatmapTypes(Enum):
-    TYPE_FRAGILITY = 'dnn_keras'
+    TYPE_FRAGILITY = 'dnn'
     TYPE_POWERSPECT = "POWERSPECTRUM"
 
 
 class HeatmapH5Field(object):
-    dnn_keras = "dnn_keras"
+    dnn = "dnn"
     LABELS = "region_labels"
 
 
@@ -25,7 +25,7 @@ class Heatmap(object):
 
     file_path = None
     matrix_over_time = None
-    dnn_keras = None
+    dnn = None
     minnorm_perturbation = None
     labels = None
     locations = None
@@ -49,7 +49,7 @@ class Heatmap(object):
         #     self.freqband = freqband
         # elif h_type is TYPE_FRAGILITY:
         self.minnorm_perturbation = matrix_over_time
-        self.dnn_keras = FragilityModel.compute_fragilitymetric(
+        self.dnn = FragilityModel.compute_fragilitymetric(
             minnorm_perturbation)
 
     @property
@@ -58,7 +58,7 @@ class Heatmap(object):
 
     def __repr__(self):
         d = {"f. minimum norm perturbation": reg_dict(self.minnorm_perturbation, self.labels),
-             "g. dnn_keras": reg_dict(self.dnn_keras, self.labels),
+             "g. dnn": reg_dict(self.dnn, self.labels),
              "a. labels": reg_dict(self.labels),
              "b. locations": reg_dict(self.locations, self.labels)}
         return formal_repr(self, sort_dict(d))

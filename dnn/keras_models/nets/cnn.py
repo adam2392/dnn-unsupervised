@@ -5,8 +5,8 @@ import numpy as np
 import tensorflow as tf
 import keras
 
-from dnn_keras.models.nets.base import BaseNet
-import dnn_keras.base.constants.model_constants as MODEL_CONSTANTS
+from dnn.keras_models.nets.base import BaseNet
+import dnn.base.constants.model_constants as MODEL_CONSTANTS
 
 from keras import Model
 # import high level optimizers, models and layers

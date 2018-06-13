@@ -5,16 +5,16 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import LambdaLR, StepLR, ReduceLROnPlateau
 
-from dnn_pytorch.models.trainers.base import BaseTrainer
-from dnn_pytorch.util import utils
-from dnn_pytorch.models.evaluate import evaluate
-from dnn_pytorch.models.metrics.classifier import BinaryClassifierMetric
-import dnn_pytorch.base.constants.model_constants as constants
+from dnn.pytorch_models.trainers.base import BaseTrainer
+from dnn.util import utils
+from dnn.pytorch_models.evaluate import evaluate
+from dnn.pytorch_models.metrics.classifier import BinaryClassifierMetric
+import dnn.base.constants.model_constants as constants
 
-from dnn_pytorch.base.constants.config import Config, OutputConfig
-from dnn_pytorch.models.regularizer.post_class_regularizer import Postalarm
+from dnn.base.constants.config import Config, OutputConfig
+from dnn.pytorch_models.regularizer.post_class_regularizer import Postalarm
 
-from dnn_pytorch.models.trainers.history import history
+from dnn.pytorch_models.trainers.history import history
 # import tensorboardX  # import SummaryWriter
 # from tqdm import trange
 
@@ -407,7 +407,7 @@ class CNNTrainer(BaseTrainer):
         torch.save(self.net.state_dict(), resultfilename)
 
 if __name__ == '__main__':
-    from dnn_pytorch.models.nets.cnn import ConvNet
+    from dnn.pytorch_models.nets.cnn import ConvNet
     from torchsummary import summary
     num_classes = 2
     imsize = 32

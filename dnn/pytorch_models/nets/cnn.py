@@ -2,9 +2,9 @@ import torch
 import torch.nn as nn
 import sys
 sys.path.append('../../../')
-from dnn_pytorch.util.layer import Flatten, PrintLayer
-from dnn_pytorch.base.constants.config import Config
-from dnn_pytorch.base.utils.log_error import initialize_logger
+from dnn.util.pytorch.layer import Flatten, PrintLayer
+from dnn.base.constants.config import Config
+from dnn.base.utils.log_error import initialize_logger
 
 class ConvNet(nn.Module):
     imsize = None

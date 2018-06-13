@@ -1,6 +1,6 @@
 import numpy as np
-from dnn_pytorch.base.constants.config import Config, OutputConfig
-from dnn_pytorch.base.utils.log_error import initialize_logger
+from dnn.base.constants.config import Config, OutputConfig
+from dnn.base.utils.log_error import initialize_logger
 
 
 class Postalarm(object):

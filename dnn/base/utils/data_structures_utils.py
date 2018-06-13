@@ -5,8 +5,8 @@ import numpy as np
 import json
 from collections import OrderedDict
 from copy import deepcopy
-from dnn_keras.base.utils.log_error import raise_value_error, raise_import_error, initialize_logger
-from dnn_keras.base.constants.config import CalculusConfig
+from dnn.base.utils.log_error import raise_value_error, raise_import_error, initialize_logger
+from dnn.base.constants.config import CalculusConfig
 
 logger = initialize_logger(__name__)
 

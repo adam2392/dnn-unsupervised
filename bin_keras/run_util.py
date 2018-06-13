@@ -7,6 +7,7 @@ from keras.utils.training_utils import multi_gpu_model
 import dnn_keras
 from dnn_keras.base.implementation.base import BaseHPC
 from dnn_keras.models.nets.cnn import iEEGCNN
+from dnn_keras.models.trainers.cnn import CNNTrainer
 from dnn_keras.io.readerimgdataset import ReaderImgDataset 
 import dnn_keras.base.constants.model_constants as constants
 

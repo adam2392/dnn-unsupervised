@@ -1,10 +1,10 @@
 import numpy as np 
-from dnn_keras.base.constants.config import Config, OutputConfig
-from dnn_keras.base.utils.log_error import initialize_logger
-import dnn_keras.base.constants.model_constants as constants
+from dnn.base.constants.config import Config, OutputConfig
+from dnn.base.utils.log_error import initialize_logger
+import dnn.base.constants.model_constants as constants
 
-from dnn_keras.models.metrics.classifier import BinaryClassifierMetric
-from dnn_keras.base.utils.data_structures_utils import NumpyEncoder
+from dnn.keras_models.metrics.classifier import BinaryClassifierMetric
+from dnn.base.utils.data_structures_utils import NumpyEncoder
 import os
 import json
 import pickle

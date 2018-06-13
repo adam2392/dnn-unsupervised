@@ -1,9 +1,9 @@
 from abc import ABCMeta, abstractmethod
 from keras.layers import TimeDistributed, Dense, Dropout, Flatten
 
-from dnn_keras.base.utils.data_structures_utils import NumpyEncoder
-from dnn_keras.base.constants.config import Config
-from dnn_keras.base.utils.log_error import initialize_logger
+from dnn.base.utils.data_structures_utils import NumpyEncoder
+from dnn.base.constants.config import Config
+from dnn.base.utils.log_error import initialize_logger
 
 import sklearn
 import json
