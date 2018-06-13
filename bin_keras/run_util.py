@@ -51,7 +51,7 @@ class MarccHPC(BaseHPC):
                         testpatdir, expname, device=None):
         if device is None:
             devices = super(MarccHPC, MarccHPC).get_available_gpus()
-        if len(devices) > 0:
+        if len(devices) > 1:
             print("Let's use {} GPUs!".format(len(devices)))
             # make the model parallel
             model = multi_gpu_model(model, gpus=len(devices))
