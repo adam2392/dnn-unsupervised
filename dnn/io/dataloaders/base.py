@@ -22,10 +22,14 @@ class TrainDataset(object):
 
     @property
     def imsize(self):
+        if isinstance(self.X_train, list):
+            return self.X_train[0].shape[2]
         return self.X_train.shape[2]
 
     @property
     def n_colors(self):
+        if isinstance(self.X_train, list):
+            return self.X_train[0].shape[3]
         return self.X_train.shape[3]
 
 class TestDataset(object):
@@ -38,11 +42,15 @@ class TestDataset(object):
 
     @property
     def imsize(self):
-        return self.X_train.shape[2]
+        if isinstance(self.X_test, list):
+            return self.X_test[0].shape[2]
+        return self.X_test.shape[2]
 
     @property
     def n_colors(self):
-        return self.X_train.shape[3]
+        if isinstance(self.X_test, list):
+            return self.X_test[0].shape[3]
+        return self.X_test.shape[3]
 
 class BaseLoader(object):
     root_dir = None
@@ -75,14 +83,6 @@ class BaseLoader(object):
         # lower sample by casting to 32 bits
         images = images.astype("float32")
         return images
-
-    @property
-    def imsize(self):
-        return self.train_dataset.X_train.shape[2]
-
-    @property
-    def n_colors(self):
-        return self.train_dataset.X_train.shape[3]
 
     def getchanstats(self, chanaxis=3):
         '''

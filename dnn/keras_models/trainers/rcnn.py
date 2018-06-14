@@ -10,6 +10,7 @@ import dnn.base.constants.model_constants as MODEL_CONSTANTS
 from dnn.keras_models.trainers.base import BaseTrainer
 from dnn.keras_models.trainers.callbacks.testingcallback import MetricsCallback
 from dnn.util.keras.augmentations import Augmentations 
+from dnn.util.generators.imgseq.generator import ImageSeqDataGenerator
 
 from dnn.keras_models.metrics.classifier import BinaryClassifierMetric
 from dnn.base.constants.config import Config, OutputConfig
@@ -23,7 +24,7 @@ seed(1)
 from tensorflow import set_random_seed
 set_random_seed(2)
 
-class CNNTrainer(BaseTrainer):
+class RCNNTrainer(BaseTrainer):
     metric_comp = BinaryClassifierMetric()
     post_regularizer = None
     HH = None
@@ -86,28 +87,6 @@ class CNNTrainer(BaseTrainer):
         if not os.path.exists(self.outputdatadir):
             os.makedirs(self.outputdatadir)
 
-    def saveoutput(self, modelname):
-        modeljson_filepath = os.path.join(self.outputdatadir, modelname + "_model.json")
-        history_filepath = os.path.join(
-            self.outputdatadir,  modelname + '_history' + '.pkl')
-        finalweights_filepath = os.path.join(
-            self.outputdatadir, modelname + '_final_weights' + '.h5')
-        self._saveoutput(modeljson_filepath, history_filepath, finalweights_filepath)
-
-    def savemetricsoutput(self, modelname):
-        metricsfilepath = os.path.join(self.outputdatadir, modelname+ "_metrics.json")
-        auc = self.metrichistory.aucs
-        fpr = self.metrichistory.fpr
-        tpr = self.metrichistory.tpr 
-        thresholds = self.metrichistory.thresholds
-        metricdata = {
-            'auc': auc,
-            'fpr': fpr,
-            'tpr': tpr,
-            'thresholds': thresholds,
-        }
-        self._writejsonfile(metricdata, metricsfilepath)
-
     def composedatasets(self, train_dataset, test_dataset):
         self.train_dataset = train_dataset
         self.test_dataset = test_dataset
@@ -118,10 +97,9 @@ class CNNTrainer(BaseTrainer):
         # size of training/testing set
         self.train_size = len(train_dataset)
         self.val_size = len(test_dataset)
+
         self.steps_per_epoch = self.train_size // self.batch_size
 
-        # self.train_size = 2#len(train_dataset_obj)
-        # self.val_size = 2#len(test_dataset_obj)
         self.logger.info(
             "Each training epoch is {} steps and each validation is {} steps.".format(
                 self.train_size, self.val_size))
@@ -130,6 +108,9 @@ class CNNTrainer(BaseTrainer):
         self.logger.info(
             "Image size is {} with {} colors".format(
                 self.imsize, self.n_colors))
+
+    def compose_sequence(self):
+        pass
 
     def configure(self):
         """
@@ -144,12 +125,9 @@ class CNNTrainer(BaseTrainer):
         model_params = {
             'loss': 'binary_crossentropy',
             'optimizer': Adam(lr=1e-5,
-                         beta_1=0.9,
-                         beta_2=0.99,
-                         epsilon=1e-08,
-                         decay=0.0,
-                         amsgrad=True,
-                         clipnorm=clipnorm),
+                         beta_1=0.9, beta_2=0.99,
+                         epsilon=1e-08, decay=0.0,
+                         amsgrad=True, clipnorm=clipnorm),
             'metrics': ['accuracy']
         }
         self.modelconfig = self.model.compile(**model_params)
@@ -184,8 +162,8 @@ class CNNTrainer(BaseTrainer):
     def train(self):
         self._loadgenerator()
 
-        print("Training data: ", self.train_dataset.X_train.shape,  self.train_dataset.y_train.shape)
-        print("Testing data: ",  self.test_dataset.X_test.shape,  self.test_dataset.y_test.shape)
+        print("Training data: ", self.train_dataset.X_train[0].shape,  len(self.train_dataset[0].y_train))
+        print("Testing data: ",  self.test_dataset.X_test[0].shape,  len(self.test_dataset.y_test[0]))
         print("Class weights are: ",  self.train_dataset.class_weight)
         test = np.argmax( self.train_dataset.y_train, axis=1)
         print("class imbalance: ", np.sum(test), len(test))
@@ -194,22 +172,23 @@ class CNNTrainer(BaseTrainer):
         if not self.AUGMENT:
             print('Not using data augmentation. Implement Solution still!')
             HH = self.model.fit( self.train_dataset.X_train,  self.train_dataset.y_train,
-                              # steps_per_epoch=X_train.shape[0] // self.batch_size,
+                              steps_per_epoch=self.steps_per_epoch,
                               batch_size = self.batch_size,
-                              epochs=self.NUM_EPOCHS,
+                              epochs=self.num_epochs,
                               validation_data=(self.test_dataset.X_test, self.test_dataset.y_test),
-                              shuffle=True,
+                              shuffle=self.shuffle,
                               class_weight= self.train_dataset.class_weight,
                               callbacks=self.callbacks)
         else:
             print('Using real-time data augmentation.')
-            # self.generator.fit(X_train)
-            HH = self.model.fit_generator(self.generator.flow(self.train_dataset.X_train, self.train_dataset.y_train, 
-                                                                batch_size=self.batch_size),
+            self.generator.fit(np.array(self.train_dataset.X_train).reshape(-1,self.imsize,self.imsize,self.n_colors))
+            HH = self.model.fit_generator(self.generator.flow(self.train_dataset.X_train, 
+                                                            self.train_dataset.y_train, 
+                                                            batch_size=self.batch_size),
                                         steps_per_epoch=self.steps_per_epoch,
-                                        epochs=self.NUM_EPOCHS,
+                                        epochs=self.num_epochs,
                                         validation_data=(self.test_dataset.X_test, self.test_dataset.y_test),
-                                        shuffle=True,
+                                        shuffle=self.shuffle,
                                         class_weight= self.train_dataset.class_weight,
                                         callbacks=self.callbacks, verbose=2)
 
@@ -233,11 +212,11 @@ class CNNTrainer(BaseTrainer):
             'vertical_flip':True,      # randomly flip images
             'channel_shift_range':4,
             'fill_mode':'nearest',
-            'preprocessing_function':Augmentations.preprocess_imgwithnoise
+            'preprocessing_function': Augmentations.preprocess_imgwithnoise
         }
 
         # This will do preprocessing and realtime data augmentation:
-        self.generator = ImageDataGenerator(**imagedatagen_args)
+        self.generator = ImageSeqDataGenerator(**imagedatagen_args)
 
 if __name__ == '__main__':
     from dnn.keras_models.nets.cnn import iEEGCNN

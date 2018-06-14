@@ -13,6 +13,8 @@ from sklearn.utils import compute_class_weight
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import scale
 
+import tqdm 
+
 class ReaderSeqDataset(BaseLoader):
     root_dir = None
     patients = None
@@ -26,7 +28,7 @@ class ReaderSeqDataset(BaseLoader):
     def __len__(self):
         return len(self.filelist)
 
-    def loadbydir(self, traindir, testdir, procedure='loo', testname=None):
+    def load_filepaths(self, traindir, testdir, procedure='loo', testname=None):
         self.logger.info("Reading testing data directory %s " % testdir)
 
         if procedure == 'loo' and testname is None:
@@ -71,7 +73,7 @@ class ReaderSeqDataset(BaseLoader):
         self.logger.info("Found {} training files and {} testing files.".format(len(self.trainfilepaths), len(self.testfilepaths)))
         self.logger.info("Finished reading in data by directories!")
 
-    def loadfiles(self, filelist=[], mode=constants.TRAIN):
+    def loadfiles_list(self, seqlength, filelist=[], mode=constants.TRAIN):
         if len(filelist) == 0:
             if self.trainfilepaths is not None and mode == constants.TRAIN:
                 filelist = self.trainfilepaths
@@ -87,15 +89,88 @@ class ReaderSeqDataset(BaseLoader):
         else:
             self.logger.info("Loading files from user passed in files!")
 
-        # print(self.trainfilepaths)
-        # print(self.testfilepaths)
-        '''     LOAD DATA      '''
-        # try:
-        # filerange = enumerate(tqdm.trange(filelist))
-        # except Exception as e:
-        filerange = enumerate(filelist)
-        #     print(e)
+        # perform the mining of data thru file list and append to a list 
+        dataset_list = []
+        labels_list = []
+        labels_tmp = []
+        # filerange = enumerate(filelist)
+        filerange = enumerate(tqdm.tqdm(filelist))
 
+        for idx, datafile in filerange:
+            if not datafile.endswith('.npz'):
+                datafile += '.npz'
+            imagedata = np.load(datafile)
+            _image_tensor = imagedata['image_tensor']
+            _ylabels = imagedata['ylabels']
+
+            _image_tensor = self._formatdata(_image_tensor)
+
+            labels_tmp.extend(_ylabels.astype(int).ravel())
+            dataset_list.append(_image_tensor)
+            labels_list.append(_ylabels.astype(int).ravel())
+
+        print(_ylabels.shape)
+        print(_image_tensor.shape)
+        print(dataset_list[0].shape)
+        # form sequences
+        seqdata, seqylabels = self.form_seq_data(dataset_list, labels_list, seqlength=seqlength)
+
+        # compute the class weights
+        class_weight = compute_class_weight('balanced',
+                            np.unique(labels_tmp).astype(int), labels_tmp)
+        if mode == constants.TRAIN:
+            self.train_dataset.X_train = seqdata
+            self.train_dataset.y_train = seqylabels
+            self.train_dataset.class_weight = class_weight
+        elif mode == constants.TEST:
+            self.test_dataset.X_test = seqdata
+            self.test_dataset.y_test = seqylabels
+            self.test_dataset.class_weight = class_weight
+
+    def form_seq_data(self, dataset_list, labels_list, seqlength):
+        assert len(dataset_list) == len(labels_list)
+
+        # initialize return sequence datasets
+        seqdata = []
+        seqylabels = []
+
+        # loop through our list of unformatted data
+        datarange = enumerate(tqdm.tqdm(dataset_list))
+        for idx, dataset in datarange:
+            print(idx)
+            labels = labels_list[idx]
+            assert len(dataset) == len(labels)
+
+            # unpack and format datasets
+            formatted_dataset = list(map(np.array, zip(*(dataset[i:,...] for i in range(seqlength)))))
+            formatted_labels = list(map(list, zip(*(labels[i:] for i in range(seqlength)))))
+
+            # unpack the formatted datasets
+            for i in range(len(formatted_dataset)):
+                seqx = formatted_dataset[i]
+                seqy = formatted_labels[i]
+                seqdata.append(seqx)
+                seqylabels.append(seqy)
+
+        return seqdata, seqylabels
+
+    def loadfiles_arr(self, seqlength, filelist=[], mode=constants.TRAIN):
+        if len(filelist) == 0:
+            if self.trainfilepaths is not None and mode == constants.TRAIN:
+                filelist = self.trainfilepaths
+            elif self.testfilepaths is not None and mode == constants.TEST:
+                filelist = self.testfilepaths
+            else:
+                self.logger.info(
+                    "Mode: {} and filelist: {}".format(
+                        mode, filelist))
+                self.logger.error(
+                    "Need to either load filepaths, or pass in correct mode!")
+            self.logger.info("Loading files from directory!")
+        else:
+            self.logger.info("Loading files from user passed in files!")
+
+        filerange = enumerate(filelist)
         for idx, datafile in filerange:
             if not datafile.endswith('.npz'):
                 datafile += '.npz'
@@ -113,8 +188,6 @@ class ReaderSeqDataset(BaseLoader):
 
                 image_tensors[wins[0]:wins[1], ...] = _image_tensor
                 ylabels[wins[0]:wins[1], ...] = _ylabels
-                # image_tensors = _image_tensor
-                # ylabels = _ylabels
             else:
                 wins = [prevwin, prevwin + _ylabels.shape[0]]
                 prevwin = wins[-1]

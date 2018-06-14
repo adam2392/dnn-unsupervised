@@ -52,6 +52,28 @@ class BaseTrainer(object):
     def _summarize(self, outputs, labels, loss, regularize=False):
         pass
 
+    def savemetricsoutput(self, modelname):
+        metricsfilepath = os.path.join(self.outputdatadir, modelname+ "_metrics.json")
+        auc = self.metrichistory.aucs
+        fpr = self.metrichistory.fpr
+        tpr = self.metrichistory.tpr 
+        thresholds = self.metrichistory.thresholds
+        metricdata = {
+            'auc': auc,
+            'fpr': fpr,
+            'tpr': tpr,
+            'thresholds': thresholds,
+        }
+        self._writejsonfile(metricdata, metricsfilepath)
+
+    def saveoutput(self, modelname):
+        modeljson_filepath = os.path.join(self.outputdatadir, modelname + "_model.json")
+        history_filepath = os.path.join(
+            self.outputdatadir,  modelname + '_history' + '.pkl')
+        finalweights_filepath = os.path.join(
+            self.outputdatadir, modelname + '_final_weights' + '.h5')
+        self._saveoutput(modeljson_filepath, history_filepath, finalweights_filepath)
+
     def _saveoutput(self, modeljson_filepath, history_filepath, finalweights_filepath):
         # save model
         if not os.path.exists(modeljson_filepath):
@@ -65,9 +87,11 @@ class BaseTrainer(object):
         # save history
         with open(history_filepath, 'wb') as file_pi:
             pickle.dump(self.HH.history, file_pi)
-
+        print("saved history file!")
+        
         # save final weights
         self.model.save(finalweights_filepath)
+        print("saved final weights file!")
 
     def _writejsonfile(self, metadata, metafilename):
         with io.open(metafilename, 'w', encoding='utf8') as outfile:

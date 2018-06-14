@@ -83,12 +83,12 @@ class BaseNet(metaclass=ABCMeta):
         if not os.path.exists(modeljson_filepath):
             # serialize model to JSON
             model_json = self.net.to_json()
-            with open(modeljsonfile, "w", encoding="utf8") as json_file:
+            with open(modeljsonfile_filepath, "w", encoding="utf8") as json_file:
                 json_file.write(model_json)
             print("Saved model to disk")
 
         # save history
-        with open(historyfile, 'wb') as file_pi:
+        with open(historyfile_filepath, 'wb') as file_pi:
             pickle.dump(self.HH.history, file_pi)
 
         # save final weights
@@ -111,7 +111,7 @@ class BaseNet(metaclass=ABCMeta):
         self.output = Dense(size_fc, activation='relu')(finalmodel)
         if self.DROPOUT:
             self.output = Dropout(0.5)(self.output)
-        self.output = Dense(size_fc/2, activation='relu')(self.output)
+        self.output = Dense(size_fc//2, activation='relu')(self.output)
         if self.DROPOUT:
             self.output = Dropout(0.5)(self.output)
         self.output = Dense(self.num_classes, activation='softmax')(self.output)

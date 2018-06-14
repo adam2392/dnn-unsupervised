@@ -58,16 +58,16 @@ class BaseTrainer(object):
             # serialize model to JSON
             model_json = self.model.to_json()
             self._writejsonfile(model_json, modeljson_filepath)
-            # with open(modeljson_filepath, "w") as json_file:
-            #     json_file.write(model_json)
-            print("Saved model to disk")
+            print("Saved model to disk!")
 
         # save history
         with open(history_filepath, 'wb') as file_pi:
             pickle.dump(self.HH.history, file_pi)
+        print("saved history to disk!")
 
         # save final weights
         self.model.save(finalweights_filepath)
+        print("saved final weights file!")
 
     def _writejsonfile(self, metadata, metafilename):
         with io.open(metafilename, 'w', encoding='utf8') as outfile:
