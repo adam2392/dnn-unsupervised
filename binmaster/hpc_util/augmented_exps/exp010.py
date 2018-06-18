@@ -1,14 +1,13 @@
-from __future__ import print_function
-print("inside main")
 import sys
 import os
 sys.path.append('/scratch/users/ali39@jhu.edu/dnn-unsupervised/')
-sys.path.append('../../')
 import argparse
-from run_util import MarccHPC
 import shutil
 
+from dnn.execute.hpc_cnnmodel import MarccHPC
+
 parser = argparse.ArgumentParser()
+parser.add_argument('iteration', type=int)
 parser.add_argument('train_data_dir', default='./',
                     help="Directory containing the dataset(s)")
 parser.add_argument('test_data_dir', default='./',
@@ -17,6 +16,8 @@ parser.add_argument('--output_data_dir', default='/scratch/users/ali39@jhu.edu/d
                     help="Directory to save logs")
 parser.add_argument('--log_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/logs/', 
                     help="Directory to save logs")
+parser.add_argument('--augmentdatadir', help="Augmented dataset directory")
+
 parser.add_argument('--patient_to_loo', default='id001_bt',
                     help="Patient to leave one out on.")
 parser.add_argument('--expname', default='_exp_default', 
@@ -26,14 +27,6 @@ parser.add_argument('--model_dir', default='experiments/base_model',
 parser.add_argument('--restore_file', default='best', 
                     help="name of the file in --model_dir \
                      containing weights to load")
-# all_patients = [
-#     'id001_bt',
-#     'id002_sd',
-#     'id003_mg', 'id004_bj', 'id005_ft',
-#     'id006_mr', 'id007_rd', 'id008_dmc',
-#     'id009_ba', 'id010_cmn', 'id011_gr',
-#     'id013_lk', 'id014_vc', 'id015_gjl',
-#     'id016_lm', 'id017_mk', 'id018_lo', 'id020_lma']
 
 # TODO: pass this list into the models to allow it to know
 # how to select directories for training
@@ -55,16 +48,21 @@ training_patients = [
 
 def hpc_run(args):
     # read in the parsed arguments
+    iteration = args.iteration
     testpat = args.patient_to_loo
     log_data_dir = args.log_data_dir
     output_data_dir = args.output_data_dir
     train_data_dir = args.train_data_dir
     test_data_dir = args.test_data_dir
+    augment_data_dir = args.augmentdatadir
     expname = args.expname
 
     print("args are: ", args)
     print("Number of different patients: {}".format(len(training_patients)))
 
+    output_data_dir = os.path.join(output_data_dir, str(iteration))
+    log_data_dir = os.path.join(log_data_dir, str(iteration))
+    
     # parameters for model
     modelname = 'loobasecnn'
     num_classes = 2
@@ -72,20 +70,20 @@ def hpc_run(args):
     # training parameters 
     num_epochs = 150
     batch_size = 32
-    learning_rate = 1e-3 # np.linspace(1e-5, 1e-3, 10)
-
-    # initialize hpc trainer object
-    hpcrun = MarccHPC()
+    learning_rate = np.linspace(1e-5, 1e-3, 10)[iteration]
 
     # for testpat in all÷_patients:
     testpatdir = os.path.join(output_data_dir, testpat)
     print("Our maint directory to save for loo exp: ", testpatdir)
     print(train_data_dir, test_data_dir)
+
+    # initialize hpc trainer object
+    hpcrun = MarccHPC()
     # get the datasets
     train_dataset, test_dataset = hpcrun.load_data(train_data_dir, test_data_dir, 
-                            data_procedure=data_procedure, 
-                            testpat=testpat, training_pats=training_patients)
-
+                                        data_procedure=data_procedure, 
+                                        testpat=testpat, 
+                                        training_pats=training_patients)
     # get the image size and n_colors from the datasets
     imsize = train_dataset.imsize
     n_colors = train_dataset.n_colors
@@ -93,11 +91,7 @@ def hpc_run(args):
     # create model
     model = hpcrun.createmodel(num_classes, imsize, n_colors)
     # extract the actual model from the object
-    model = model.net
-    print("Image size is {} with {} colors".format(imsize, n_colors))
-    print("Model is: {}".format(model))
-    print("Model summary: {}".format(model.summary()))
-    
+    model = model.net    
     # train model
     trainer = hpcrun.trainmodel(model=model, num_epochs=num_epochs, batch_size=batch_size, 
                         train_dataset=train_dataset, test_dataset=test_dataset,
@@ -105,6 +99,10 @@ def hpc_run(args):
     # test and save model
     trainer = hpcrun.testmodel(trainer, modelname)
 
+    print("Image size is {} with {} colors".format(imsize, n_colors))
+    print("Model is: {}".format(model))
+    print("Model summary: {}".format(model.summary()))
+    
 if __name__ == '__main__':
     args = parser.parse_args()
     

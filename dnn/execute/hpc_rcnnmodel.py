@@ -4,12 +4,12 @@ import keras
 from keras.utils.training_utils import multi_gpu_model
 
 # Custom Built libraries
-import dnn_keras
-from dnn_keras.base.implementation.base import BaseHPC
-from dnn_keras.models.nets.cnn import iEEGCNN
-from dnn_keras.models.trainers.cnn import CNNTrainer
-from dnn_keras.io.readerimgdataset import ReaderImgDataset 
-import dnn_keras.base.constants.model_constants as constants
+import dnn
+from dnn.execute.hpc_basemodel import BaseHPC
+import dnn.base.constants.model_constants as constants
+from dnn.keras_models.nets.rcnn import RCNN 
+from dnn.keras_models.trainers.rcnn import RCNNTrainer
+from dnn.io.readerseqdataset import ReaderSeqDataset 
 
 class MarccHPC(BaseHPC):
     '''
@@ -17,17 +17,18 @@ class MarccHPC(BaseHPC):
     impelements the basehpc functions.
     '''
     @staticmethod
-    def load_data(traindir, testdir, data_procedure='loo', testpat=None, training_pats=None):
+    def load_data(trainfilepaths, testfilepaths, seqlen, 
+            data_procedure='loo', testpat=None, training_pats=None):
         '''
         If LOO training, then we have to trim these into 
         their separate filelists
         '''
         # initialize reader to get the training/testing data
-        reader = ReaderImgDataset()
-        reader.loadbydir(traindir, testdir, procedure=data_procedure, testname=testpat)
-        reader.loadfiles(mode=constants.TRAIN)
-        reader.loadfiles(mode=constants.TEST)
-        
+        reader = ReaderSeqDataset()
+        # reader.load_filepaths(traindir, testdir, procedure=data_procedure, testname=testpat)
+        reader.loadfiles_list(seqlen, filelist=trainfilepaths, mode=constants.TRAIN)
+        reader.loadfiles_list(seqlen, filelist=testfilepaths, mode=constants.TEST)
+
         # create the dataset objects
         train_dataset = reader.train_dataset
         test_dataset = reader.test_dataset
@@ -35,21 +36,28 @@ class MarccHPC(BaseHPC):
         return train_dataset, test_dataset
 
     @staticmethod
-    def createmodel(num_classes, imsize, n_colors):
-        # define model
+    def createmodel(num_classes, seqlen, 
+                    imsize, n_colors,
+                    weightsfile, modelfile):
+        # define model parameters
         model_params = {
-            'num_classes': 2,
-            'imsize': 64,
-            'n_colors':4,
+            'name': 'SAME',
+            'seqlen': seqlen,
+            'num_classes': num_classes,
+            'imsize': imsize,
+            'n_colors': n_colors,
         }
-        model = iEEGCNN(**model_params) 
-        model.buildmodel(output=True)
+        model = RCNN(**model_params)
 
+        # load in old model
+        model.loadmodel_file(modelfile, weightsfile)
+        # build the overall model
+        model.buildmodel(output=True)
         return model
 
     @staticmethod
     def trainmodel(model, num_epochs, batch_size, train_dataset, test_dataset, 
-                        testpatdir, expname, device=None):
+                        outputdir, expname, device=None):
         if device is None:
             devices = super(MarccHPC, MarccHPC).get_available_gpus()
         if len(devices) > 1:
@@ -57,15 +65,14 @@ class MarccHPC(BaseHPC):
             # make the model parallel
             model = multi_gpu_model(model, gpus=len(devices))
 
-        trainer = CNNTrainer(model=model, num_epochs=num_epochs, 
+        trainer = RCNNTrainer(model=model, num_epochs=num_epochs, 
                             batch_size=batch_size,
-                            # learning_rate=,
-                            testpatdir=testpatdir)
+                            outputdir=outputdir)
         trainer.composedatasets(train_dataset, test_dataset)
         trainer.configure()
         # Train the model
         trainer.train()
-        print(model)
+        print(model.net.summary())
         print("Training on {} ".format(device))
         print("Training object: {}".format(trainer))
         return trainer

@@ -13,6 +13,8 @@ from sklearn.utils import compute_class_weight
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import scale
 
+ProcedureTypes = ['loo', 'naive']
+
 class ReaderImgDataset(BaseLoader):
     root_dir = None
     patients = None
@@ -48,22 +50,34 @@ class ReaderImgDataset(BaseLoader):
                     # file = file.split('.')[0]
                     if testname not in file and file.endswith('.npz'):
                         self.trainfilepaths.append(os.path.join(root, file))
-        else:
-            ''' Get list of file paths '''
-            self.testfilepaths = []
-            for root, dirs, files in os.walk(testdir):
-                for file in files:
-                    file = file.split('.')[0]
-                    self.testfilepaths.append(os.path.join(root, file))
-            self.testfilepaths.append(os.path.join(root, file))
+        elif procedure == 'naive':
+            from sklearn.model_selection import train_test_split
+            
+            # test and train directory are separate
+            if testdir != traindir:
+                ''' Get list of file paths '''
+                self.testfilepaths = []
+                for root, dirs, files in os.walk(testdir):
+                    for file in files:
+                        file = file.split('.')[0]
+                        self.testfilepaths.append(os.path.join(root, file))
+                self.testfilepaths.append(os.path.join(root, file))
 
-            self.logger.info("Reading training data directory %s " % traindir)
-            ''' Get list of file paths '''
-            self.trainfilepaths = []
-            for root, dirs, files in os.walk(traindir):
-                for file in files:
-                    file = file.split('.')[0]
-                    self.trainfilepaths.append(os.path.join(root, file))
+                self.logger.info("Reading training data directory %s " % traindir)
+                ''' Get list of file paths '''
+                self.trainfilepaths = []
+                for root, dirs, files in os.walk(traindir):
+                    for file in files:
+                        file = file.split('.')[0]
+                        self.trainfilepaths.append(os.path.join(root, file))
+            # test and train directory are the same, so do a train/test split
+            else:
+                allfilepaths = []
+                for root, dirs, files in os.walk(testdir):
+                    for file in files:
+                        file = file.split('.')[0]
+                        allfilepaths.append(os.path.join(root, file))
+                self.trainfilepaths, self.testfilepaths = train_test_split(allfilepaths, test_size=0.33, random_state=42)
 
         self.logger.info("Found {} training files and {} testing files.".format(len(self.trainfilepaths), len(self.testfilepaths)))
         self.logger.info("Finished reading in data by directories!")

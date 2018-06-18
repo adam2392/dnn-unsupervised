@@ -30,13 +30,13 @@ class CNNTrainer(BaseTrainer):
 
     def __init__(self, model, num_epochs=MODEL_CONSTANTS.NUM_EPOCHS, 
                  batch_size=MODEL_CONSTANTS.BATCH_SIZE,
-                 testpatdir=None,
+                 outputdir=None,
                  learning_rate=MODEL_CONSTANTS.LEARNING_RATE,
                  shuffle=MODEL_CONSTANTS.SHUFFLE,
                  augment=MODEL_CONSTANTS.AUGMENT,
                  config=None):
         '''         SET LOGGING DIRECTORIES: MODEL, TENSORBOARD         '''
-        self.testpatdir = testpatdir
+        self.outputdir = outputdir
         super(CNNTrainer, self).__init__(model=model,
                                          config=config)
 
@@ -67,7 +67,7 @@ class CNNTrainer(BaseTrainer):
 
     def _setdirs(self):
         # set where to log outputs of explog
-        if self.testpatdir is None:
+        if self.outputdir is None:
             self.explogdir = os.path.join(
                 self.config.tboard.FOLDER_LOGS, 'traininglogs')
             self.tboardlogdir = os.path.join(
@@ -75,9 +75,9 @@ class CNNTrainer(BaseTrainer):
             self.outputdatadir = os.path.join(
                 self.config.tboard.FOLDER_LOGS, 'output')
         else:
-            self.explogdir = os.path.join(self.testpatdir, 'traininglogs')
-            self.tboardlogdir = os.path.join(self.testpatdir, 'tensorboard')
-            self.outputdatadir = os.path.join(self.testpatdir, 'output')
+            self.explogdir = os.path.join(self.outputdir, 'traininglogs')
+            self.tboardlogdir = os.path.join(self.outputdir, 'tensorboard')
+            self.outputdatadir = os.path.join(self.outputdir, 'output')
 
         if not os.path.exists(self.explogdir):
             os.makedirs(self.explogdir)
@@ -168,9 +168,10 @@ class CNNTrainer(BaseTrainer):
                                     patience=10, 
                                     min_lr=1e-8)
         tboard = keras.callbacks.TensorBoard(log_dir=self.tboardlogdir, 
-                                    histogram_freq=self.num_epochs/10, 
+                                    # histogram_freq=self.num_epochs/10, 
                                     batch_size=self.batch_size, write_graph=True, 
-                                    write_grads=True, write_images=True, 
+                                    write_grads=True, 
+                                    # write_images=True, 
                                     embeddings_freq=0, 
                                     embeddings_layer_names=None, 
                                     embeddings_metadata=None, 
@@ -183,7 +184,6 @@ class CNNTrainer(BaseTrainer):
 
     def train(self):
         self._loadgenerator()
-
         print("Training data: ", self.train_dataset.X_train.shape,  self.train_dataset.y_train.shape)
         print("Testing data: ",  self.test_dataset.X_test.shape,  self.test_dataset.y_test.shape)
         print("Class weights are: ",  self.train_dataset.class_weight)
@@ -269,10 +269,10 @@ if __name__ == '__main__':
 
     num_epochs = 1
     batch_size = 32
-    testpatdir = './'
+    outputdir = './'
     trainer = CNNTrainer(model=model.net, num_epochs=num_epochs, 
                         batch_size=batch_size,
-                        testpatdir=testpatdir)
+                        outputdir=outputdir)
     trainer.composedatasets(train_dataset, test_dataset)
     trainer.configure()
     # Train the model

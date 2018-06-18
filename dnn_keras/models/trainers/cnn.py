@@ -103,11 +103,14 @@ class CNNTrainer(BaseTrainer):
         fpr = self.metrichistory.fpr
         tpr = self.metrichistory.tpr 
         thresholds = self.metrichistory.thresholds
+        roc_metrics = self.metrichistory.roc_metrics
+
         metricdata = {
             'auc': auc,
             'fpr': fpr,
             'tpr': tpr,
             'thresholds': thresholds,
+            'roc_metrics': roc_metrics,
         }
         self._writejsonfile(metricdata, metricsfilepath)
 

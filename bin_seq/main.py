@@ -72,17 +72,24 @@ def hpc_run(args):
     # training parameters 
     num_epochs = 150
     batch_size = 32
-    learning_rate = 1e-3 # np.linspace(1e-5, 1e-3, 10)
+    seqlen = 20
+
+    # direct file path to model and weights
+    cnn_result_dir = '/scratch/users/ali39\@jhu.edu/data/dnn/output/exp001/'
+    cnn_output_dir = os.path.join(cnn_result_dir, testpat, 'output')
+    model_filepath = os.path.join(cnn_output_dir, 'loobasecnn_model.json')
+    weights_filepath = os.path.join(cnn_output_dir, 'loobasecnn_final_weights.h5')
 
     # initialize hpc trainer object
     hpcrun = MarccHPC()
 
     # for testpat in all÷_patients:
     testpatdir = os.path.join(output_data_dir, testpat)
-    print("Our maint directory to save for loo exp: ", testpatdir)
+    print("Our main directory to save for loo exp: ", testpatdir)
     print(train_data_dir, test_data_dir)
     # get the datasets
     train_dataset, test_dataset = hpcrun.load_data(train_data_dir, test_data_dir, 
+                            seqlen=seqlen,
                             data_procedure=data_procedure, 
                             testpat=testpat, training_pats=training_patients)
 
@@ -91,7 +98,9 @@ def hpc_run(args):
     n_colors = train_dataset.n_colors
             
     # create model
-    model = hpcrun.createmodel(num_classes, imsize, n_colors)
+    model = hpcrun.createmodel(num_classes=num_classes, seqlen=seqlen//2, 
+                            imsize=imsize, n_colors=n_colors, 
+                            weightsfile=weights_filepath, modelfile=model_filepath)
     # extract the actual model from the object
     model = model.net
     print("Image size is {} with {} colors".format(imsize, n_colors))

@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.metrics import roc_auc_score 
 from sklearn.metrics import confusion_matrix, classification_report
 
-from dnn.models.metrics.classifier import BinaryClassifierMetric
+from dnn.keras_models.metrics.classifier import BinaryClassifierMetric
 
 class MetricsCallback(Callback):
     def on_train_begin(self, logs={}):
