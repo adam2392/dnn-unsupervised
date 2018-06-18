@@ -118,8 +118,7 @@ class BaseTrainer(object):
         self.metadata = metadata
         return self.metadata
 
-
-    def visualize_filters(self):
+    def visualize_filters(self, epoch):
         from mpl_toolkits.axes_grid1 import make_axes_locatable
         import numpy.ma as ma
         import matplotlib as mpl

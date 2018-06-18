@@ -72,9 +72,9 @@ for i in $(seq 1 10); do
 
 		# build a scavenger job, gpu job, or other job
 		echo "Sbatch should run now"
-		echo $sbatchcomm $exvars ./run_train_keras.sbatch
+		echo $sbatchcomm $exvars ./run_augmentedtrain_keras.sbatch
 
-		${sbatchcomm} $exvars ./run_train_keras.sbatch
+		${sbatchcomm} $exvars ./run_augmentedtrain_keras.sbatch
 		# ${sbatchcomm} $exvars ./run_augmentedtrain_keras.sbatch
 
 		read -p "Continuing in 0.5 Seconds...." -t 0.5
