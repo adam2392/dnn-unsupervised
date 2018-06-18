@@ -56,13 +56,13 @@ for i in $(seq 1 10); do
 
 		# create export commands
 		exvars="--export=logdatadir=${logdatadir},\
-	outputdatadir=${outputdatadir},\
-	traindatadir=${traindatadir},\
-	testdatadir=${testdatadir},\
-	augmentdatadir=${augmentdatadir},\
-	patient=${patient},\
-	iteration=${i},\
-	expname=${expname} "
+outputdatadir=${outputdatadir},\
+traindatadir=${traindatadir},\
+testdatadir=${testdatadir},\
+augmentdatadir=${augmentdatadir},\
+patient=${patient},\
+iteration=${i},\
+expname=${expname} "
 
 		# build a scavenger job, gpu job, or other job
 		# set jobname
