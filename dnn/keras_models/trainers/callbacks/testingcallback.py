@@ -6,6 +6,9 @@ from sklearn.metrics import confusion_matrix, classification_report
 from dnn.keras_models.metrics.classifier import BinaryClassifierMetric
 
 class MetricsCallback(Callback):
+    def __init__(self):
+        super(MetricsCallback, self).__init__()
+        
     def on_train_begin(self, logs={}):
         self.metrics = BinaryClassifierMetric()
         self.aucs = []
