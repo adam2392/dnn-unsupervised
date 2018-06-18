@@ -18,7 +18,25 @@ class MarccHPC(BaseHPC):
     impelements the basehpc functions.
     '''
     @staticmethod
-    def load_data(trainfilepaths, testfilepaths, 
+    def load_data(traindir, testdir, 
+        data_procedure='loo', testpat=None, training_pats=None):
+        '''
+        If LOO training, then we have to trim these into 
+        their separate filelists
+        '''
+        # initialize reader to get the training/testing data
+        reader = ReaderImgDataset()
+        reader.loadbydir(traindir, testdir, procedure=data_procedure, testname=testpat)
+        reader.loadfiles(mode=constants.TRAIN)
+        reader.loadfiles(mode=constants.TEST)
+
+        # create the dataset objects
+        train_dataset = reader.train_dataset
+        test_dataset = reader.test_dataset
+        return train_dataset, test_dataset
+
+    @staticmethod
+    def load_data_files(trainfilepaths, testfilepaths, 
         data_procedure='loo', testpat=None, training_pats=None):
         '''
         If LOO training, then we have to trim these into 
