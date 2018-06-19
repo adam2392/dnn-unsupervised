@@ -23,7 +23,7 @@ ml cuda/9.0
 ml singularity 
 
 # cd to the scratch location 
-cd /scratch/users/$USER/dnn-unsupervised/bin_keras/
+cd /scratch/users/$USER/dnn-unsupervised/binmaster/
 
 ########################## DEBUG OUTPUT  ###########################
 # grep $SLURM_EXPORT_ENV

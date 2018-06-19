@@ -1,3 +1,4 @@
+import numpy as np
 import sys
 import os
 sys.path.append('/scratch/users/ali39@jhu.edu/dnn-unsupervised/')
