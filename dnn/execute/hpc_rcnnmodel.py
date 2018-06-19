@@ -11,13 +11,53 @@ from dnn.keras_models.nets.rcnn import RCNN
 from dnn.keras_models.trainers.rcnn import RCNNTrainer
 from dnn.io.readerseqdataset import ReaderSeqDataset 
 
+
+def build_cnn_model(num_classes, imsize, n_colors, weightsfile):
+    from dnn.keras_models.nets.cnn import iEEGCNN
+
+    # define model
+    model_params = {
+        'num_classes': num_classes,
+        'imsize': imsize,
+        'n_colors': n_colors,
+    }
+    convnet = iEEGCNN(**model_params) 
+    convnet.buildmodel(output=True)
+
+    convnet.net.load_weights(weightsfile)
+    convnet.net.pop()
+    convnet.net.pop()
+    convnet.net.pop()
+    convnet.net.pop()
+    convnet.net.pop()
+    convnet.net.pop()
+    convnet.net.pop()
+    return convnet
 class MarccHPC(BaseHPC):
     '''
     An implementation specifcally for our MARCC HPC runner that
     impelements the basehpc functions.
     '''
     @staticmethod
-    def load_data(trainfilepaths, testfilepaths, seqlen, 
+    def load_data(traindir, testdir, seqlen,
+        data_procedure='loo', testpat=None, training_pats=None):
+        '''
+        If LOO training, then we have to trim these into 
+        their separate filelists
+        '''
+        # initialize reader to get the training/testing data
+        reader = ReaderSeqDataset()
+        reader.load_filepaths(traindir, testdir, procedure=data_procedure, testname=testpat)
+        reader.loadfiles_list(seqlen, mode=constants.TRAIN)
+        reader.loadfiles_list(seqlen, mode=constants.TEST)
+
+        # create the dataset objects
+        train_dataset = reader.train_dataset
+        test_dataset = reader.test_dataset
+        return train_dataset, test_dataset
+
+    @staticmethod
+    def load_data_files(trainfilepaths, testfilepaths, seqlen, 
             data_procedure='loo', testpat=None, training_pats=None):
         '''
         If LOO training, then we have to trim these into 
@@ -49,8 +89,13 @@ class MarccHPC(BaseHPC):
         }
         model = RCNN(**model_params)
 
+        # load new model but with trained weights
+        convnet = build_cnn_model(num_classes, imsize, n_colors, weightsfile)
+        model.loadmodel_net(convnet.net)
+
         # load in old model
-        model.loadmodel_file(modelfile, weightsfile)
+        # model.loadmodel_file(modelfile, weightsfile)
+
         # build the overall model
         model.buildmodel(output=True)
         return model

@@ -1,6 +1,7 @@
 import sys
 import os
 sys.path.append('/scratch/users/ali39@jhu.edu/dnn-unsupervised/')
+sys.path.append(os.path.expanduser('~/Documents/dnn-unsupervised/'))
 import argparse
 import shutil
 
@@ -43,14 +44,29 @@ training_patients = [
     'id013_pg', 
 ]
 
+def local_run(args):
+    testpat = 'id001_bt'
+    output_data_dir = os.path.expanduser('~/Downloads')
+    train_data_dir = os.path.expanduser('~/Downloads/tngpipeline/freq/fft_img/')
+    test_data_dir = train_data_dir
+    expname = 'test'
+
+    cnn_model_dir = os.path.expanduser('~/Downloads/exp001/id001_bt/output/')
+    weightsfile = os.path.join(cnn_model_dir, 'loobasecnn_final_weights.h5')
+    modelfile = os.path.join(cnn_model_dir, 'loobasecnn_model.json')
+
 def hpc_run(args):
     # read in the parsed arguments
     testpat = args.patient_to_loo
     log_data_dir = args.log_data_dir
     output_data_dir = args.output_data_dir
     train_data_dir = args.train_data_dir
+    cnn_model_dir = args.model_dir
     test_data_dir = args.test_data_dir
     expname = args.expname
+
+    weightsfile = os.path.join(cnn_model_dir, patient, 'output', 'loobasecnn_final_weights.h5')
+    modelfile = os.path.join(cnn_model_dir, patient, 'output', 'loobasecnn_model.json')
 
     print("args are: ", args)
     print("Number of different patients: {}".format(len(training_patients)))
@@ -59,6 +75,7 @@ def hpc_run(args):
     modelname = 'loobasecnn'
     num_classes = 2
     data_procedure='loo'
+    seqlen = 20
     # training parameters 
     num_epochs = 150
     batch_size = 32
@@ -72,16 +89,19 @@ def hpc_run(args):
     # initialize hpc trainer object
     hpcrun = MarccHPC()
     # get the datasets
-    train_dataset, test_dataset = hpcrun.load_data(train_data_dir, test_data_dir, 
+    train_dataset, test_dataset = hpcrun.load_data(seqlen,
+                                        train_data_dir, test_data_dir, 
                                         data_procedure=data_procedure, 
                                         testpat=testpat, 
                                         training_pats=training_patients)
     # get the image size and n_colors from the datasets
     imsize = train_dataset.imsize
     n_colors = train_dataset.n_colors
-            
+
     # create model
-    model = hpcrun.createmodel(num_classes, imsize, n_colors)
+    model = hpcrun.createmodel(num_classes=num_classes, seqlen=seqlen//2, 
+                            imsize=imsize, n_colors=n_colors,
+                            weightsfile=weightsfile, modelfile=modelfile)
     # extract the actual model from the object
     model = model.net    
     # train model

@@ -31,6 +31,7 @@ echo "log data dir is : ${logdatadir}"
 echo "Output data dir is: ${outputdatadir}"
 echo "Train data dir is: ${traindatadir}"
 echo "Test data dir is: ${testdatadir}"
+echo "Model weights/model dir is: ${model_dir}"
 echo "Patient to analyze is: ${patient}"
 echo "Iteration is: ${iteration}"
 echo "Number of CUDA available devices: ${CUDA_VISIBLE_DEVICES}"
@@ -46,7 +47,13 @@ echo $PWD
 echo "Running training model"
 
 # run training here in this
-singularity exec -B /scratch/ --nv ./tensorflow.simg python ./hpc_util/baseline_exps/exp_base.py ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}
-# singularity exec -B /scratch/ --nv ./tensorflow.simg python ./hpc_util/augmented_exps/exp010.py ${traindatadir} ${testdatadir} --output_data_dir ${outputdatadir} --log_data_dir ${logdatadir} --patient_to_loo ${patient} --expname ${expname}
+singularity exec -B /scratch/ --nv ./tensorflow.simg python ./hpc_util/baseline_exps/exp_base.py \
+	${traindatadir} ${testdatadir} \
+	--output_data_dir ${outputdatadir} \
+	--log_data_dir ${logdatadir} \
+	--model_dir ${model_dir} \
+	--patient_to_loo ${patient} \
+	--expname ${expname}
+
 
 exit

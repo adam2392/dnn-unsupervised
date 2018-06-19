@@ -30,7 +30,7 @@ testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/pipelin
 # logs for the training logs, and outputdata directory for final summary
 logdatadir="/scratch/users/ali39@jhu.edu/data/dnn/logs/$expname/" 			
 outputdatadir="/scratch/users/ali39@jhu.edu/data/dnn/output/$expname/"
-
+model_dir="/scratch/users/ali39@jhu.edu/data/dnn/output/exp001/"
 augmentdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/tvbsims_new/"
 
 echo "These are the data directories: "
@@ -61,6 +61,7 @@ outputdatadir=${outputdatadir},\
 traindatadir=${traindatadir},\
 testdatadir=${testdatadir},\
 augmentdatadir=${augmentdatadir},\
+model_dir=${model_dir},\
 patient=${patient},\
 iteration=${i},\
 expname=${expname} "
@@ -73,10 +74,10 @@ expname=${expname} "
 
 		# build a scavenger job, gpu job, or other job
 		echo "Sbatch should run now"
-		echo $sbatchcomm $exvars ./run_augmentedtrain_keras.sbatch
-
-		${sbatchcomm} $exvars ./run_augmentedtrain_keras.sbatch
+		echo ${sbatchcomm} $exvars ./run_train_keras.sbatch
+		# echo $sbatchcomm $exvars ./run_augmentedtrain_keras.sbatch
 		# ${sbatchcomm} $exvars ./run_augmentedtrain_keras.sbatch
+		${sbatchcomm} $exvars ./run_train_keras.sbatch
 
 		read -p "Continuing in 0.5 Seconds...." -t 0.5
 		echo "Continuing ...."
