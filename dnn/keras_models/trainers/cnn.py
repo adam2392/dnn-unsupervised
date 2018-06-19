@@ -5,7 +5,6 @@ from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 from keras.preprocessing.image import ImageDataGenerator
 
-import dnn
 import dnn.base.constants.model_constants as MODEL_CONSTANTS
 from dnn.keras_models.trainers.base import BaseTrainer
 from dnn.keras_models.trainers.callbacks.testingcallback import MetricsCallback

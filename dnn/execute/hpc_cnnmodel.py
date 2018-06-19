@@ -9,7 +9,7 @@ from dnn.execute.hpc_basemodel import BaseHPC
 
 import dnn.base.constants.model_constants as constants
 from dnn.keras_models.nets.cnn import iEEGCNN
-from dnn.keras_models.trainers.rcnn import CNNTrainer
+from dnn.keras_models.trainers.cnn import CNNTrainer
 from dnn.io.readerimgdataset import ReaderImgDataset 
 
 class MarccHPC(BaseHPC):
