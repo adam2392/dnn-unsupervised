@@ -89,8 +89,8 @@ def hpc_run(args):
     # initialize hpc trainer object
     hpcrun = MarccHPC()
     # get the datasets
-    train_dataset, test_dataset = hpcrun.load_data(seqlen,
-                                        train_data_dir, test_data_dir, 
+    train_dataset, test_dataset = hpcrun.load_data(train_data_dir, test_data_dir, 
+                                        seqlen=seqlen,
                                         data_procedure=data_procedure, 
                                         testpat=testpat, 
                                         training_pats=training_patients)
