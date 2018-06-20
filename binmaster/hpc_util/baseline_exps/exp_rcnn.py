@@ -65,8 +65,8 @@ def hpc_run(args):
     test_data_dir = args.test_data_dir
     expname = args.expname
 
-    weightsfile = os.path.join(cnn_model_dir, patient, 'output', 'loobasecnn_final_weights.h5')
-    modelfile = os.path.join(cnn_model_dir, patient, 'output', 'loobasecnn_model.json')
+    weightsfile = os.path.join(cnn_model_dir, testpat, 'output', 'loobasecnn_final_weights.h5')
+    modelfile = os.path.join(cnn_model_dir, testpat, 'output', 'loobasecnn_model.json')
 
     print("args are: ", args)
     print("Number of different patients: {}".format(len(training_patients)))
