@@ -122,11 +122,14 @@ class ReaderSeqDataset(BaseLoader):
             self.train_dataset.X_train = seqdata
             self.train_dataset.y_train = seqylabels
             self.train_dataset.class_weight = class_weight
+
+            self.logger.info("Finished setting training data!")
         elif mode == constants.TEST:
             self.test_dataset.X_test = seqdata
             self.test_dataset.y_test = seqylabels
             self.test_dataset.class_weight = class_weight
 
+            self.logger.info("Finished setting testing data!")
     def form_seq_data(self, dataset_list, labels_list, seqlength):
         assert len(dataset_list) == len(labels_list)
 
@@ -137,7 +140,6 @@ class ReaderSeqDataset(BaseLoader):
         # loop through our list of unformatted data
         datarange = enumerate(tqdm.tqdm(dataset_list))
         for idx, dataset in datarange:
-            print(idx)
             labels = labels_list[idx]
             assert len(dataset) == len(labels)
 
