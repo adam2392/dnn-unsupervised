@@ -196,6 +196,7 @@ class RCNNTrainer(BaseTrainer):
         self.metrichistory = self.callbacks[3] 
 
     def _loadgenerator(self):
+        print("Loading generator!")
         imagedatagen_args = {
             'featurewise_center':True,  # set input mean to 0 over the dataset
             'samplewise_center':True,  # set each sample mean to 0

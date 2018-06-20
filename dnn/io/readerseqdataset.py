@@ -109,12 +109,15 @@ class ReaderSeqDataset(BaseLoader):
             dataset_list.append(_image_tensor)
             labels_list.append(_ylabels.astype(int).ravel())
 
-        print(_ylabels.shape)
-        print(_image_tensor.shape)
-        print(dataset_list[0].shape)
         # form sequences
         seqdata, seqylabels = self.form_seq_data(dataset_list, labels_list, seqlength=seqlength)
 
+        print(_ylabels.shape)
+        print(_image_tensor.shape)
+        print(dataset_list[0].shape)
+        print(seqdata.shape)
+        print(seqylabels.shape)
+        
         # compute the class weights
         class_weight = compute_class_weight('balanced',
                             np.unique(labels_tmp).astype(int), labels_tmp)
