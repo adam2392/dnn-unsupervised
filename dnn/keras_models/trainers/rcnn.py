@@ -100,6 +100,7 @@ class RCNNTrainer(BaseTrainer):
 
         self.steps_per_epoch = self.train_size // self.batch_size
 
+        self.logger.info("Our training dataset size is: {}".format(self.train_dataset.X_train.shape))
         self.logger.info(
             "Each training epoch is {} steps and each validation is {} steps.".format(
                 self.train_size, self.val_size))
