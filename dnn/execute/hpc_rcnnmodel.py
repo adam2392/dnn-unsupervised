@@ -33,6 +33,29 @@ def build_cnn_model(num_classes, imsize, n_colors, weightsfile):
     convnet.net.pop()
     convnet.net.pop()
     return convnet
+
+def build_cnn_model_noweights(num_classes, imsize, n_colors):
+    from dnn.keras_models.nets.cnn import iEEGCNN
+
+    # define model
+    model_params = {
+        'num_classes': num_classes,
+        'imsize': imsize,
+        'n_colors': n_colors,
+    }
+    convnet = iEEGCNN(**model_params) 
+    convnet.buildmodel(output=False)
+
+    # convnet.net.load_weights(weightsfile)
+    # convnet.net.pop()
+    # convnet.net.pop()
+    # convnet.net.pop()
+    # convnet.net.pop()
+    # convnet.net.pop()
+    # convnet.net.pop()
+    # convnet.net.pop()
+    return convnet
+
 class MarccHPC(BaseHPC):
     '''
     An implementation specifcally for our MARCC HPC runner that
@@ -90,9 +113,9 @@ class MarccHPC(BaseHPC):
         model = RCNN(**model_params)
 
         # load new model but with trained weights
-        convnet = build_cnn_model(num_classes, imsize, n_colors, weightsfile)
+        convnet = build_cnn_model_noweights(num_classes, imsize, n_colors, weightsfile)
+        
         model.loadmodel_net(convnet.net)
-
         # load in old model
         # model.loadmodel_file(modelfile, weightsfile)
 

@@ -113,7 +113,7 @@ class ReaderSeqDataset(BaseLoader):
         seqdata, seqylabels = self.form_seq_data(dataset_list, labels_list, seqlength=seqlength)
         seqdata = np.array(seqdata)
         seqylabels = np.array(seqylabels)
-        
+
         print(_ylabels.shape)
         print(_image_tensor.shape)
         print(dataset_list[0].shape)
@@ -137,13 +137,14 @@ class ReaderSeqDataset(BaseLoader):
             self.logger.info("Finished setting testing data!")
     def form_seq_data(self, dataset_list, labels_list, seqlength):
         assert len(dataset_list) == len(labels_list)
-
+        print("Forming sequence data for {} length on {} length".format(seqlength, len(dataset_list)))
         # initialize return sequence datasets
         seqdata = []
         seqylabels = []
 
         # loop through our list of unformatted data
-        datarange = enumerate(tqdm.tqdm(dataset_list))
+        datarange = enumerate(dataset_list)
+        # datarange = enumerate(tqdm.tqdm(dataset_list))
         for idx, dataset in datarange:
             labels = labels_list[idx]
             assert len(dataset) == len(labels)

@@ -1,5 +1,8 @@
 from keras.callbacks import Callback
 import numpy as np
+import keras.backend as K
+
+import warnings
 
 class ReducLr(Callback):
     def __init__(self, monitor='val_loss', factor=0.1, patience=10,
@@ -11,10 +14,7 @@ class ReducLr(Callback):
         if factor >= 1.0:
             raise ValueError('ReduceLROnPlateau '
                              'does not support a factor >= 1.0.')
-        if 'epsilon' in kwargs:
-            min_delta = kwargs.pop('epsilon')
-            warnings.warn('`epsilon` argument is deprecated and '
-                          'will be removed, use `min_delta` instead.')
+
         self.factor = factor
         self.min_lr = min_lr
         self.min_delta = min_delta
