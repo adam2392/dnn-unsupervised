@@ -93,8 +93,8 @@ class ReaderSeqDataset(BaseLoader):
         dataset_list = []
         labels_list = []
         labels_tmp = []
-        # filerange = enumerate(filelist)
-        filerange = enumerate(tqdm.tqdm(filelist))
+        filerange = enumerate(filelist)
+        # filerange = enumerate(tqdm.tqdm(filelist))
 
         for idx, datafile in filerange:
             if not datafile.endswith('.npz'):
