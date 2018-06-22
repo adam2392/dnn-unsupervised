@@ -111,7 +111,9 @@ class ReaderSeqDataset(BaseLoader):
 
         # form sequences
         seqdata, seqylabels = self.form_seq_data(dataset_list, labels_list, seqlength=seqlength)
-
+        seqdata = np.array(seqdata)
+        seqylabels = np.array(seqylabels)
+        
         print(_ylabels.shape)
         print(_image_tensor.shape)
         print(dataset_list[0].shape)
