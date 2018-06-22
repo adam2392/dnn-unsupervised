@@ -9,27 +9,33 @@
 
 ################################### 1. READ USER INPUT ###########################################
 patients=(
-'id001_bt')
-#  id002_sd id003_mg
-# id004_bj id005_ft
-# id006_mr id007_rd id008_dmc
-# id009_ba id010_cmn 
-# id011_gr id013_lk id014_vc id015_gjl
-# id016_lm id017_mk id018_lo id020_lma')
+'id001_bt id002_sd id003_mg
+id004_bj id005_ft
+id006_mr id007_rd id008_dmc
+id009_ba id010_cmn 
+id011_gr id013_lk id014_vc id015_gjl
+id016_lm id017_mk id018_lo id020_lma
+
+id001_ac
+id002_cj
+id008_gc id010_js id011_ml
+id012_pc id013_pg')
 
 ## load in the modules for this run -> python, matlab, etc.
 # module unload git
 ml python/3.6.5
 module list
 
-expname="explr"
+expname="exp_win5000_step2500"
 ## For training and modeling with the simulated data
-# traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/exp001/"
-traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/pipeline/"
-testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/pipeline/"
+traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/mne_methods/win5000_step2500"
+testdatadir=$traindatadir
+# traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/pipeline/"
+# testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/pipeline/"
 # logs for the training logs, and outputdata directory for final summary
 logdatadir="/scratch/users/ali39@jhu.edu/data/dnn/logs/$expname/" 			
 outputdatadir="/scratch/users/ali39@jhu.edu/data/dnn/output/$expname/"
+
 model_dir="/scratch/users/ali39@jhu.edu/data/dnn/output/exp001/"
 augmentdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/tvbsims_new/"
 

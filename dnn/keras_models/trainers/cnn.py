@@ -167,7 +167,7 @@ class CNNTrainer(BaseTrainer):
                                     patience=10, 
                                     min_lr=1e-8)
         tboard = keras.callbacks.TensorBoard(log_dir=self.tboardlogdir, 
-                                    # histogram_freq=self.num_epochs/10, 
+                                    histogram_freq=self.num_epochs/5, 
                                     batch_size=self.batch_size, write_graph=True, 
                                     write_grads=True, 
                                     # write_images=True, 

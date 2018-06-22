@@ -48,7 +48,7 @@ echo "Running training model"
 
 # run training here in this
 singularity exec -B /scratch/ --nv ./tensorflow.simg \
-python ./hpc_util/baseline_exps/exp_rcnn.py \
+python ./hpc_util/baseline_exps/exp_base.py \
 	${traindatadir} ${testdatadir} \
 	--output_data_dir ${outputdatadir} \
 	--log_data_dir ${logdatadir} \
