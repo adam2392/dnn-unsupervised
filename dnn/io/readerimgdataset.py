@@ -110,10 +110,16 @@ class ReaderImgDataset(BaseLoader):
         for idx, datafile in filerange:
             if not datafile.endswith('.npz'):
                 datafile += '.npz'
+            # dirname = os.path.dirname(datafile)
+            # jsonfilename = dirname.split('__stftimgmodel')[0] + '_meta.json'
+            
             imagedata = np.load(datafile)
             _image_tensor = imagedata['image_tensor']
             _ylabels = imagedata['ylabels']
 
+            # print(datafile)
+            # print(_image_tensor.shape)
+            # print(_ylabels.shape)
             if idx == 0:
                 image_tensors = np.zeros(
                     (len(filelist) * 1000, *tuple(_image_tensor.shape[1:])))
