@@ -7,23 +7,23 @@ sys.path.append(os.path.expanduser('~/Documents/dnn-unsupervised/'))
 from dnn.execute.hpc_cnnmodel import MarccHPC
 
 parser = argparse.ArgumentParser()
-# parser.add_argument('train_data_dir', default='./',
-#                     help="Directory containing the dataset(s)")
-# parser.add_argument('test_data_dir', default='./',
-#                     help="Directory containing the dataset(s)")
-# parser.add_argument('--output_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/output/', 
-#                     help="Directory to save logs")
-# parser.add_argument('--log_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/logs/', 
-#                     help="Directory to save logs")
-# parser.add_argument('--patient_to_loo', default='id001_bt',
-#                     help="Patient to leave one out on.")
-# parser.add_argument('--expname', default='_exp_default', 
-#                     help="name of the experiment name")
-# parser.add_argument('--model_dir', default='experiments/base_model', 
-#                     help="Directory containing params.json")
-# parser.add_argument('--restore_file', default='best', 
-#                     help="name of the file in --model_dir \
-#                      containing weights to load")
+parser.add_argument('train_data_dir', default='./',
+                    help="Directory containing the dataset(s)")
+parser.add_argument('test_data_dir', default='./',
+                    help="Directory containing the dataset(s)")
+parser.add_argument('--output_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/output/', 
+                    help="Directory to save logs")
+parser.add_argument('--log_data_dir', default='/scratch/users/ali39@jhu.edu/data/dnn/logs/', 
+                    help="Directory to save logs")
+parser.add_argument('--patient_to_loo', default='id001_bt',
+                    help="Patient to leave one out on.")
+parser.add_argument('--expname', default='_exp_default', 
+                    help="name of the experiment name")
+parser.add_argument('--model_dir', default='experiments/base_model', 
+                    help="Directory containing params.json")
+parser.add_argument('--restore_file', default='best', 
+                    help="name of the file in --model_dir \
+                     containing weights to load")
 
 # TODO: pass this list into the models to allow it to know
 # how to select directories for training
