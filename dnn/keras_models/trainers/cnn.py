@@ -206,7 +206,7 @@ class CNNTrainer(BaseTrainer):
             HH = self.model.fit_generator(self.generator.flow(self.train_dataset.X_train, self.train_dataset.y_train, 
                                                                 batch_size=self.batch_size),
                                         steps_per_epoch=self.steps_per_epoch,
-                                        epochs=self.NUM_EPOCHS,
+                                        epochs=self.num_epochs,
                                         validation_data=(self.test_dataset.X_test, self.test_dataset.y_test),
                                         shuffle=True,
                                         class_weight= self.train_dataset.class_weight,
