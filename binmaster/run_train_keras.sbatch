@@ -1,5 +1,6 @@
 #!/bin/bash
 #SBATCH
+#SBATCH --mem=50G
 #SBATCH --mail-type=end
 #SBATCH --mail-user=ali39@jhu.edu
 #SBATCH --output=_out/%A.out 
