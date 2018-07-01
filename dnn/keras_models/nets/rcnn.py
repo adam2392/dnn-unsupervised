@@ -12,7 +12,6 @@ from keras import Model
 from keras.models import Sequential, Model
 from keras.layers import InputLayer
 
-from keras.optimizers import Adam
 # for CNN
 from keras.layers import Conv2D
 from keras.layers import MaxPooling1D, MaxPooling2D, MaxPooling3D

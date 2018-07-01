@@ -1,8 +1,6 @@
 from dnn.base.constants.config import Config
 from dnn.base.utils.log_error import initialize_logger
 from dnn.base.utils.data_structures_utils import NumpyEncoder
-
-
 import numpy as np
 import json
 import io
@@ -11,6 +9,11 @@ try:
     to_unicode = unicode
 except NameError:
     to_unicode = str
+
+from numpy.random import seed
+seed(1)
+from tensorflow import set_random_seed
+set_random_seed(2)
     
 ''' Class wrappers for writing HPC mvar model computations '''
 class BaseHPC(object):

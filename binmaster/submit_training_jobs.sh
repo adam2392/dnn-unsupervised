@@ -26,7 +26,7 @@ id012_pc id013_pg')
 ml python/3.6.5
 module list
 
-expname="exp_win5000_step2500_lr1e-4"
+expname="exp_win5000_step2500_lr1e-1"
 ## For training and modeling with the simulated data
 traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/mne_methods/win5000_step2500"
 testdatadir=$traindatadir
