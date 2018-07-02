@@ -20,29 +20,31 @@ class MetricsCallback(Callback):
     def on_epoch_end(self, epoch, logs={}):
         # access the validatian data
         x = self.validation_data[0]
-        aux_x = x[0]
-        xvec = x[1]
+        aux_x = self.validation_data[0]
+        xvec = self.validation_data[1]
 
-        y = self.validation_data[1]
+        y = self.validation_data[2]
         ytrue = np.argmax(y, axis=1)
 
-        if epoch < 5:
-            print(len(self.validation_data))
-            print(len(y))
-            print(len(x))
-            print(aux_x.shape)
-            print(xvec.shape)
-            print(x.shape)
-            print(y.shape)
+        # if epoch < 5:
+        #     print(len(self.validation_data))
+        #     print(len(y))
+        #     print(len(x))
+        #     print(aux_x.shape)
+        #     print(xvec.shape)
+        #     print(x.shape)
+        #     print(y.shape)
 
 
         # compute loss, and accuracy of model
         loss, acc = self.model.evaluate({'aux_input_layer': aux_x,
                                         'input_layer': xvec}, y, verbose=0)
-        predicted_probs = self.model.predict(x)
+        predicted_probs = self.model.predict({'aux_input_layer': aux_x,
+                                        'input_layer': xvec})
         predicted_probs_positive = predicted_probs[:,1]
         # compute the predicted classes
-        predicted = self.model.predict_classes(x)
+        predicted = self.model.predict_classes({'aux_input_layer': aux_x,
+                                        'input_layer': xvec})
             
         # compute roc_auc scores using the predicted probabilties
         self.metrics.compute_roc(ytrue, predicted_probs_positive)
