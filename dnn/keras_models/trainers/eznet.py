@@ -231,7 +231,7 @@ class EZNetTrainer(BaseTrainer):
                                                             batch_size=self.batch_size),
                                         steps_per_epoch=self.steps_per_epoch,
                                         epochs=self.num_epochs,
-                                        validation_data=([self.test_dataset.X_aux, self.train_dataset.X_chan], self.test_dataset.ylabels),
+                                        validation_data=([self.test_dataset.X_aux, self.test_dataset.X_chan], self.test_dataset.ylabels),
                                         shuffle=self.shuffle,
                                         class_weight= self.train_dataset.class_weight,
                                         callbacks=self.callbacks, verbose=2)

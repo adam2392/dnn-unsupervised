@@ -42,7 +42,7 @@ class CNNTrainer(BaseTrainer):
         self.AUGMENT = augment
 
         self.save_summary_steps = 10
-        self.gradclip_value = 0.25
+        self.gradclip_value = 1.5
 
         # set tensorboard writer
         self._setdirs()  # set directories for all logging
@@ -136,8 +136,7 @@ class CNNTrainer(BaseTrainer):
         clipnorm = 1.
         model_params = {
             'loss': 'binary_crossentropy',
-            'optimizer': Adam(lr=1e-5,
-                         beta_1=0.9,
+            'optimizer': Adam(beta_1=0.9,
                          beta_2=0.99,
                          epsilon=1e-08,
                          decay=0.0,

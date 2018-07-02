@@ -103,6 +103,7 @@ class iEEGCNN(BaseNet):
                                       self.imsize, self.imsize, self.n_colors),
                                       dilation_rate=self.dilation,
                                       kernel_initializer=kernel_init,
+                                      use_bias=False,
                                       activation='linear'))
         # self.net.add(LeakyReLU(alpha=0.1))
         self.net.add(BatchNormalization(axis=-1, momentum=0.99, 
@@ -134,7 +135,7 @@ class iEEGCNN(BaseNet):
         self.net = Sequential()
         # check for weight initialization -> apply Glorotuniform
         if self.w_init is None:
-            self.w_init = [keras.initializers.glorot_uniform()] * sum(self.n_layers)
+            self.w_init = keras.initializers.glorot_uniform()
         self.net.add(InputLayer(input_shape=(
             self.imsize, self.imsize, self.n_colors)))
         # initialize counter to keep track of which weight to assign
@@ -142,7 +143,7 @@ class iEEGCNN(BaseNet):
         # add the rest of the hidden layers
         for idx, n_layer in enumerate(self.n_layers):
             for ilay in range(n_layer):
-                kernel_init = self.w_init[count]
+                kernel_init = self.w_init
                 self._add_vgg_layer(idx, kernel_init)
                 # increment counter to the next weight initializer
                 count += 1

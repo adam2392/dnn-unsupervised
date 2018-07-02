@@ -137,7 +137,7 @@ class AuxNumpyArrayIterator(Iterator):
         # loop through index array to create a batch
         for i, j in enumerate(index_array):
             x = self.x[j]
-            aux_x = self.chanx[j]
+            aux_x = self.chan_x[j]
 
             # make initialization of transformed batches
             transform_x = np.zeros(x.shape)
