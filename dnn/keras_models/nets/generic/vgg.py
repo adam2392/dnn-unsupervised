@@ -29,6 +29,7 @@ class VGG(BaseGenericNet):
                                     self.n_colors),
                         # dilation_rate=dilation_rate,
                         activation='linear',
+                        use_bias=False,
                         name='vgg_conv_{}_relu_s{}'.format(idx, ilay))(x)
 
         x = BatchNormalization(axis=-1, momentum=0.99, 
