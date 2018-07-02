@@ -32,11 +32,15 @@ class MetricsCallback(Callback):
     def on_epoch_end(self, epoch, logs={}):
         # access the validatian data
         x = self.validation_data[0]
+        aux_x = x[0]
+        xvec = x[1]
+
         y = self.validation_data[1]
         ytrue = np.argmax(y, axis=1)
 
         # compute loss, and accuracy of model
-        loss, acc = self.model.evaluate(x, y, verbose=0)
+        loss, acc = self.model.evaluate({'aux_input_layer': aux_x,
+                                        'input_layer': xvec}, y, verbose=0)
         predicted_probs = self.model.predict(x)
         predicted_probs_positive = predicted_probs[:,1]
         # compute the predicted classes

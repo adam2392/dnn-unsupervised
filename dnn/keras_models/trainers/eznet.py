@@ -164,7 +164,6 @@ class EZNetTrainer(BaseTrainer):
                                     histogram_freq=self.num_epochs/5, 
                                     batch_size=self.batch_size, write_graph=True, 
                                     write_grads=True, 
-                                    # write_images=True, 
                                     embeddings_freq=0, 
                                     embeddings_layer_names=None, 
                                     embeddings_metadata=None, 
@@ -174,7 +173,6 @@ class EZNetTrainer(BaseTrainer):
                         reduce_lr,
                         tboard,
                         metrichistory]
-        # self.callbacks = [checkpoint, reduce_lr]
 
     def test(self, modelname):
         def predict_with_uncertainty(f, x, n_iter=10):
