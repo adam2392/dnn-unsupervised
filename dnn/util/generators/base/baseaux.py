@@ -138,24 +138,16 @@ class AuxNumpyArrayIterator(Iterator):
         for i, j in enumerate(index_array):
             x = self.x[j]
             aux_x = self.chan_x[j]
-
-            # make initialization of transformed batches
-            transform_x = np.zeros(x.shape)
-            transform_aux_x = np.zeros(aux_x.shape)
             
             # extract parameters to augment x
             params = self.image_data_generator.get_random_transform(x.shape)
             x = self.image_data_generator.apply_transform(
                 x.astype(K.floatx()), params)
             x = self.image_data_generator.standardize(x)
-            transform_x[idx,...] = x
-            
-            # extract parameters to transform and augment auxiliary chan 
-            transform_aux_x[idx,...] = aux_x
 
-            # assign to batch
-            batch_x[i] = transform_x
-            batch_aux_x[i] = transform_aux_x
+            # assign transformed samples to batch
+            batch_x[i] = x
+            batch_aux_x[i] = aux_x
 
         if self.save_to_dir:
             for i, j in enumerate(index_array):
@@ -173,17 +165,15 @@ class AuxNumpyArrayIterator(Iterator):
         batch_x_miscs = [xx[index_array] for xx in self.x_misc]
         batch_x_aux_miscs = [xx[index_array] for xx in self.x_misc]
 
-        output = (batch_x if batch_x_miscs == []
-                  else [batch_x] + batch_x_miscs,)
-        output += (batch_aux_x if batch_x_aux_miscs == [] else [batch_aux_x] + batch_x_aux_miscs,)
+        output = ([batch_x, batch_aux_x] if batch_x_miscs == []
+                  else [[batch_x] + batch_x_miscs,
+                        [batch_aux_x] + batch_x_aux_miscs],
+                  )
         if self.y is None:
             return output[0]
         output += (self.y[index_array],)
         if self.sample_weight is not None:
             output += (self.sample_weight[index_array],)
-        print(len(output))
-        for i in output:
-            print(i.shape)
         return output
 
     def next(self):

@@ -222,6 +222,25 @@ class EZNetTrainer(BaseTrainer):
                               shuffle=self.shuffle,
                               class_weight= self.train_dataset.class_weight,
                               callbacks=self.callbacks)
+        elif self.AUGMENT=='dir':
+            directory = self.train_directory
+            target_size = (self.length_imsize, self.width_imsize)
+            color_mode = 'grayscale'
+            classes=[0, 1]
+            
+            HH = self.model.fit_generator(self.generator.flow_from_directory(self, directory,
+                                                            target_size=target_size, color_mode=color_mode,
+                                                            classes=None, 
+                                                            class_mode='categorical',
+                                                            batch_size=self.batch_size, 
+                                                            shuffle=self.shuffle, 
+                                                            interpolation='nearest'),
+                                        steps_per_epoch=self.steps_per_epoch,
+                                        epochs=self.num_epochs,
+                                        validation_data=([self.test_dataset.X_aux, self.test_dataset.X_chan], self.test_dataset.ylabels),
+                                        shuffle=self.shuffle,
+                                        class_weight= self.train_dataset.class_weight,
+                                        callbacks=self.callbacks, verbose=2)
         else:
             print('Using real-time data augmentation.')
             # self.generator.fit(X_train)
@@ -258,3 +277,6 @@ class EZNetTrainer(BaseTrainer):
 
         # This will do preprocessing and realtime data augmentation:
         self.generator = AuxImgDataGenerator(**imagedatagen_args)
+
+    def _loadgeneratordir(self):
+        pass
