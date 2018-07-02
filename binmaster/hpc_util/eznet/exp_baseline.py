@@ -142,9 +142,10 @@ def hpc_run(args):
     
     ########################## 3. TRAIN MODEL ##########################
     # train model
-    trainer = hpcrun.trainmodel(model=model, num_epochs=num_epochs, batch_size=batch_size, 
+    trainer = hpcrun.trainmodel(model=model, num_epochs=num_epochs, 
+                        batch_size=batch_size, 
                         train_dataset=train_dataset, test_dataset=test_dataset,
-                        testpatdir=testpatdir,  expname=expname)
+                        outputdir=testpatdir, expname=expname)
     
     ########################## 4. TEST MODEL  ##########################
     # test and save model
