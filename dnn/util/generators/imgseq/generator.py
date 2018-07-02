@@ -3,7 +3,7 @@ import keras
 from keras import backend as K
 from keras.preprocessing.image import ImageDataGenerator
 
-from dnn.util.generators.imgseq.baseseq import SeqNumpyArrayIterator
+from dnn.util.generators.base.baseseq import SeqNumpyArrayIterator
 
 class ImageSeqDataGenerator(ImageDataGenerator):
     def __init__(self, *args, **kwargs):

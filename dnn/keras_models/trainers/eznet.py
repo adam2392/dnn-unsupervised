@@ -2,26 +2,29 @@ import os
 import numpy as np
 import keras
 from keras.optimizers import Adam
-from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
-from keras.preprocessing.image import ImageDataGenerator
 
 import dnn.base.constants.model_constants as MODEL_CONSTANTS
 from dnn.keras_models.trainers.base import BaseTrainer
+
+# import callbacks and augmentation functions
+from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 from dnn.keras_models.trainers.callbacks.testingcallback import MetricsCallback
 from dnn.util.keras.augmentations import Augmentations 
 
-from dnn.keras_models.metrics.classifier import BinaryClassifierMetric
-from dnn.base.constants.config import Config, OutputConfig
-from dnn.keras_models.regularizer.post_class_regularizer import Postalarm
-# import tensorboardX  # import SummaryWriter
-# from tqdm import trange
+# import generator(s) for loading in data
+from dnn.util.generators.auxseq.generator import AuxImgDataGenerator
 
-class CNNTrainer(BaseTrainer):
+# import metrics for postprocessing - metric analysis
+from dnn.keras_models.metrics.classifier import BinaryClassifierMetric
+from dnn.keras_models.regularizer.post_class_regularizer import Postalarm
+
+class EZNetTrainer(BaseTrainer):
     metric_comp = BinaryClassifierMetric()
     post_regularizer = None
     HH = None
 
-    def __init__(self, model, num_epochs=MODEL_CONSTANTS.NUM_EPOCHS, 
+    def __init__(self, model, 
+                num_epochs=MODEL_CONSTANTS.NUM_EPOCHS, 
                  batch_size=MODEL_CONSTANTS.BATCH_SIZE,
                  outputdir=None,
                  learning_rate=MODEL_CONSTANTS.LEARNING_RATE,
@@ -30,7 +33,7 @@ class CNNTrainer(BaseTrainer):
                  config=None):
         '''         SET LOGGING DIRECTORIES: MODEL, TENSORBOARD         '''
         self.outputdir = outputdir
-        super(CNNTrainer, self).__init__(model=model,
+        super(EZNetTrainer, self).__init__(model=model,
                                          config=config)
 
         # Hyper parameters - training
@@ -42,12 +45,10 @@ class CNNTrainer(BaseTrainer):
         self.AUGMENT = augment
 
         self.save_summary_steps = 10
-        self.gradclip_value = 0.25
+        self.gradclip_value = 1.0
 
         # set tensorboard writer
         self._setdirs()  # set directories for all logging
-        # self.writer = tensorboardX.SummaryWriter(self.tboardlogdir)
-
         self.logger.info(
             "Logging output data to: {}".format(
                 self.outputdatadir))
@@ -106,7 +107,7 @@ class CNNTrainer(BaseTrainer):
         self.test_dataset = test_dataset
 
         # get input characteristics
-        self.imsize = train_dataset.imsize
+        self.imsize = (train_dataset.length_imsize, train_dataset.width_imsize)
         self.n_colors = train_dataset.n_colors
         # size of training/testing set
         self.train_size = len(train_dataset)
@@ -136,8 +137,7 @@ class CNNTrainer(BaseTrainer):
         clipnorm = 1.
         model_params = {
             'loss': 'binary_crossentropy',
-            'optimizer': Adam(lr=1e-5,
-                         beta_1=0.9,
+            'optimizer': Adam(beta_1=0.9,
                          beta_2=0.99,
                          epsilon=1e-08,
                          decay=0.0,
@@ -174,35 +174,65 @@ class CNNTrainer(BaseTrainer):
                         reduce_lr,
                         tboard,
                         metrichistory]
+        # self.callbacks = [checkpoint, reduce_lr]
+
+    def test(self, modelname):
+        def predict_with_uncertainty(f, x, n_iter=10):
+            result = numpy.zeros((n_iter,) + x.shape)
+
+            for iter in range(n_iter):
+                result[iter] = f(x, 1)
+
+            prediction = result.mean(axis=0)
+            uncertainty = result.var(axis=0)
+            return prediction, uncertainty
+
+        # create a "learning phase" function, to allow prediction with uncertainty
+        f = K.Function(self.model.inputs + [K.learning_phase()], self.model.outputs)
+        X = [self.test_dataset.X_aux, self.test_dataset.X_chan]
+        prediction, uncertainty = predict_with_uncertainty(f, X, n_iter=50)
+
+        # determine scoring of these predictions
+        metricsfilepath = os.path.join(self.outputdatadir, modelname+ "_test_predictions.json")
+
+        metricdata = {
+            'prediction': prediction,
+            'uncertainty': uncertainty
+        }
+        self._writejsonfile(metricdata, metricsfilepath)
 
     def train(self):
         self._loadgenerator()
-        print("Training data: ", self.train_dataset.X_train.shape,  self.train_dataset.y_train.shape)
-        print("Testing data: ",  self.test_dataset.X_test.shape,  self.test_dataset.y_test.shape)
+        print("Training data: ", self.train_dataset.X_aux.shape,  self.train_dataset.ylabels.shape)
+        print("Testing data: ",  self.test_dataset.X_aux.shape,  self.test_dataset.ylabels.shape)
         print("Class weights are: ",  self.train_dataset.class_weight)
-        test = np.argmax( self.train_dataset.y_train, axis=1)
+        test = np.argmax( self.train_dataset.ylabels, axis=1)
         print("class imbalance: ", np.sum(test), len(test))
 
+        # self.AUGMENT = False
+        # self.steps_per_epoch = 2
         # augment data, or not and then trian the model!
         if not self.AUGMENT:
             print('Not using data augmentation. Implement Solution still!')
-            HH = self.model.fit( self.train_dataset.X_train,  self.train_dataset.y_train,
-                              # steps_per_epoch=X_train.shape[0] // self.batch_size,
+            HH = self.model.fit([self.train_dataset.X_aux, self.train_dataset.X_chan], 
+                              self.train_dataset.ylabels,
                               batch_size = self.batch_size,
-                              epochs=self.NUM_EPOCHS,
-                              validation_data=(self.test_dataset.X_test, self.test_dataset.y_test),
-                              shuffle=True,
+                              epochs=self.num_epochs,
+                              validation_data=([self.test_dataset.X_aux, self.test_dataset.X_chan], self.test_dataset.ylabels),
+                              shuffle=self.shuffle,
                               class_weight= self.train_dataset.class_weight,
                               callbacks=self.callbacks)
         else:
             print('Using real-time data augmentation.')
             # self.generator.fit(X_train)
-            HH = self.model.fit_generator(self.generator.flow(self.train_dataset.X_train, self.train_dataset.y_train, 
-                                                                batch_size=self.batch_size),
+            HH = self.model.fit_generator(self.generator.flow(self.train_dataset.X_aux, 
+                                                            self.train_dataset.X_chan, 
+                                                            self.train_dataset.ylabels, 
+                                                            batch_size=self.batch_size),
                                         steps_per_epoch=self.steps_per_epoch,
                                         epochs=self.num_epochs,
-                                        validation_data=(self.test_dataset.X_test, self.test_dataset.y_test),
-                                        shuffle=True,
+                                        validation_data=([self.test_dataset.X_aux, self.train_dataset.X_chan], self.test_dataset.ylabels),
+                                        shuffle=self.shuffle,
                                         class_weight= self.train_dataset.class_weight,
                                         callbacks=self.callbacks, verbose=2)
 
@@ -211,66 +241,20 @@ class CNNTrainer(BaseTrainer):
 
     def _loadgenerator(self):
         imagedatagen_args = {
-            'featurewise_center':True,  # set input mean to 0 over the dataset
+            'featurewise_center':False,  # set input mean to 0 over the dataset
             'samplewise_center':False,  # set each sample mean to 0
-            'featurewise_std_normalization':True,  # divide inputs by std of the dataset
+            'featurewise_std_normalization':False,  # divide inputs by std of the dataset
             'samplewise_std_normalization':False,  # divide each input by its std
             'zca_whitening':False,      # apply ZCA whitening
-            # randomly rotate images in the range (degrees, 0 to 180)
-            'rotation_range':5,
-            # randomly shift images horizontally (fraction of total width)
-            'width_shift_range':0.2,
-            # randomly shift images vertically (fraction of total height)
-            'height_shift_range':0.2,
+            'rotation_range':2,         # randomly rotate images in the range (degrees, 0 to 180)
+            'width_shift_range':0.2,    # randomly shift images horizontally (fraction of total width)
+            'height_shift_range':0.2,   # randomly shift images vertically (fraction of total height)
             'horizontal_flip':True,    # randomly flip images
             'vertical_flip':True,      # randomly flip images
-            'channel_shift_range':4,
+            'channel_shift_range':0,
             'fill_mode':'nearest',
             'preprocessing_function':Augmentations.preprocess_imgwithnoise
         }
 
         # This will do preprocessing and realtime data augmentation:
-        self.generator = ImageDataGenerator(**imagedatagen_args)
-
-if __name__ == '__main__':
-    from dnn.keras_models.nets.cnn import iEEGCNN
-    from dnn.io.readerimgdataset import ReaderImgDataset 
-    import dnn.base.constants.model_constants as constants
-
-    data_procedure = 'loo'
-    testpat = 'id001_bt'
-    traindir = os.path.expanduser('~/Downloads/tngpipeline/freq/fft_img/')
-    testdir = traindir
-    # initialize reader to get the training/testing data
-    reader = ReaderImgDataset()
-    reader.loadbydir(traindir, testdir, procedure=data_procedure, testname=testpat)
-    reader.loadfiles(mode=constants.TRAIN)
-    reader.loadfiles(mode=constants.TEST)
-    
-    # create the dataset objects
-    train_dataset = reader.train_dataset
-    test_dataset = reader.test_dataset
-
-    # define model
-    model_params = {
-        'num_classes': 2,
-        'imsize': 64,
-        'n_colors':4,
-    }
-    model = iEEGCNN(**model_params) 
-    model.buildmodel(output=True)
-
-    num_epochs = 1
-    batch_size = 32
-    outputdir = './'
-    trainer = CNNTrainer(model=model.net, num_epochs=num_epochs, 
-                        batch_size=batch_size,
-                        outputdir=outputdir)
-    trainer.composedatasets(train_dataset, test_dataset)
-    trainer.configure()
-    # Train the model
-    # trainer.train()
-    modelname='test'
-    trainer.saveoutput(modelname=modelname)
-    trainer.savemetricsoutput(modelname=modelname)
-    print(model.net)
+        self.generator = AuxImgDataGenerator(**imagedatagen_args)

@@ -12,49 +12,62 @@ from sklearn.utils import compute_class_weight
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import scale
 
-
 class TrainDataset(object):
-    X_train = None
-    y_train = None
+    X_aux = None
+    X_chan = None
+    ylabels = None
     class_weight = None
 
     def __len__(self):
-        return len(self.X_train)
+        return len(self.X_chan)
 
     @property
-    def imsize(self):
-        if isinstance(self.X_train, list):
-            return self.X_train[0].shape[2]
-        return self.X_train.shape[2]
+    def width_imsize(self):
+        if isinstance(self.X_aux, list):
+            return self.X_aux[0].shape[2]
+        return self.X_aux.shape[2]
 
     @property
     def n_colors(self):
-        if isinstance(self.X_train, list):
-            return self.X_train[0].shape[3]
-        return self.X_train.shape[3]
+        if isinstance(self.X_aux, list):
+            return self.X_aux[0].shape[3]
+        return self.X_aux.shape[3]
+
+    @property
+    def length_imsize(self):
+        if isinstance(self.X_aux, list):
+            return self.X_aux[0].shape[1]
+        return self.X_aux.shape[1]
+
 
 class TestDataset(object):
-    X_test = None
-    y_test = None
+    X_aux = None
+    X_chan = None
+    ylabels = None
     class_weight = None
 
     def __len__(self):
-        return len(self.X_test)
+        return len(self.X_chan)
 
     @property
-    def imsize(self):
-        if isinstance(self.X_test, list):
-            return self.X_test[0].shape[2]
-        return self.X_test.shape[2]
+    def width_imsize(self):
+        if isinstance(self.X_aux, list):
+            return self.X_aux[0].shape[2]
+        return self.X_aux.shape[2]
 
     @property
     def n_colors(self):
-        if isinstance(self.X_test, list):
-            return self.X_test[0].shape[3]
-        return self.X_test.shape[3]
+        if isinstance(self.X_aux, list):
+            return self.X_aux[0].shape[3]
+        return self.X_aux.shape[3]
 
-
-class BaseLoader(object):
+    @property
+    def length_imsize(self):
+        if isinstance(self.X_aux, list):
+            return self.X_aux[0].shape[1]
+        return self.X_aux.shape[1]
+        
+class BaseAuxLoader(object):
     root_dir = None
     patients = None
     testfilepaths = None
@@ -86,18 +99,18 @@ class BaseLoader(object):
         images = images.astype("float32")
         return images
 
-    def getchanstats(self, chanaxis=3):
+    def getchanstats(self, images, numchans, chanaxis=3):
         '''
         Chan axis = 3 if using keras/tensorflow
         Chan axis = 1 if using pytorch
         '''
-        numchans = self.train_dataset.X_train.shape[chanaxis]
-
         chanmeans = []
         chanstd = []
         for ichan in range(numchans):
-            chandata = self.train_dataset.X_train[...,ichan].ravel()
+            chandata = images[...,ichan].ravel()
             chanmeans.append(np.mean(chandata))
             chanstd.append(np.std(chandata))
         self.chanmeans = np.array(chanmeans)
         self.chanstd = np.array(chanstd)
+
+
