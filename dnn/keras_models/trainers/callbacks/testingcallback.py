@@ -35,6 +35,11 @@ class MetricsCallback(Callback):
         aux_x = x[0]
         xvec = x[1]
 
+        if epoch < 5:
+            print(len(x))
+            print(aux_x.shape)
+            print(xvec.shape)
+
         y = self.validation_data[1]
         ytrue = np.argmax(y, axis=1)
 
