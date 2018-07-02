@@ -225,8 +225,8 @@ class EZNetTrainer(BaseTrainer):
         else:
             print('Using real-time data augmentation.')
             # self.generator.fit(X_train)
-            HH = self.model.fit_generator(self.generator.flow(self.train_dataset.X_aux, 
-                                                            self.train_dataset.X_chan, 
+            HH = self.model.fit_generator(self.generator.flow([self.train_dataset.X_aux, 
+                                                            self.train_dataset.X_chan], 
                                                             self.train_dataset.ylabels, 
                                                             batch_size=self.batch_size),
                                         steps_per_epoch=self.steps_per_epoch,
