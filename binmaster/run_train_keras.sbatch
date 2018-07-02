@@ -48,8 +48,9 @@ echo $PWD
 echo "Running training model"
 
 # run training here in this
+# python ./hpc_util/baseline_exps/exp_base.py \
 singularity exec -B /scratch/ --nv ./tensorflow.simg \
-python ./hpc_util/baseline_exps/exp_base.py \
+python ./hpc_util/eznet/exp_baseline.py \
 	${traindatadir} ${testdatadir} \
 	--output_data_dir ${outputdatadir} \
 	--log_data_dir ${logdatadir} \
