@@ -16,32 +16,25 @@ class MetricsCallback(Callback):
         self.fpr = []
         self.tpr = []
         self.thresholds = []
- 
-    # def on_train_end(self, logs={}):
-    #     return
- 
-    # def on_epoch_begin(self, epoch, logs={}):
-    #     return
- 
-    # def on_batch_begin(self, batch, logs={}):
-    #     return
- 
-    # def on_batch_end(self, batch, logs={}):
-    #     return
-
+        
     def on_epoch_end(self, epoch, logs={}):
         # access the validatian data
         x = self.validation_data[0]
         aux_x = x[0]
         xvec = x[1]
 
+        y = self.validation_data[1]
+        ytrue = np.argmax(y, axis=1)
+
         if epoch < 5:
+            print(len(self.validation_data))
+            print(len(y))
             print(len(x))
             print(aux_x.shape)
             print(xvec.shape)
+            print(x.shape)
+            print(y.shape)
 
-        y = self.validation_data[1]
-        ytrue = np.argmax(y, axis=1)
 
         # compute loss, and accuracy of model
         loss, acc = self.model.evaluate({'aux_input_layer': aux_x,

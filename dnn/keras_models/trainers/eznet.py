@@ -2,6 +2,7 @@ import os
 import numpy as np
 import keras
 from keras.optimizers import Adam
+import keras.backend as K
 
 import dnn.base.constants.model_constants as MODEL_CONSTANTS
 from dnn.keras_models.trainers.base import BaseTrainer
