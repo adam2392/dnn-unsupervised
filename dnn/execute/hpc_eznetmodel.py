@@ -71,7 +71,7 @@ class MarccHPC(BaseHPC):
             # make the model parallel
             model = multi_gpu_model(model, gpus=len(devices))
 
-        trainer = CNNTrainer(model=model, 
+        trainer = EZNetTrainer(model=model, 
                             num_epochs=num_epochs, 
                             batch_size=batch_size,
                             outputdir=outputdir)

@@ -8,6 +8,8 @@ import keras
 from dnn.keras_models.nets.base import BaseNet
 import dnn.base.constants.model_constants as MODEL_CONSTANTS
 
+from dnn.keras_models.nets.generic import inception
+
 from keras import Model
 # import high level optimizers, models and layers
 from keras.models import Sequential, Model
@@ -185,56 +187,21 @@ class iEEGCNN(BaseNet):
 
             # build the inception towers
             if i == 0:
-                tower_0, tower_1, tower_2, tower_3 = self._build_inception_towers(conv_input_img, numfilters)
+                output = inception.Inception().residualblock(conv_input_img, i, numfilters)
             else:
                 output = MaxPooling2D((3,3), strides=(2,2), 
                         padding='same')(output)
-                tower_0, tower_1, tower_2, tower_3 = self._build_inception_towers(output, numfilters)  
-            # concatenate the layers and flatten
-            output = keras.layers.concatenate([tower_0, tower_1, tower_2, tower_3], axis=1)
+                output = inception.Inception().residualblock(output, i, numfilters)  
 
         # make sure layers are all flattened
         output = Flatten()(output)
-        # output = AveragePooling1D(pool_size=4,
-        #                           strides=1)(output)
-        # output = AveragePooling2D(pool_size=(4,4),
-        #                         strides=1)(output)
+        
         # create the output layers that are generally fc - with some DROPOUT
         output = self._build_output(output, size_fc=self.size_fc)
         # create the model
         self.net = Model(inputs=input_img, outputs=output)
         return self.net
 
-    def _build_inception_towers(self, input_img):
-        '''
-        Utility function to build up the inception modules for an
-        inception style network that operates at different scales (e.g.
-        1x1, 3x3, 5x5 convolutions)
-        '''
-
-        # create the towers that occur during each layer of diff scale convolutions
-        tower_0 = Conv2D(self.n_filters_first, kernel_size=(1,1),
-                        padding='same',
-                        activation='relu')(input_img)
-        tower_1 = Conv2D(self.n_filters_first, kernel_size=(1,1), 
-                        padding='same', 
-                        activation='relu')(input_img)
-        tower_1 = Conv2D(self.n_filters_first, kernel_size=(3,3), 
-                        padding='same',
-                        activation='relu')(tower_1)
-        tower_2 = Conv2D(self.n_filters_first, kernel_size=(1,1), 
-                        padding='same', 
-                        activation='relu')(input_img)
-        tower_2 = Conv2D(self.n_filters_first, kernel_size=(5,5), 
-                        padding='same', 
-                        activation='relu')(tower_2)
-        tower_3 = MaxPooling2D((3,3), strides=(1,1), 
-                        padding='same')(input_img)
-        tower_3 = Conv2D(self.n_filters_first, kernel_size=(1,1), 
-                        padding='same', 
-                        activation='relu')(tower_3)
-
-        return tower_0, tower_1, tower_2, tower_3
 
 if __name__ == '__main__':
     # define model
