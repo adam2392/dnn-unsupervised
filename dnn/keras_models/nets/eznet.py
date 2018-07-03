@@ -68,7 +68,7 @@ class EZNet(BaseNet):
     def buildmodel(self, output=True):
         # weight initialization
         self.w_init = None 
-        self.size_fc = 1024 
+        self.size_fc = 512
 
         # parameters for AuxNet
         numfilters = 24
@@ -76,7 +76,7 @@ class EZNet(BaseNet):
         kernel_size=(1,2)
         dilation = (1,1)
         nb_stacks = 1
-        n_layers = [4, 2, 1]
+        n_layers = [2, 1]
 
         vgg = self.build_vgg(n_layers,
                     poolsize,
@@ -87,7 +87,7 @@ class EZNet(BaseNet):
         # parameters for TCN
         dilations = [1,2,4,6]
         numfilters = 24
-        kernel_size = 3
+        kernel_size = 2
         nb_stacks=1
         activation = 'norm_relu'
 
@@ -133,7 +133,7 @@ class EZNet(BaseNet):
         skip_connections = []
         for s in range(nb_stacks):
             for i in dilations:
-                kernel_init = keras.initializers.glorot_uniform()
+                kernel_init = keras.initializers.he_normal()
                 x, skip_out = tcn.TCN.residual_block(x, s, i, activation, 
                                             nb_filters=numfilters, 
                                             kernel_size=kernel_size,
@@ -171,7 +171,7 @@ class EZNet(BaseNet):
         '''
         # check for weight initialization -> apply Glorotuniform
         # if self.w_init is None:
-        # w_init = keras.initializers.glorot_uniform()
+        # w_init = [keras.initializers.glorot_uniform()]
         
         # define starting layers
         input_layer = Input(name='aux_input_layer', 
@@ -186,7 +186,8 @@ class EZNet(BaseNet):
         for s in range(nb_stacks):
             for idx, n_layer in enumerate(n_layers):
                 for ilay in range(n_layer):
-                    kernel_init = keras.initializers.glorot_uniform()
+                    # kernel_init = keras.initializers.glorot_uniform()
+                    kernel_init = keras.initializers.he_normal()
                     x = vgg_helper.residualblock(x, ilay, idx,
                                             numfilters, 
                                             kernel_size,
