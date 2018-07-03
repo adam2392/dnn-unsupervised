@@ -210,7 +210,7 @@ class EZNetTrainer(BaseTrainer):
         # callbacks availabble
         checkpoint = ModelCheckpoint(tempfilepath,
                                      # monitor='val_acc',
-                                     monitor='categorical_accuracy',
+                                     monitor=categorical_accuracy,
                                      verbose=1,
                                      save_best_only=True,
                                      mode='max')

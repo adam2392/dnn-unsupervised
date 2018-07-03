@@ -22,15 +22,18 @@ class MetricsCallback(Callback):
         x = self.validation_data[0]
         aux_x = self.validation_data[0]
         xvec = self.validation_data[1]
-
         y = self.validation_data[2]
+
+        xvec = self.validation_data[0]
+        y = self.validation_data[1]
         ytrue = np.argmax(y, axis=1)
 
         # compute loss, and accuracy of model
-        loss, acc = self.model.evaluate({'aux_input_layer': aux_x,
-                                        'input_layer': xvec}, y, verbose=0)
-        predicted_probs = self.model.predict({'aux_input_layer': aux_x,
-                                        'input_layer': xvec})
+        inputs = {'aux_input_layer': aux_x,
+                'input_layer': xvec}
+        inputs = {'input_layer': xvec}
+        loss, acc = self.model.evaluate(inputs, y, verbose=0)
+        predicted_probs = self.model.predict(inputs)
 
         if epoch < 5:
             print(aux_x.shape)
