@@ -153,7 +153,8 @@ class EZNetTrainer(BaseTrainer):
             return K.categorical_crossentropy(y_pred, y_true) * final_mask
         from keras.losses import binary_crossentropy
         def weighted_binary_crossentropy(y_true, y_pred):
-            false_positive_weight = self.train_dataset.class_weight[1]        
+            false_positive_weight = self.train_dataset.class_weight[0]        
+            false_negative_weight = self.train_dataset.class_weight[1]
             thresh = 0.5
             y_pred_true = K.greater_equal(thresh,y_pred)
             y_not_true = K.less_equal(thresh,y_true)
@@ -181,7 +182,7 @@ class EZNetTrainer(BaseTrainer):
             nonFalseLoss = binary_crossentropy(nonFalseGroupTrue,nonFalseGroupPred)
 
             #return them weighted:
-            return (false_positive_weight*falsePosLoss) + nonFalseLoss
+            return (false_positive_weight*falsePosLoss) + (false_negative_weight*nonFalseLoss)
 
         ncce = functools.partial(w_categorical_crossentropy, weights=self.train_dataset.class_weight)
         # ncce = functools.partial(weighted_binary_crossentropy)
