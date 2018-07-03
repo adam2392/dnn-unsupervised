@@ -89,7 +89,7 @@ class EZNet(BaseNet):
         numfilters = 24
         kernel_size = 2
         nb_stacks=1
-        activation = 'norm_relu'
+        activation = 'relu'
 
         tcn = self.build_dilatedtcn(dilations, 
                             numfilters, kernel_size, 
