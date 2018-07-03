@@ -58,7 +58,7 @@ echo "Running training model"
 # 	--patient_to_loo ${patient} \
 # 	--expname ${expname}
 
-# singularity exec -B /scratch/ --nv ./tensorflow.simg \
+singularity exec -B /scratch/ --nv ./tensorflow.simg \
 python ./hpc_util/baseline_exps/exp_base.py \
 ${traindatadir} ${testdatadir} \
 	--output_data_dir ${outputdatadir} \
