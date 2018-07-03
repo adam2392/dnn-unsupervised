@@ -38,7 +38,7 @@ class MetricsCallback(Callback):
             print(y.shape)
             print(predicted_probs.shape)
             print(y[0:5,:])
-            print(predicted_probs[0,:])
+            print(predicted_probs[0:5,:])
 
         predicted_probs_positive = predicted_probs[:,1]
         predicted = np.argmax(predicted_probs, axis=1)
