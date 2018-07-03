@@ -260,7 +260,7 @@ class EZNetTrainer(BaseTrainer):
         test = np.argmax( self.train_dataset.ylabels, axis=1)
         print("class imbalance: ", np.sum(test), len(test))
 
-        # self.AUGMENT = False
+        self.AUGMENT = False
         # self.steps_per_epoch = 2
         # augment data, or not and then trian the model!
         if not self.AUGMENT:
