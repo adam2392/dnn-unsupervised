@@ -136,6 +136,7 @@ class EZNetTrainer(BaseTrainer):
         """
         # initialize loss function, SGD optimizer and metrics
         from itertools import product
+        import functools
         def w_categorical_crossentropy(y_true, y_pred, weights):
             nb_cl = len(weights)
             final_mask = K.zeros_like(y_pred[:, 0])
@@ -145,7 +146,7 @@ class EZNetTrainer(BaseTrainer):
             for c_p, c_t in product(range(nb_cl), range(nb_cl)):
                 final_mask += (weights[c_t, c_p] * y_pred_max_mat[:, c_p] * y_true[:, c_t])
             return K.categorical_crossentropy(y_pred, y_true) * final_mask
-        ncce = partial(w_categorical_crossentropy, weights=self.train_dataset.class_weight)
+        ncce = functools.partial(w_categorical_crossentropy, weights=self.train_dataset.class_weight)
 
         model_params = {
             # 'loss': 'binary_crossentropy',
