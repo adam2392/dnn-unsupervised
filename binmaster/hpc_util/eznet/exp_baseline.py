@@ -85,10 +85,10 @@ def hpc_run(args):
     # get the datasets
     train_dataset, test_dataset = hpcrun.load_data(train_data_dir, test_data_dir)
 
-    X_train = np.repeat(train_dataset.X_train, 4, axis=0)
-    y_train = np.repeat(train_dataset.y_train, 4, axis=0)
-    train_dataset.X_train = X_train
-    train_dataset.y_train = y_train
+    X_train = np.repeat(train_dataset.X_chan, 4, axis=0)
+    y_train = np.repeat(train_dataset.ylabels, 4, axis=0)
+    train_dataset.X_chan = X_train
+    train_dataset.ylabels = y_train
 
     # find ezs
     ez_inds = np.where(y_train[:,1] == 1)[0]
