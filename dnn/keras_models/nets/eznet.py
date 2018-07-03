@@ -72,7 +72,7 @@ class EZNet(BaseNet):
 
         # parameters for AuxNet
         numfilters = 24
-        poolsize=((1,2))
+        poolsize=(1,2)
         kernel_size=(1,2)
         dilation = (1,1)
         nb_stacks = 1
@@ -94,6 +94,20 @@ class EZNet(BaseNet):
         tcn = self.build_dilatedtcn(dilations, 
                             numfilters, kernel_size, 
                             nb_stacks, activation=activation)
+
+        # parameters for VGG TCN
+        numfilters = 24
+        poolsize=(2,)
+        kernel_size=(3,)
+        dilation = (1,)
+        nb_stacks = 1
+        n_layers = [4, 2, 1]
+        tcn = self.build_vggtcn(n_layers,
+                    poolsize,
+                    numfilters,
+                    kernel_size, 
+                    nb_stacks)
+
         combinedx = self.combinenets(tcn, vgg)
 
         if output:
@@ -107,6 +121,37 @@ class EZNet(BaseNet):
     def buildoutput(self, model, size_fc):
         model = self._build_output(model, size_fc=size_fc)
         return model 
+
+    def build_vggtcn(self, n_layers,
+                    poolsize,
+                    numfilters,
+                    kernel_size, 
+                    nb_stacks):
+        # define starting layers
+        input_layer = Input(name='input_layer', shape=(self.width_imsize, self.n_colors))
+        x = input_layer
+        self.input_layer = input_layer
+
+        # initialize counter to keep track of which weight to assign
+        count = 0
+        # add the rest of the hidden layers
+        vgg_helper = vgg.VGG(self.length_imsize, self.width_imsize, self.n_colors)
+        for s in range(nb_stacks):
+            for idx, n_layer in enumerate(n_layers):
+                for ilay in range(n_layer):
+                    # kernel_init = keras.initializers.glorot_uniform()
+                    kernel_init = keras.initializers.he_normal()
+                    x = vgg_helper.residual1dblock(x, ilay, idx,
+                                            numfilters, 
+                                            kernel_size,
+                                            kernel_init)
+                    # increment counter to the next weight initializer
+                    count += 1
+                # create a network at the end with a max pooling
+                x = MaxPooling1D(pool_size=poolsize)(x)
+        x = Flatten()(x)
+        self.net = x
+        return x
 
     def build_dilatedtcn(self, dilations, 
                     numfilters,
