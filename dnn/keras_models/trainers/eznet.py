@@ -275,7 +275,7 @@ class EZNetTrainer(BaseTrainer):
         # augment data, or not and then trian the model!
         if not self.AUGMENT:
             print('Not using data augmentation. Implement Solution still!')
-            HH = self.model.fit(self.train_dataset.X_chan
+            HH = self.model.fit(self.train_dataset.X_chan,
                 # [self.train_dataset.X_aux, self.train_dataset.X_chan], 
                               self.train_dataset.ylabels,
                               batch_size = self.batch_size,
