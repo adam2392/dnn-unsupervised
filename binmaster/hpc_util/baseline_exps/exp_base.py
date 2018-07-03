@@ -72,7 +72,7 @@ def hpc_run(args):
     batch_size = 32
     learning_rate = 5e-4 # np.linspace(1e-5, 1e-3, 10)
 
-    # for testpat in all÷_patients:
+    # for testpat in all_patients:
     testpatdir = os.path.join(output_data_dir, testpat)
     print("Our main directory to save for loo exp: ", testpatdir)
     print(train_data_dir, test_data_dir)
