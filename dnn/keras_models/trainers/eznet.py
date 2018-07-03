@@ -15,6 +15,8 @@ from dnn.util.keras.augmentations import Augmentations
 # import generator(s) for loading in data
 from dnn.util.generators.auxseq.generator import AuxImgDataGenerator
 
+from keras.metrics import categorical_accuracy
+
 # import metrics for postprocessing - metric analysis
 from dnn.keras_models.metrics.classifier import BinaryClassifierMetric
 from dnn.keras_models.regularizer.post_class_regularizer import Postalarm
@@ -187,8 +189,8 @@ class EZNetTrainer(BaseTrainer):
         ncce = functools.partial(w_categorical_crossentropy, weights=self.train_dataset.class_weight)
         # ncce = functools.partial(weighted_binary_crossentropy)
         model_params = {
-            # 'loss': 'categorical_crossentropy',
-            'loss': weighted_binary_crossentropy,
+            'loss': 'binary_crossentropy',
+            # 'loss': weighted_binary_crossentropy,
             'optimizer': Adam(beta_1=0.9,
                          beta_2=0.99,
                          epsilon=1e-08,
@@ -196,7 +198,7 @@ class EZNetTrainer(BaseTrainer):
                          amsgrad=True,
                          # clipnorm=self.gradclip_value
                          ),
-            'metrics': ['accuracy']
+            'metrics': [categorical_accuracy]
         }
         self.modelconfig = self.model.compile(**model_params)
 
