@@ -26,21 +26,18 @@ class MetricsCallback(Callback):
         y = self.validation_data[2]
         ytrue = np.argmax(y, axis=1)
 
-        # if epoch < 5:
-        #     print(len(self.validation_data))
-        #     print(len(y))
-        #     print(len(x))
-        #     print(aux_x.shape)
-        #     print(xvec.shape)
-        #     print(x.shape)
-        #     print(y.shape)
-
-
         # compute loss, and accuracy of model
         loss, acc = self.model.evaluate({'aux_input_layer': aux_x,
                                         'input_layer': xvec}, y, verbose=0)
         predicted_probs = self.model.predict({'aux_input_layer': aux_x,
                                         'input_layer': xvec})
+
+        if epoch < 5:
+            print(aux_x.shape)
+            print(xvec.shape)
+            print(y.shape)
+            print(predicted_probs.shape)
+
         predicted_probs_positive = predicted_probs[:,1]
         predicted = np.argmax(predicted_probs, axis=1)
         # compute the predicted classes

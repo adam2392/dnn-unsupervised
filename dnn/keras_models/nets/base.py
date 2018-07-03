@@ -114,7 +114,7 @@ class BaseNet(metaclass=ABCMeta):
         self.output = Dense(size_fc//2, activation='relu')(self.output)
         if self.DROPOUT:
             self.output = Dropout(0.5)(self.output)
-        self.output = Dense(self.num_classes, activation='sigmoid')(self.output)
+        self.output = Dense(self.num_classes, activation='softmax')(self.output)
         if self.DROPOUT:
             self.output = Dropout(0.5)(self.output)
         return self.output
@@ -142,4 +142,4 @@ class BaseNet(metaclass=ABCMeta):
         self.net.add(Dense(size_fc//2, activation='relu'))
         if self.DROPOUT:
             self.net.add(Dropout(0.5))
-        self.net.add(Dense(self.num_classes, activation='sigmoid'))
+        self.net.add(Dense(self.num_classes, activation='softmax'))
