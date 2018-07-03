@@ -37,6 +37,7 @@ class MetricsCallback(Callback):
             print(xvec.shape)
             print(y.shape)
             print(predicted_probs.shape)
+            print(predicted_probs[0,:])
 
         predicted_probs_positive = predicted_probs[:,1]
         predicted = np.argmax(predicted_probs, axis=1)
