@@ -27,7 +27,7 @@ ml python/3.6.5
 module list
 
 # expname="exp_win5000_step2500_lr1e-1"
-expname="eznet_baseline_v7"
+expname="eznet_baseline_tcn"
 ## For training and modeling with the simulated data
 traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/mne_methods/win5000_step2500"
 testdatadir=$traindatadir

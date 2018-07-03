@@ -94,14 +94,13 @@ class EZNet(BaseNet):
         tcn = self.build_dilatedtcn(dilations, 
                             numfilters, kernel_size, 
                             nb_stacks, activation=activation)
-
         combinedx = self.combinenets(tcn, vgg)
 
         if output:
-            combinedx = self.buildoutput(combinedx, self.size_fc)
+            combinedx = self.buildoutput(tcn, self.size_fc)
 
-        net = Model(inputs=[self.aux_input_layer, self.tcn_input_layer],
-                        outputs=combinedx)
+        # net = Model(inputs=[self.aux_input_layer, self.tcn_input_layer], outputs=combinedx)
+        net = Model(inputs=self.tcn_input_layer, outputs=combinedx)
         self.net = net
         return net
 
