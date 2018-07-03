@@ -268,7 +268,7 @@ class EZNetTrainer(BaseTrainer):
         print("class imbalance: ", np.sum(test), len(test))
 
         # swap the class weights
-        self.train_dataset.class_weight[0], self.train_dataset.class_weight[1] = self.train_dataset.class_weight[1], iself.train_dataset.class_weight[0]
+        self.train_dataset.class_weight[0], self.train_dataset.class_weight[1] = self.train_dataset.class_weight[1], self.train_dataset.class_weight[0]
 
         self.AUGMENT = False
         # self.steps_per_epoch = 2
