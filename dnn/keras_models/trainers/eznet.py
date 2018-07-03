@@ -219,6 +219,7 @@ class EZNetTrainer(BaseTrainer):
                                     factor=0.5,
                                     patience=10, 
                                     min_lr=1e-8)
+        
         tboard = keras.callbacks.TensorBoard(log_dir=self.tboardlogdir, 
                                     histogram_freq=self.num_epochs/5, 
                                     batch_size=self.batch_size, write_graph=True, 
@@ -230,7 +231,7 @@ class EZNetTrainer(BaseTrainer):
         metrichistory = MetricsCallback()
         self.callbacks = [
                         # checkpoint,
-                        reduce_lr,
+                        # reduce_lr,
                         tboard,
                         metrichistory
                     ]

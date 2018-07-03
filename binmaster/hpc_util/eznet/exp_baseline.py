@@ -51,51 +51,6 @@ def local_run(args):
     test_data_dir = train_data_dir
     expname = 'test'
 
-    # parameters for model
-    modelname = 'eznet'
-    num_classes = 2
-    data_procedure='loo'
-    # training parameters 
-    num_epochs = 150
-    batch_size = 32
-    learning_rate = 5e-3  # np.linspace(1e-5, 1e-3, 10)
-
-    # for testpat in all÷_patients:
-    testpatdir = os.path.join(output_data_dir, testpat)
-    print("Our maint directory to save for loo exp: ", testpatdir)
-    print(train_data_dir, test_data_dir)
-
-    # initialize hpc trainer object
-    hpcrun = MarccHPC()
-    ########################## 1. LOAD DATA ##########################
-    # get the datasets
-    train_dataset, test_dataset = hpcrun.load_data(train_data_dir, test_data_dir)
-
-    # get the image size and n_colors from the datasets
-    length_imsize = train_dataset.length_imsize
-    width_imsize = train_dataset.width_imsize
-    n_colors = train_dataset.n_colors
-            
-    ########################## 2. CREATE MODEL  ##########################
-    # create model
-    model = hpcrun.createmodel(num_classes, length_imsize, width_imsize, n_colors)
-    # extract the actual model from the object
-    model = model.net    
-    
-    ########################## 3. TRAIN MODEL ##########################
-    # train model
-    trainer = hpcrun.trainmodel(model=model, num_epochs=num_epochs, batch_size=batch_size, 
-                        train_dataset=train_dataset, test_dataset=test_dataset,
-                        testpatdir=testpatdir,  expname=expname)
-    
-    ########################## 4. TEST MODEL  ##########################
-    # test and save model
-    trainer = hpcrun.testmodel(trainer, modelname)
-
-    print("Image size is {} with {} colors".format(imsize, n_colors))
-    print("Model is: {}".format(model))
-    print("Model summary: {}".format(model.summary()))
-
 
 def hpc_run(args):
     # read in the parsed arguments
@@ -115,8 +70,8 @@ def hpc_run(args):
     data_procedure='loo'
     # training parameters 
     num_epochs = 150
-    batch_size = 8
-    learning_rate = 5e-4  # np.linspace(1e-5, 1e-3, 10)
+    batch_size = 32
+    learning_rate = 1e-4  # np.linspace(1e-5, 1e-3, 10)
 
     # for testpat in all÷_patients:
     testpatdir = os.path.join(output_data_dir, testpat)
