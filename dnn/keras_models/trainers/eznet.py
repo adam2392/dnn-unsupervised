@@ -225,10 +225,12 @@ class EZNetTrainer(BaseTrainer):
                                     embeddings_metadata=None, 
                                     embeddings_data=None)
         metrichistory = MetricsCallback()
-        self.callbacks = [checkpoint,
-                        reduce_lr,
-                        tboard,
-                        metrichistory]
+        self.callbacks = [
+                        checkpoint,
+                        # reduce_lr,
+                        # tboard,
+                        metrichistory
+                    ]
 
     def test(self, modelname):
         def predict_with_uncertainty(f, x, n_iter=10):
