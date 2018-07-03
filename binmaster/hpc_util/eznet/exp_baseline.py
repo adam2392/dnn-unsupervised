@@ -57,7 +57,7 @@ def local_run(args):
     data_procedure='loo'
     # training parameters 
     num_epochs = 150
-    batch_size = 8
+    batch_size = 32
     learning_rate = 5e-3  # np.linspace(1e-5, 1e-3, 10)
 
     # for testpat in all÷_patients:

@@ -236,7 +236,7 @@ class EZNetTrainer(BaseTrainer):
 
     def test(self, modelname):
         def predict_with_uncertainty(f, x, n_iter=10):
-            result = numpy.zeros((n_iter,) + x.shape)
+            result = np.zeros((n_iter,) + x.shape)
 
             for iter in range(n_iter):
                 result[iter] = f(x, 1)
