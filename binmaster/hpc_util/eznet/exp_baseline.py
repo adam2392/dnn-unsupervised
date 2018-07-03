@@ -85,12 +85,11 @@ def hpc_run(args):
     # get the datasets
     train_dataset, test_dataset = hpcrun.load_data(train_data_dir, test_data_dir)
 
+    # upsample dataset
     X_train = train_dataset.X_chan
     y_train = train_dataset.ylabels
-
     # find ezs
     ez_inds = np.where(y_train[:,1] == 1)[0]
-
     X_train = np.repeat(train_dataset.X_chan[ez_inds,...], 4, axis=0)
     y_train = np.repeat(train_dataset.ylabels[ez_inds,...], 4, axis=0)
     train_dataset.X_chan = np.concatenate((train_dataset.X_chan, X_train), axis=0)
