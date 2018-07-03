@@ -133,10 +133,11 @@ class EZNet(BaseNet):
         skip_connections = []
         for s in range(nb_stacks):
             for i in dilations:
+                kernel_init = keras.initializers.glorot_uniform()
                 x, skip_out = tcn.TCN.residual_block(x, s, i, activation, 
                                             nb_filters=numfilters, 
                                             kernel_size=kernel_size,
-                                            kernel_init=w_init[s])
+                                            kernel_init=kernel_init)
                 skip_connections.append(skip_out)
 
         # should we use skip_connections?
@@ -170,7 +171,7 @@ class EZNet(BaseNet):
         '''
         # check for weight initialization -> apply Glorotuniform
         # if self.w_init is None:
-        w_init = keras.initializers.glorot_uniform()
+        # w_init = keras.initializers.glorot_uniform()
         
         # define starting layers
         input_layer = Input(name='aux_input_layer', 
@@ -185,7 +186,7 @@ class EZNet(BaseNet):
         for s in range(nb_stacks):
             for idx, n_layer in enumerate(n_layers):
                 for ilay in range(n_layer):
-                    kernel_init = w_init
+                    kernel_init = keras.initializers.glorot_uniform()
                     x = vgg_helper.residualblock(x, ilay, idx,
                                             numfilters, 
                                             kernel_size,

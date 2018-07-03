@@ -237,7 +237,7 @@ class EZNetTrainer(BaseTrainer):
                                         epochs=self.num_epochs,
                                         validation_data=([self.test_dataset.X_aux, self.test_dataset.X_chan], self.test_dataset.ylabels),
                                         shuffle=self.shuffle,
-                                        class_weight= self.train_dataset.class_weight,
+                                        # class_weight= self.train_dataset.class_weight,
                                         callbacks=self.callbacks, verbose=2)
         else:
             print('Using real-time data augmentation.')
