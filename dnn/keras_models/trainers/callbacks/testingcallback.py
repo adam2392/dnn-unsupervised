@@ -42,9 +42,10 @@ class MetricsCallback(Callback):
         predicted_probs = self.model.predict({'aux_input_layer': aux_x,
                                         'input_layer': xvec})
         predicted_probs_positive = predicted_probs[:,1]
+        predicted = np.argmax(predicted_probs, axis=1)
         # compute the predicted classes
-        predicted = self.model.predict_classes({'aux_input_layer': aux_x,
-                                        'input_layer': xvec})
+        # predicted = self.model.predict_classes({'aux_input_layer': aux_x,
+        #                                 'input_layer': xvec})
             
         # compute roc_auc scores using the predicted probabilties
         self.metrics.compute_roc(ytrue, predicted_probs_positive)
