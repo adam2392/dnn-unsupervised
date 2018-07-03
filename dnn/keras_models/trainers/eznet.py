@@ -189,8 +189,8 @@ class EZNetTrainer(BaseTrainer):
         ncce = functools.partial(w_categorical_crossentropy, weights=self.train_dataset.class_weight)
         # ncce = functools.partial(weighted_binary_crossentropy)
         model_params = {
-            # 'loss': 'binary_crossentropy',
-            'loss': weighted_binary_crossentropy,
+            'loss': 'categorical_crossentropy',
+            # 'loss': weighted_binary_crossentropy,
             'optimizer': Adam(beta_1=0.9,
                          beta_2=0.99,
                          epsilon=1e-08,
