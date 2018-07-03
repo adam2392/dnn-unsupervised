@@ -201,6 +201,8 @@ class EZNetTrainer(BaseTrainer):
             'metrics': [categorical_accuracy]
         }
         self.modelconfig = self.model.compile(**model_params)
+        print("Available metrics: ", self.model.metrics_names)
+
 
         tempfilepath = os.path.join(self.explogdir, "weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5")
 
@@ -226,7 +228,7 @@ class EZNetTrainer(BaseTrainer):
                                     embeddings_data=None)
         metrichistory = MetricsCallback()
         self.callbacks = [
-                        checkpoint,
+                        # checkpoint,
                         # reduce_lr,
                         # tboard,
                         metrichistory
