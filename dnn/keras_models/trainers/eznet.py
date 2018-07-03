@@ -228,7 +228,7 @@ class EZNetTrainer(BaseTrainer):
                                     embeddings_data=None)
         metrichistory = MetricsCallback()
         self.callbacks = [
-                        checkpoint,
+                        # checkpoint,
                         reduce_lr,
                         tboard,
                         metrichistory
