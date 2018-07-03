@@ -189,8 +189,8 @@ class EZNetTrainer(BaseTrainer):
         ncce = functools.partial(w_categorical_crossentropy, weights=self.train_dataset.class_weight)
         # ncce = functools.partial(weighted_binary_crossentropy)
         model_params = {
-            'loss': 'binary_crossentropy',
-            # 'loss': weighted_binary_crossentropy,
+            # 'loss': 'binary_crossentropy',
+            'loss': weighted_binary_crossentropy,
             'optimizer': Adam(beta_1=0.9,
                          beta_2=0.99,
                          epsilon=1e-08,
@@ -283,7 +283,7 @@ class EZNetTrainer(BaseTrainer):
                               # validation_data=([self.test_dataset.X_aux, self.test_dataset.X_chan], self.test_dataset.ylabels),
                               validation_data=(self.test_dataset.X_chan, self.test_dataset.ylabels),
                               shuffle=self.shuffle,
-                              class_weight= self.train_dataset.class_weight,
+                              # class_weight= self.train_dataset.class_weight,
                               callbacks=self.callbacks, verbose=2)
         elif self.AUGMENT=='dir':
             directory = self.train_directory
