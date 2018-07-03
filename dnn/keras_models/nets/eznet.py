@@ -107,6 +107,7 @@ class EZNet(BaseNet):
                     numfilters,
                     kernel_size, 
                     nb_stacks)
+        print("Build the vgg style tcn")
 
         combinedx = self.combinenets(tcn, vgg)
 
@@ -116,6 +117,7 @@ class EZNet(BaseNet):
         # net = Model(inputs=[self.aux_input_layer, self.tcn_input_layer], outputs=combinedx)
         net = Model(inputs=self.tcn_input_layer, outputs=combinedx)
         self.net = net
+
         return net
 
     def buildoutput(self, model, size_fc):

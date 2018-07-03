@@ -94,7 +94,7 @@ def hpc_run(args):
     model = hpcrun.createmodel(num_classes, length_imsize, width_imsize, n_colors)
     # extract the actual model from the object
     model = model.net    
-    
+    print(model.summary())
     ########################## 3. TRAIN MODEL ##########################
     # train model
     trainer = hpcrun.trainmodel(model=model, num_epochs=num_epochs, 
