@@ -207,7 +207,8 @@ class EZNetTrainer(BaseTrainer):
         '''                         CREATE CALLBACKS                        '''
         # callbacks availabble
         checkpoint = ModelCheckpoint(tempfilepath,
-                                     monitor='val_acc',
+                                     # monitor='val_acc',
+                                     monitor='val_categorical_accuracy',
                                      verbose=1,
                                      save_best_only=True,
                                      mode='max')
