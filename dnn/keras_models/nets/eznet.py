@@ -85,11 +85,11 @@ class EZNet(BaseNet):
                     nb_stacks)
 
         # parameters for TCN
-        dilations = [1]
-        numfilters = 24
-        kernel_size = 2
+        dilations = [1,2,4]
+        numfilters = 16
+        kernel_size = 5
         nb_stacks=1
-        activation = 'relu'
+        activation = 'norm_relu'
 
         tcn = self.build_dilatedtcn(dilations, 
                             numfilters, kernel_size, 
