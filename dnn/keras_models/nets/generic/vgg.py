@@ -29,15 +29,15 @@ class VGG(BaseGenericNet):
                                     self.n_colors),
                         # dilation_rate=dilation_rate,
                         activation='linear',
-                        use_bias=False,
+                        # use_bias=False,
                         name='vgg_conv_{}_relu_s{}'.format(idx, ilay))(x)
 
-        x = BatchNormalization(axis=-1, momentum=0.99, 
-                epsilon=0.001, center=True, scale=True, 
-                beta_initializer='zeros', gamma_initializer='ones', 
-                moving_mean_initializer='zeros', moving_variance_initializer='ones', 
-                beta_regularizer=None, gamma_regularizer=None, 
-                beta_constraint=None, gamma_constraint=None)(conv)
+        # x = BatchNormalization(axis=-1, momentum=0.99, 
+        #         epsilon=0.001, center=True, scale=True, 
+        #         beta_initializer='zeros', gamma_initializer='ones', 
+        #         moving_mean_initializer='zeros', moving_variance_initializer='ones', 
+        #         beta_regularizer=None, gamma_regularizer=None, 
+        #         beta_constraint=None, gamma_constraint=None)(conv)
         # x = LeakyReLU(alpha=0.1)(x)
         x = Activation('relu')(x)
         return x

@@ -46,7 +46,7 @@ class EZNetTrainer(BaseTrainer):
         self.AUGMENT = augment
 
         self.save_summary_steps = 10
-        self.gradclip_value = 1.0
+        self.gradclip_value = 2.0
 
         # set tensorboard writer
         self._setdirs()  # set directories for all logging
@@ -135,7 +135,6 @@ class EZNetTrainer(BaseTrainer):
         - sets post-prediction-regularizer
         """
         # initialize loss function, SGD optimizer and metrics
-        clipnorm = 1.
         model_params = {
             'loss': 'binary_crossentropy',
             'optimizer': Adam(beta_1=0.9,
@@ -143,7 +142,7 @@ class EZNetTrainer(BaseTrainer):
                          epsilon=1e-08,
                          decay=0.0,
                          amsgrad=True,
-                         clipnorm=clipnorm),
+                         clipnorm=self.gradclip_value),
             'metrics': ['accuracy']
         }
         self.modelconfig = self.model.compile(**model_params)
