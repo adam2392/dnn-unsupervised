@@ -115,7 +115,7 @@ class EZNet(BaseNet):
             combinedx = self.buildoutput(tcn, self.size_fc)
 
         # net = Model(inputs=[self.aux_input_layer, self.tcn_input_layer], outputs=combinedx)
-        net = Model(inputs=self.tcn_input_layer, outputs=combinedx)
+        net = Model(inputs=self.input_layer, outputs=combinedx)
         self.net = net
 
         return net
@@ -168,7 +168,7 @@ class EZNet(BaseNet):
         # define starting layers
         input_layer = Input(name='input_layer', shape=(self.width_imsize, self.n_colors))
         x = input_layer
-        self.tcn_input_layer = input_layer
+        self.input_layer = input_layer
 
         x = Conv1D(numfilters, kernel_size, 
                         kernel_initializer=keras.initializers.he_normal(),
