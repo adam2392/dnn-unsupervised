@@ -135,14 +135,28 @@ class EZNetTrainer(BaseTrainer):
         - sets post-prediction-regularizer
         """
         # initialize loss function, SGD optimizer and metrics
+        from itertools import product
+        def w_categorical_crossentropy(y_true, y_pred, weights):
+            nb_cl = len(weights)
+            final_mask = K.zeros_like(y_pred[:, 0])
+            y_pred_max = K.max(y_pred, axis=1)
+            y_pred_max = K.reshape(y_pred_max, (K.shape(y_pred)[0], 1))
+            y_pred_max_mat = K.equal(y_pred, y_pred_max)
+            for c_p, c_t in product(range(nb_cl), range(nb_cl)):
+                final_mask += (weights[c_t, c_p] * y_pred_max_mat[:, c_p] * y_true[:, c_t])
+            return K.categorical_crossentropy(y_pred, y_true) * final_mask
+        ncce = partial(w_categorical_crossentropy, weights=self.train_dataset.class_weight)
+
         model_params = {
-            'loss': 'binary_crossentropy',
+            # 'loss': 'binary_crossentropy',
+            'loss': ncce,
             'optimizer': Adam(beta_1=0.9,
                          beta_2=0.99,
                          epsilon=1e-08,
                          decay=0.0,
                          amsgrad=True,
-                         clipnorm=self.gradclip_value),
+                         # clipnorm=self.gradclip_value
+                         ),
             'metrics': ['accuracy']
         }
         self.modelconfig = self.model.compile(**model_params)
@@ -237,7 +251,7 @@ class EZNetTrainer(BaseTrainer):
                                         epochs=self.num_epochs,
                                         validation_data=([self.test_dataset.X_aux, self.test_dataset.X_chan], self.test_dataset.ylabels),
                                         shuffle=self.shuffle,
-                                        # class_weight= self.train_dataset.class_weight,
+                                        class_weight= self.train_dataset.class_weight,
                                         callbacks=self.callbacks, verbose=2)
         else:
             print('Using real-time data augmentation.')
