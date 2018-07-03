@@ -124,7 +124,7 @@ class EZNet(BaseNet):
         self.tcn_input_layer = input_layer
 
         x = Conv1D(numfilters, kernel_size, 
-                        kernel_initializer=w_init[0],
+                        kernel_initializer=keras.initializers.he_normal(),
                         padding='causal', 
                         name='initial_conv')(x)
 
