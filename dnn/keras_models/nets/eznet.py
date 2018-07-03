@@ -76,7 +76,7 @@ class EZNet(BaseNet):
         kernel_size=(1,2)
         dilation = (1,1)
         nb_stacks = 1
-        n_layers = [2, 1]
+        n_layers = [4, 2, 1]
 
         vgg = self.build_vgg(n_layers,
                     poolsize,
@@ -85,7 +85,7 @@ class EZNet(BaseNet):
                     nb_stacks)
 
         # parameters for TCN
-        dilations = [1,2,4,6]
+        dilations = [1]
         numfilters = 24
         kernel_size = 2
         nb_stacks=1
