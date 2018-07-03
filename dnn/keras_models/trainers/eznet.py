@@ -268,7 +268,7 @@ class EZNetTrainer(BaseTrainer):
         print("class imbalance: ", np.sum(test), len(test))
 
         # swap the class weights
-        self.train_dataset.class_weight[[0,1]] = self.train_dataset.class_weight[[1,0]]
+        # self.train_dataset.class_weight[[0,1]] = self.train_dataset.class_weight[[1,0]]
 
         self.AUGMENT = False
         # self.steps_per_epoch = 2
@@ -282,7 +282,7 @@ class EZNetTrainer(BaseTrainer):
                               validation_data=([self.test_dataset.X_aux, self.test_dataset.X_chan], self.test_dataset.ylabels),
                               shuffle=self.shuffle,
                               class_weight= self.train_dataset.class_weight,
-                              callbacks=self.callbacks)
+                              callbacks=self.callbacks, verbose=2)
         elif self.AUGMENT=='dir':
             directory = self.train_directory
             target_size = (self.length_imsize, self.width_imsize)

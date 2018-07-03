@@ -9,6 +9,7 @@ from dnn.keras_models.nets.base import BaseNet
 import dnn.base.constants.model_constants as MODEL_CONSTANTS
 
 from dnn.keras_models.nets.generic import inception
+from dnn.keras_models.nets.generic import tcn, vgg
 
 from keras import Model
 # import high level optimizers, models and layers
@@ -36,6 +37,8 @@ class iEEGCNN(BaseNet):
 
         # initialize class elements
         self.imsize = imsize
+        self.length_imsize = imsize
+        self.width_imsize = imsize
         self.n_colors = n_colors
         self.num_classes = num_classes
 
@@ -43,9 +46,6 @@ class iEEGCNN(BaseNet):
 
         # initialize model constants
         self.DROPOUT = MODEL_CONSTANTS.DROPOUT
-
-        # start off with a relatively simple sequential model
-        self.net = Sequential()
 
     def summaryinfo(self):
         summary = {
@@ -77,44 +77,40 @@ class iEEGCNN(BaseNet):
     def buildmodel(self, output=True):
         # weight initialization
         self.w_init = None  
+        self.size_fc = 512
         # number of convolutions per layer
-        self.n_layers = (4, 2, 1)
-        self.numfilters = 32                     # number of filters in first layer of each new layer
-        self.poolsize = ((2,)*self.netdim)      # pool size
-        self.kernel_size = ((2,)*self.netdim)   # filter size
-        self.size_fc = 1024
-        self.dilation = (1,1) 
-        self._build_vgg()
+        numfilters = 32
+        poolsize=((2,2))
+        kernel_size=(3,3)
+        dilation = (1,1)
+        nb_stacks = 1
+        n_layers = [4, 2, 1]
+
+        vgg = self.build_vgg(n_layers,
+                    poolsize,
+                    numfilters,
+                    kernel_size, 
+                    nb_stacks)
 
         ''' INCEPTION MODEL PARAMS '''
-        # self.num_layers=10, 
-        # self.n_filters_first=64
-        # self._build_inception()
+        # num_layers=10, 
+        # n_filters_first=64
+        # inception = self._build_inception()
         if output:
-            self.buildoutput(self.size_fc)
+            model_output = self.buildoutput(vgg, self.size_fc)
 
-    def buildoutput(self, size_fc):
-        self._build_seq_output(size_fc=size_fc)
+        self.net = Model(inputs=self.input_layer,
+                        outputs=model_output)
 
-    def _add_vgg_layer(self, idx, kernel_init):
-        self.net.add(Conv2D(self.numfilters*(2 ** idx),
-                                      kernel_size=self.kernel_size,
-                                      input_shape=(
-                                      self.imsize, self.imsize, self.n_colors),
-                                      dilation_rate=self.dilation,
-                                      kernel_initializer=kernel_init,
-                                      use_bias=False,
-                                      activation='linear'))
-        # self.net.add(LeakyReLU(alpha=0.1))
-        self.net.add(BatchNormalization(axis=-1, momentum=0.99, 
-            epsilon=0.001, center=True, scale=True, 
-            beta_initializer='zeros', gamma_initializer='ones', 
-            moving_mean_initializer='zeros', moving_variance_initializer='ones', 
-            beta_regularizer=None, gamma_regularizer=None, 
-            beta_constraint=None, gamma_constraint=None))
-        self.net.add(ReLU())
+    def buildoutput(self, model, size_fc):
+        model = self._build_output(model, size_fc=size_fc)
+        return model 
 
-    def _build_vgg(self):
+    def build_vgg(self, n_layers,
+                    poolsize,
+                    numfilters,
+                    kernel_size, 
+                    nb_stacks):
         '''
         Creates a Convolutional Neural network in VGG-16 style. It requires self
         to initialize a sequential model first.
@@ -131,24 +127,37 @@ class iEEGCNN(BaseNet):
         Returns:
         model               the sequential model object with all layers added in CNN style
         '''
-        # set up input layer of CNN
-        self.net = Sequential()
         # check for weight initialization -> apply Glorotuniform
-        if self.w_init is None:
-            self.w_init = keras.initializers.glorot_uniform()
-        self.net.add(InputLayer(input_shape=(
-            self.imsize, self.imsize, self.n_colors)))
+        # if self.w_init is None:
+        # w_init = [keras.initializers.glorot_uniform()]
+        
+        # define starting layers
+        input_layer = Input(name='input_layer', 
+                            shape=(self.length_imsize, self.width_imsize, self.n_colors))
+        x = input_layer
+        self.input_layer = input_layer
+
         # initialize counter to keep track of which weight to assign
         count = 0
         # add the rest of the hidden layers
-        for idx, n_layer in enumerate(self.n_layers):
-            for ilay in range(n_layer):
-                kernel_init = self.w_init
-                self._add_vgg_layer(idx, kernel_init)
-                # increment counter to the next weight initializer
-                count += 1
-            # create a network at the end with a max pooling
-            self.net.add(MaxPooling2D(pool_size=self.poolsize))
+        vgg_helper = vgg.VGG(self.length_imsize, self.width_imsize, self.n_colors)
+        for s in range(nb_stacks):
+            for idx, n_layer in enumerate(n_layers):
+                for ilay in range(n_layer):
+                    # kernel_init = keras.initializers.glorot_uniform()
+                    kernel_init = keras.initializers.he_normal()
+                    x = vgg_helper.residualblock(x, ilay, idx,
+                                            numfilters, 
+                                            kernel_size,
+                                            kernel_init)
+                    # increment counter to the next weight initializer
+                    count += 1
+                # create a network at the end with a max pooling
+                x = MaxPooling2D(pool_size=poolsize)(x)
+
+        x = Flatten()(x)
+        self.net = x
+        return x
 
     def _build_inception(self):
         '''
@@ -157,7 +166,8 @@ class iEEGCNN(BaseNet):
         Allows customization based on number of layers, layout, etc.
         '''
         # define the input image
-        input_img = Input(shape=(self.imsize, self.imsize, self.n_colors))
+        input_img = Input(name='input_layer', shape=(self.imsize, self.imsize, self.n_colors))
+        self.input_layer = input_img
 
         # first add the beginning convolutional layers
         conv_input_img = Conv2D(self.n_filters_first//2, 
@@ -196,12 +206,8 @@ class iEEGCNN(BaseNet):
 
         # make sure layers are all flattened
         output = Flatten()(output)
-        
-        # create the output layers that are generally fc - with some DROPOUT
-        output = self._build_output(output, size_fc=self.size_fc)
-        # create the model
-        self.net = Model(inputs=input_img, outputs=output)
-        return self.net
+
+        return output
 
 
 if __name__ == '__main__':
