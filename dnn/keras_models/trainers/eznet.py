@@ -202,7 +202,8 @@ class EZNetTrainer(BaseTrainer):
         }
         self.modelconfig = self.model.compile(**model_params)
         print("Available metrics: ", self.model.metrics_names)
-
+        print("false_positive_weight = ", self.train_dataset.class_weight[0])        
+        print("false_negative_weight = ", self.train_dataset.class_weight[1])
 
         tempfilepath = os.path.join(self.explogdir, "weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5")
 
