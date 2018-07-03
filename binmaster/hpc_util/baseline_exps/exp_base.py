@@ -58,7 +58,7 @@ def local_run(args):
     # training parameters 
     num_epochs = 150
     batch_size = 32
-    learning_rate = 1e-1  # np.linspace(1e-5, 1e-3, 10)
+    learning_rate = 5e-2  # np.linspace(1e-5, 1e-3, 10)
 
     # for testpat in all÷_patients:
     testpatdir = os.path.join(output_data_dir, testpat)
@@ -112,7 +112,7 @@ def hpc_run(args):
     # training parameters 
     num_epochs = 150
     batch_size = 32
-    learning_rate = 1e-3 # np.linspace(1e-5, 1e-3, 10)
+    learning_rate = 5e-2 # np.linspace(1e-5, 1e-3, 10)
 
     # for testpat in all÷_patients:
     testpatdir = os.path.join(output_data_dir, testpat)
