@@ -116,7 +116,7 @@ def hpc_run(args):
     # training parameters 
     num_epochs = 150
     batch_size = 8
-    learning_rate = 5e-3  # np.linspace(1e-5, 1e-3, 10)
+    learning_rate = 5e-4  # np.linspace(1e-5, 1e-3, 10)
 
     # for testpat in all÷_patients:
     testpatdir = os.path.join(output_data_dir, testpat)
