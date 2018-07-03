@@ -10,6 +10,8 @@ from dnn.keras_models.trainers.base import BaseTrainer
 from dnn.keras_models.trainers.callbacks.testingcallback import MetricsCallback
 from dnn.util.keras.augmentations import Augmentations 
 
+from keras.metrics import categorical_accuracy
+
 from dnn.keras_models.metrics.classifier import BinaryClassifierMetric
 from dnn.base.constants.config import Config, OutputConfig
 from dnn.keras_models.regularizer.post_class_regularizer import Postalarm
@@ -142,7 +144,7 @@ class CNNTrainer(BaseTrainer):
                          decay=0.0,
                          amsgrad=True,
                          clipnorm=clipnorm),
-            'metrics': ['accuracy']
+            'metrics': [categorical_accuracy]
         }
         self.modelconfig = self.model.compile(**model_params)
 
@@ -151,7 +153,7 @@ class CNNTrainer(BaseTrainer):
         '''                         CREATE CALLBACKS                        '''
         # callbacks availabble
         checkpoint = ModelCheckpoint(tempfilepath,
-                                     monitor='val_acc',
+                                     monitor=categorical_accuracy,
                                      verbose=1,
                                      save_best_only=True,
                                      mode='max')
@@ -208,7 +210,7 @@ class CNNTrainer(BaseTrainer):
                                                             interpolation='nearest'),
                                         steps_per_epoch=self.steps_per_epoch,
                                         epochs=self.num_epochs,
-                                        validation_data=([self.test_dataset.X_aux, self.test_dataset.X_chan], self.test_dataset.ylabels),
+                                        validation_data=(self.test_dataset.X_test, self.test_dataset.y_test),
                                         shuffle=self.shuffle,
                                         class_weight= self.train_dataset.class_weight,
                                         callbacks=self.callbacks, verbose=2)

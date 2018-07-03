@@ -319,7 +319,7 @@ class EZNetTrainer(BaseTrainer):
                                         callbacks=self.callbacks, verbose=2)
 
         self.HH = HH
-        self.metrichistory = self.callbacks[3] 
+        self.metrichistory = self.callbacks[2] 
 
     def _loadgenerator(self):
         imagedatagen_args = {

@@ -71,6 +71,7 @@ class ReaderEZNetDataset(BaseAuxLoader):
             newtensor = np.zeros((tensor.shape[0] * 2, *tuple(tensor.shape[1:])))
             newtensor[0:tensor.shape[0], ...] = tensor
             return newtensor
+            
         def pad_tensor(shape, tensor):
             result = np.zeros(shape)
             if tensor.ndim == 2:
