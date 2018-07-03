@@ -1,5 +1,5 @@
 import keras.backend as K
-from keras.layers import Conv2D, Conv1Dn
+from keras.layers import Conv2D, Conv1D
 from keras.layers import Activation, Lambda
 from keras.models import Input, Model
 import keras.layers
