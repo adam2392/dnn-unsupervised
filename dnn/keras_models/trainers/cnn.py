@@ -153,7 +153,7 @@ class CNNTrainer(BaseTrainer):
         '''                         CREATE CALLBACKS                        '''
         # callbacks availabble
         checkpoint = ModelCheckpoint(tempfilepath,
-                                     monitor='val_categorical_accuracy',
+                                     monitor='val_loss',
                                      verbose=1,
                                      save_best_only=True,
                                      mode='max')
@@ -171,7 +171,8 @@ class CNNTrainer(BaseTrainer):
                                     embeddings_metadata=None, 
                                     embeddings_data=None)
         metrichistory = MetricsCallback()
-        self.callbacks = [checkpoint,
+        self.callbacks = [
+                        # checkpoint,
                         reduce_lr,
                         tboard,
                         metrichistory]
@@ -227,7 +228,7 @@ class CNNTrainer(BaseTrainer):
                                         callbacks=self.callbacks, verbose=2)
 
         self.HH = HH
-        self.metrichistory = self.callbacks[3] 
+        self.metrichistory = self.callbacks[2] 
 
     def _loadgenerator(self):
         imagedatagen_args = {
