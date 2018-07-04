@@ -12,6 +12,23 @@ from sklearn.utils import compute_class_weight
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import scale
 
+class Dataset(object):
+    def __len__(self):
+        return len(self.X)
+    @property
+    def imsize(self):
+        if isinstance(self.X, list):
+            return self.X[0].shape[2]
+        return self.X.shape[2]
+    @property
+    def n_colors(self):
+        if isinstance(self.X, list):
+            return self.X[0].shape[3]
+        return self.X.shape[3]
+    def empty(self):
+        self.X = None
+        self.y = None
+        self.class_weight = None
 
 class TrainDataset(object):
     X_train = None
@@ -33,6 +50,11 @@ class TrainDataset(object):
             return self.X_train[0].shape[3]
         return self.X_train.shape[3]
 
+    def empty(self):
+        self.X_train = None
+        self.y_train = None
+        self.class_weight = None
+
 class TestDataset(object):
     X_test = None
     y_test = None
@@ -53,6 +75,10 @@ class TestDataset(object):
             return self.X_test[0].shape[3]
         return self.X_test.shape[3]
 
+    def empty(self):
+        self.X_test = None
+        self.y_test = None
+        self.class_weight = None
 
 class BaseLoader(object):
     root_dir = None

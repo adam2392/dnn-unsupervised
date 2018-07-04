@@ -52,6 +52,10 @@ def local_run(args):
     expname = 'test'
 
 def hpc_run(args):
+    from psutil import virtual_memory
+    mem = virtual_memory()
+    print(mem.total)  # total physical memory available
+
     # read in the parsed arguments
     testpat = args.patient_to_loo
     log_data_dir = args.log_data_dir
@@ -80,13 +84,24 @@ def hpc_run(args):
     # initialize hpc trainer object
     hpcrun = MarccHPC()
     # get the datasets
-    train_dataset, test_dataset = hpcrun.load_data(train_data_dir, test_data_dir, 
+    # train_dataset, test_dataset = hpcrun.load_data(train_data_dir, test_data_dir, 
+    #                                     data_procedure=data_procedure, 
+    #                                     testpat=testpat, 
+    #                                     training_pats=training_patients)
+    # # get the image size and n_colors from the datasets
+    # imsize = train_dataset.imsize
+    # n_colors = train_dataset.n_colors
+
+    # hard code imsize/n_colors
+    test_dataset = hpcrun.load_test_data(train_data_dir, test_data_dir, 
                                         data_procedure=data_procedure, 
                                         testpat=testpat, 
                                         training_pats=training_patients)
-    # get the image size and n_colors from the datasets
-    imsize = train_dataset.imsize
-    n_colors = train_dataset.n_colors
+    train_dataset = test_dataset
+    train_dataset.empty()
+    
+    imsize = test_dataset.imsize
+    n_colors = test_dataset.n_colors
             
     # create model
     model = hpcrun.createmodel(num_classes, imsize, n_colors)

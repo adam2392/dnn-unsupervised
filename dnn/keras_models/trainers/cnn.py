@@ -199,12 +199,11 @@ class CNNTrainer(BaseTrainer):
         elif self.AUGMENT=='dir':
             directory = self.train_directory
             target_size = (self.length_imsize, self.width_imsize)
-            color_mode = 'grayscale'
             classes=[0, 1]
             
             HH = self.model.fit_generator(self.generator.flow_from_directory(self, directory,
-                                                            target_size=target_size, color_mode=color_mode,
-                                                            classes=None, 
+                                                            target_size=target_size, 
+                                                            classes=classes, 
                                                             class_mode='categorical',
                                                             batch_size=self.batch_size, 
                                                             shuffle=self.shuffle, 

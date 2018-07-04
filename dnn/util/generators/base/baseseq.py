@@ -99,7 +99,6 @@ class Iterator(keras.utils.Sequence):
         """
         raise NotImplementedError
 
-
 class DirectoryIterator(Iterator):
     """Iterator capable of reading images from a directory on disk.
 

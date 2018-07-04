@@ -18,8 +18,28 @@ class MarccHPC(BaseHPC):
     impelements the basehpc functions.
     '''
     @staticmethod
+    def load_test_data(traindir, testdir, 
+        data_procedure='loo', 
+        testpat=None, 
+        training_pats=None):
+        '''
+        If LOO training, then we have to trim these into 
+        their separate filelists
+        '''
+        # initialize reader to get the training/testing data
+        reader = ReaderImgDataset()
+        reader.loadbydir(traindir, testdir, procedure=data_procedure, testname=testpat)
+        reader.loadfiles(mode=constants.TEST)
+
+        # create the dataset objects
+        test_dataset = reader.test_dataset
+        return test_dataset
+
+    @staticmethod
     def load_data(traindir, testdir, 
-        data_procedure='loo', testpat=None, training_pats=None):
+        data_procedure='loo', 
+        testpat=None, 
+        training_pats=None):
         '''
         If LOO training, then we have to trim these into 
         their separate filelists
@@ -75,7 +95,7 @@ class MarccHPC(BaseHPC):
     @staticmethod
     def trainmodel(model, num_epochs, batch_size, 
                     train_dataset, test_dataset, 
-                    outputdir, expname, device=None):
+                    outputdir, expname, use_dir_generator=False, device=None):
         if device is None:
             devices = super(MarccHPC, MarccHPC).get_available_gpus()
         if len(devices) > 1:
@@ -87,7 +107,8 @@ class MarccHPC(BaseHPC):
                             num_epochs=num_epochs, 
                             batch_size=batch_size,
                             outputdir=outputdir)
-        trainer.composedatasets(train_dataset, test_dataset)
+        if not use_dir_generator:
+            trainer.composedatasets(train_dataset, test_dataset)
         trainer.configure()
         print("Training on {} ".format(device))
         print("Training object: {}".format(trainer))
