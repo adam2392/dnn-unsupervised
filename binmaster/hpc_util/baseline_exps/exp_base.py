@@ -111,6 +111,7 @@ def hpc_run(args):
                         num_epochs=num_epochs, batch_size=batch_size, 
                         test_dataset=test_dataset,
                         train_datadir=train_data_dir,
+                        leave_out_name=testpat,
                         outputdir=testpatdir, 
                         expname=expname)
 
