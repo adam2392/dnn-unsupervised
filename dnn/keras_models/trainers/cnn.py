@@ -26,17 +26,28 @@ class CNNTrainer(BaseTrainer):
     post_regularizer = None
     HH = None
 
+    train_dataset = None
+    test_dataset = None
+    train_size = None
+    steps_per_epoch = None
+
     def __init__(self, model, num_epochs=MODEL_CONSTANTS.NUM_EPOCHS, 
                  batch_size=MODEL_CONSTANTS.BATCH_SIZE,
                  outputdir=None,
                  learning_rate=MODEL_CONSTANTS.LEARNING_RATE,
                  shuffle=MODEL_CONSTANTS.SHUFFLE,
                  augment=MODEL_CONSTANTS.AUGMENT,
+                 train_directory=None,
+                 leave_out_name=None,
                  config=None):
         '''         SET LOGGING DIRECTORIES: MODEL, TENSORBOARD         '''
         self.outputdir = outputdir
         super(CNNTrainer, self).__init__(model=model,
                                          config=config)
+
+        # initialize directories
+        self.train_directory = train_directory
+        self.leave_out_name = leave_out_name
 
         # Hyper parameters - training
         self.learning_rate = learning_rate
@@ -106,17 +117,25 @@ class CNNTrainer(BaseTrainer):
         }
         self._writejsonfile(metricdata, metricsfilepath)
 
-    def composedatasets(self, train_dataset, test_dataset):
-        self.train_dataset = train_dataset
+    def compose_testdataset(self, test_dataset):
         self.test_dataset = test_dataset
+        # get input characteristics
+        self.imsize = test_dataset.imsize
+        self.n_colors = test_dataset.n_colors
+        self.val_size = len(test_dataset)
 
+    def compose_traindataset(self, train_dataset):
+        self.train_dataset = train_dataset
         # get input characteristics
         self.imsize = train_dataset.imsize
         self.n_colors = train_dataset.n_colors
         # size of training/testing set
         self.train_size = len(train_dataset)
-        self.val_size = len(test_dataset)
         self.steps_per_epoch = self.train_size // self.batch_size
+
+    def composedatasets(self, train_dataset, test_dataset):
+        self.compose_testdataset(test_dataset)
+        self.compose_traindataset(train_dataset)
 
         # self.train_size = 2#len(train_dataset_obj)
         # self.val_size = 2#len(test_dataset_obj)
@@ -180,6 +199,32 @@ class CNNTrainer(BaseTrainer):
                         tboard,
                         metrichistory]
 
+    def test(self, modelname):
+        import keras.backend as K 
+        def predict_with_uncertainty(f, x, n_iter=10):
+            result = np.zeros((n_iter,) + x.shape)
+
+            for iter in range(n_iter):
+                result[iter] = f(x, 1)
+
+            prediction = result.mean(axis=0)
+            uncertainty = result.var(axis=0)
+            return prediction, uncertainty
+
+        # create a "learning phase" function, to allow prediction with uncertainty
+        f = K.Function(self.model.inputs + [K.learning_phase()], self.model.outputs)
+        X = [self.test_dataset.X_aux, self.test_dataset.X_chan]
+        prediction, uncertainty = predict_with_uncertainty(f, X, n_iter=50)
+
+        # determine scoring of these predictions
+        metricsfilepath = os.path.join(self.outputdatadir, modelname+ "_test_predictions.json")
+
+        metricdata = {
+            'prediction': prediction,
+            'uncertainty': uncertainty
+        }
+        self._writejsonfile(metricdata, metricsfilepath)
+
     def train(self):
         self._loadgenerator()
         print("Training data: ", self.train_dataset.X_train.shape,  self.train_dataset.y_train.shape)
@@ -202,12 +247,12 @@ class CNNTrainer(BaseTrainer):
         elif self.AUGMENT=='dir':
             # load the generator for directory
             self._loadgenerator_dir()
-            self.train_directory = '/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/mne_methods/win500_step250'
             directory = self.train_directory
-            target_size = (self.length_imsize, self.width_imsize)
+            target_size = (self.imsize, self.imsize)
             classes=[0, 1]
             
             HH = self.model.fit_generator(self.generator.flow_from_directory(self, directory,
+                                                            testname=self.leave_out_name,
                                                             target_size=target_size, 
                                                             classes=classes, 
                                                             class_mode='binary',

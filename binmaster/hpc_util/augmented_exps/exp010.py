@@ -85,10 +85,16 @@ def hpc_run(args):
                                         data_procedure=data_procedure, 
                                         testpat=testpat, 
                                         training_pats=training_patients)
+    
     # get the image size and n_colors from the datasets
-    imsize = train_dataset.imsize
-    n_colors = train_dataset.n_colors
+    test_dataset = hpcrun.load_test_data(train_data_dir, test_data_dir, 
+                                        data_procedure=data_procedure, 
+                                        testpat=testpat, 
+                                        training_pats=training_patients)    
+    imsize = test_dataset.imsize
+    n_colors = test_dataset.n_colors
             
+
     # create model
     model = hpcrun.createmodel(num_classes, imsize, n_colors)
     # extract the actual model from the object

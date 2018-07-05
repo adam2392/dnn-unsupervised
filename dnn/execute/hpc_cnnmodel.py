@@ -93,9 +93,35 @@ class MarccHPC(BaseHPC):
         return model
 
     @staticmethod
+    def trainmodel_withdir(model, 
+                    num_epochs, 
+                    batch_size, 
+                    test_dataset, 
+                    train_datadir,
+                    leave_out_name,
+                    outputdir, expname):
+        devices = super(MarccHPC, MarccHPC).get_available_gpus()
+        if len(devices) > 1:
+            print("Let's use {} GPUs!".format(len(devices)))
+            # make the model parallel
+            model = multi_gpu_model(model, gpus=len(devices))
+
+        trainer = CNNTrainer(model=model, 
+                            num_epochs=num_epochs, 
+                            batch_size=batch_size,
+                            outputdir=outputdir,
+                            train_datadir=train_datadir,
+                            leave_out_name=leave_out_name,
+                            augment='dir')
+        trainer.compose_testdataset(test_dataset)
+        trainer.configure()
+        trainer.train()
+        return trainer
+
+    @staticmethod
     def trainmodel(model, num_epochs, batch_size, 
                     train_dataset, test_dataset, 
-                    outputdir, expname, use_dir_generator=False, device=None):
+                    outputdir, expname, device=None):
         if device is None:
             devices = super(MarccHPC, MarccHPC).get_available_gpus()
         if len(devices) > 1:
@@ -107,8 +133,8 @@ class MarccHPC(BaseHPC):
                             num_epochs=num_epochs, 
                             batch_size=batch_size,
                             outputdir=outputdir)
-        if not use_dir_generator:
-            trainer.composedatasets(train_dataset, test_dataset)
+
+        trainer.composedatasets(train_dataset, test_dataset)
         trainer.configure()
         print("Training on {} ".format(device))
         print("Training object: {}".format(trainer))
@@ -120,5 +146,6 @@ class MarccHPC(BaseHPC):
     def testmodel(trainer, modelname):
         trainer.saveoutput(modelname=modelname)
         trainer.savemetricsoutput(modelname=modelname)
+        trainer.test(modelname=modelname)
         return trainer
 

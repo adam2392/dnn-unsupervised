@@ -108,9 +108,19 @@ def hpc_run(args):
     # extract the actual model from the object
     model = model.net    
     # train model
-    trainer = hpcrun.trainmodel(model=model, num_epochs=num_epochs, batch_size=batch_size, 
-                        train_dataset=train_dataset, test_dataset=test_dataset,
-                        outputdir=testpatdir, expname=expname)
+    # trainer = hpcrun.trainmodel(model=model, 
+    #                     num_epochs=num_epochs, batch_size=batch_size, 
+    #                     train_dataset=train_dataset, 
+    #                     test_dataset=test_dataset,
+    #                     outputdir=testpatdir, 
+    #                     expname=expname)
+    trainer = hpcrun.trainmodel(model=model, 
+                        num_epochs=num_epochs, batch_size=batch_size, 
+                        test_dataset=test_dataset,
+                        train_datadir=train_datadir,
+                        outputdir=testpatdir, 
+                        expname=expname)
+
     # test and save model
     trainer = hpcrun.testmodel(trainer, modelname)
 
