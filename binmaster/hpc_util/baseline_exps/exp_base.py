@@ -110,7 +110,7 @@ def hpc_run(args):
     trainer = hpcrun.trainmodel(model=model, 
                         num_epochs=num_epochs, batch_size=batch_size, 
                         test_dataset=test_dataset,
-                        train_datadir=train_datadir,
+                        train_datadir=train_data_dir,
                         outputdir=testpatdir, 
                         expname=expname)
 
