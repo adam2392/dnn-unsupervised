@@ -93,9 +93,6 @@ def hpc_run(args):
                                         data_procedure=data_procedure, 
                                         testpat=testpat, 
                                         training_pats=training_patients)
-    train_dataset = test_dataset
-    train_dataset.empty()
-    
     imsize = test_dataset.imsize
     n_colors = test_dataset.n_colors
             
