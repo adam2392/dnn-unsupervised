@@ -227,11 +227,11 @@ class CNNTrainer(BaseTrainer):
 
     def train(self):
         self._loadgenerator()
-        print("Training data: ", self.train_dataset.X_train.shape,  self.train_dataset.y_train.shape)
+        # print("Training data: ", self.train_dataset.X_train.shape,  self.train_dataset.y_train.shape)
         print("Testing data: ",  self.test_dataset.X_test.shape,  self.test_dataset.y_test.shape)
-        print("Class weights are: ",  self.train_dataset.class_weight)
-        test = np.argmax( self.train_dataset.y_train, axis=1)
-        print("class imbalance: ", np.sum(test), len(test))
+        # print("Class weights are: ",  self.train_dataset.class_weight)
+        # test = np.argmax( self.train_dataset.y_train, axis=1)
+        # print("class imbalance: ", np.sum(test), len(test))
 
         # augment data, or not and then trian the model!
         if not self.AUGMENT:
