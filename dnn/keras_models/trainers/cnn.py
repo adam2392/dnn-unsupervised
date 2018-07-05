@@ -202,7 +202,7 @@ class CNNTrainer(BaseTrainer):
         elif self.AUGMENT=='dir':
             # load the generator for directory
             self._loadgenerator_dir()
-
+            self.train_directory = '/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/mne_methods/win500_step250'
             directory = self.train_directory
             target_size = (self.length_imsize, self.width_imsize)
             classes=[0, 1]

@@ -116,11 +116,12 @@ def _list_valid_filenames_in_directory(directory, white_list_formats, split,
 
     return classes, filenames
 
-def _get_all_subfiles(directory, extension):
+def _get_all_subfiles(directory, extension, testname):
     testfilepaths = []
     for root, dirs, files in os.walk(directory):
         for file in files:
-            if file.endswith(extension) and not file.startswith('.'):
+            if file.endswith(extension) and not file.startswith('.') \
+                and testname not in file:
                 testfilepaths.append(os.path.join(root, file))
     return testfilepaths
 
@@ -164,6 +165,7 @@ class CustomDirectoryIterator(Iterator):
         self.directory = directory
         self.image_data_generator = image_data_generator
         self.target_size = tuple(target_size)
+        self.testname = testname
 
         if color_mode not in {'rgb', 'grayscale'}:
             raise ValueError('Invalid color mode:', color_mode,
@@ -218,7 +220,7 @@ class CustomDirectoryIterator(Iterator):
         self.num_classes = len(classes)
         self.class_indices = dict(zip(classes, range(len(classes))))
 
-        alldatasets = _get_all_subfiles(directory, extension='.npz')
+        alldatasets = _get_all_subfiles(directory, extension='.npz',testname=self.testname)
         total_size_dataset, datasets_dict = count_dataset(alldatasets)
         # self.datasets = len(alldatasets)
         self.datasets = total_size_dataset
