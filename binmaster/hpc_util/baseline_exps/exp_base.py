@@ -84,21 +84,21 @@ def hpc_run(args):
     # initialize hpc trainer object
     hpcrun = MarccHPC()
     # get the datasets
-    train_dataset, test_dataset = hpcrun.load_data(train_data_dir, test_data_dir, 
-                                        data_procedure=data_procedure, 
-                                        testpat=testpat, 
-                                        training_pats=training_patients)
-    # get the image size and n_colors from the datasets
-    imsize = train_dataset.imsize
-    n_colors = train_dataset.n_colors
-
-    # hard code imsize/n_colors
-    # test_dataset = hpcrun.load_test_data(train_data_dir, test_data_dir, 
+    # train_dataset, test_dataset = hpcrun.load_data(train_data_dir, test_data_dir, 
     #                                     data_procedure=data_procedure, 
     #                                     testpat=testpat, 
     #                                     training_pats=training_patients)
-    # train_dataset = test_dataset
-    # train_dataset.empty()
+    # # get the image size and n_colors from the datasets
+    # imsize = train_dataset.imsize
+    # n_colors = train_dataset.n_colors
+
+    # hard code imsize/n_colors
+    test_dataset = hpcrun.load_test_data(train_data_dir, test_data_dir, 
+                                        data_procedure=data_procedure, 
+                                        testpat=testpat, 
+                                        training_pats=training_patients)
+    train_dataset = test_dataset
+    train_dataset.empty()
     
     imsize = test_dataset.imsize
     n_colors = test_dataset.n_colors

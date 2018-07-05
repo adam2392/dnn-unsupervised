@@ -5,10 +5,13 @@ from keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 from keras.preprocessing.image import ImageDataGenerator
 
+# import module based functions
 import dnn.base.constants.model_constants as MODEL_CONSTANTS
 from dnn.keras_models.trainers.base import BaseTrainer
 from dnn.keras_models.trainers.callbacks.testingcallback import MetricsCallback
 from dnn.util.keras.augmentations import Augmentations 
+
+from dnn.util.generators.direcotry.generator import ImageDirectoryGenerator
 
 from keras.metrics import categorical_accuracy
 
@@ -41,7 +44,7 @@ class CNNTrainer(BaseTrainer):
         self.batch_size = batch_size
         # hyper parameters - dataset
         self.shuffle = shuffle
-        self.AUGMENT = augment
+        self.AUGMENT = 'dir'
 
         self.save_summary_steps = 10
         self.gradclip_value = 1.5
@@ -197,6 +200,9 @@ class CNNTrainer(BaseTrainer):
                               class_weight= self.train_dataset.class_weight,
                               callbacks=self.callbacks)
         elif self.AUGMENT=='dir':
+            # load the generator for directory
+            self._loadgenerator_dir()
+
             directory = self.train_directory
             target_size = (self.length_imsize, self.width_imsize)
             classes=[0, 1]
@@ -204,15 +210,14 @@ class CNNTrainer(BaseTrainer):
             HH = self.model.fit_generator(self.generator.flow_from_directory(self, directory,
                                                             target_size=target_size, 
                                                             classes=classes, 
-                                                            class_mode='categorical',
+                                                            class_mode='binary',
                                                             batch_size=self.batch_size, 
                                                             shuffle=self.shuffle, 
                                                             interpolation='nearest'),
-                                        steps_per_epoch=self.steps_per_epoch,
                                         epochs=self.num_epochs,
                                         validation_data=(self.test_dataset.X_test, self.test_dataset.y_test),
                                         shuffle=self.shuffle,
-                                        class_weight= self.train_dataset.class_weight,
+                                        # class_weight= self.train_dataset.class_weight,
                                         callbacks=self.callbacks, verbose=2)
         else:
             print('Using real-time data augmentation.')
@@ -228,6 +233,28 @@ class CNNTrainer(BaseTrainer):
 
         self.HH = HH
         self.metrichistory = self.callbacks[2] 
+
+    def _loadgenerator_dir(self):
+        imagedatagen_args = {
+            'featurewise_center':True,  # set input mean to 0 over the dataset
+            'samplewise_center':False,  # set each sample mean to 0
+            'featurewise_std_normalization':True,  # divide inputs by std of the dataset
+            'samplewise_std_normalization':False,  # divide each input by its std
+            'zca_whitening':False,      # apply ZCA whitening
+            # randomly rotate images in the range (degrees, 0 to 180)
+            'rotation_range':5,
+            # randomly shift images horizontally (fraction of total width)
+            'width_shift_range':0.2,
+            # randomly shift images vertically (fraction of total height)
+            'height_shift_range':0.2,
+            'horizontal_flip':True,    # randomly flip images
+            'vertical_flip':True,      # randomly flip images
+            'channel_shift_range':4,
+            'fill_mode':'nearest',
+            'preprocessing_function':Augmentations.preprocess_imgwithnoise
+        }
+        # This will do preprocessing and realtime data augmentation:
+        self.generator = ImageDirectoryGenerator(**imagedatagen_args)
 
     def _loadgenerator(self):
         imagedatagen_args = {

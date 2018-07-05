@@ -9,6 +9,8 @@ import multiprocessing.pool
 from functools import partial
 from dnn.util.generators.base.baseseq import Iterator, DirectoryIterator
 
+from random import shuffle
+
 def _iter_valid_files(directory, white_list_formats, follow_links):
     """Iterates on files with extension in `white_list_formats` contained in `directory`.
 
@@ -122,6 +124,29 @@ def _get_all_subfiles(directory, extension):
                 testfilepaths.append(os.path.join(root, file))
     return testfilepaths
 
+
+def count_dataset(datasetfiles):
+    """
+    A function to count the length of our entire dataset that can't be fit into ram,
+
+    VERY INEFFICIENT. 
+
+    TODO:
+    - see if we can improve a way to determine the size of our entire dataset of chunks
+    """
+    from collections import OrderedDict
+
+    datasetdict = OrderedDict()
+    count = 0
+    for dataset in datasetfiles:
+        datastruct = np.load(dataset)
+        ylabels = datastruct['ylabels']
+        # have a dictionary store the indices between each dataset
+        datasetdict[dataset] = [count,count+len(ylabels)]
+        count += len(ylabels)
+
+    return count, datasetdict
+
 class CustomDirectoryIterator(Iterator):
     def __init__(self, directory, image_data_generator,
                  testname=None,
@@ -194,7 +219,10 @@ class CustomDirectoryIterator(Iterator):
         self.class_indices = dict(zip(classes, range(len(classes))))
 
         alldatasets = _get_all_subfiles(directory, extension='.npz')
-        self.datasets = len(alldatasets)
+        total_size_dataset, datasets_dict = count_dataset(alldatasets)
+        # self.datasets = len(alldatasets)
+        self.datasets = total_size_dataset
+        self.datasets_dict = datasets_dict
 
         print('Found %d images belonging to %d classes.' %
               (self.datasets, self.num_classes))
@@ -209,7 +237,7 @@ class CustomDirectoryIterator(Iterator):
                                                 shuffle,
                                                 seed)
 
-    def _sample_datasets(self, dataset, numsamps):
+    def _sample_datasets(self, dataset_filelist, numsamps):
         """
         A function to help sample datasets. Assuming user has 
         multiple datasets passed into the directories, this can be used
@@ -218,9 +246,27 @@ class CustomDirectoryIterator(Iterator):
 
         """
         # get random indices to sample of the dataset
-        randinds = np.random.choice(dataset, size=numsamps, replace=True)
-        
-        pass
+        randinds = np.random.choice(len(dataset_filelist), size=numsamps, replace=True)
+
+        X = []
+        Y = []
+        # sample from here
+        for i in range(randinds):
+            fname = self.filenames[j]
+            datastruct = np.load(fname)
+            # print(datastruct.keys())
+            # x = datastruct['image_tensor']
+            x = datastruct['auxmats']
+            y = datastruct['ylabels']
+
+            # rand sample the dataset
+            randsample = np.random.choice(len(y), size=1, replace=False)
+            x = x[randsample,...]
+            y = y[randsample,...]
+            X.append(x)
+            Y.append(y)
+
+        return X, Y
 
     def _get_batches_of_transformed_samples(self, index_array):
         batch_x = np.zeros(
@@ -232,22 +278,37 @@ class CustomDirectoryIterator(Iterator):
         grayscale = self.color_mode == 'grayscale'
 
         # get random indices from file list
-        randinds = np.random.choice(self.datasets, size=len(index_array)//5, replace=True)
-        batch_filelist = np.array(self.filenames)[randinds]
+        # randinds = np.random.choice(self.datasets, size=len(index_array)//5, replace=True)
+        # batch_filelist = np.array(self.filenames)[randinds]
+
+        def _get_dataset_index(index):
+            for f in self.filenames:
+                ind_range = self.datasets_dict[f]
+                if index >= ind_range[0] and index < ind_range[1]:
+                    return f
 
         for i, j in enumerate(index_array):
-            fname = self.filenames[j]
+            # obtain the filepath for this index and the corresponding index range
+            fname = _get_dataset_index(j)
+            ind_range = self.datasets_dict[fname]
+
+            print("index range is: ", ind_range)
+            print("j is ", j)
+            # get actual index within this dataset by subtracting the lower bound
+            j = j - ind_range[0]
+
+            # load dataset
             datastruct = np.load(fname)
-            print(datastruct.keys())
+            # print(datastruct.keys())
             # x = datastruct['image_tensor']
             x = datastruct['auxmats']
             y = datastruct['ylabels']
-            print(x.shape)
-            print(y.shape)
+            # print(x.shape)
+            # print(y.shape)
 
-            randind = np.random.choice(len(x), size=1)
-            x = x[randind, ...].squeeze().reshape(self.image_shape)
-            y = y[randind, ...].squeeze()
+            # get that index
+            x = x[j, ...].squeeze().reshape(self.image_shape)
+            y = y[j, ...].squeeze()
 
             params = self.image_data_generator.get_random_transform(x.shape)
             x = self.image_data_generator.apply_transform(x, params)
