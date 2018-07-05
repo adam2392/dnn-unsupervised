@@ -151,7 +151,7 @@ def count_dataset(datasetfiles):
 class CustomDirectoryIterator(Iterator):
     def __init__(self, directory, image_data_generator,
                  testname=None,
-                 target_size=(256, 256), color_mode='rgb',
+                 target_size=(256, 256), num_colors=None, color_mode='rgb',
                  classes=None, class_mode='binary',
                  batch_size=32, shuffle=True, seed=None,
                  data_format=None,
@@ -182,6 +182,9 @@ class CustomDirectoryIterator(Iterator):
                 self.image_shape = self.target_size + (1,)
             else:
                 self.image_shape = (1,) + self.target_size
+        if num_colors is not None:
+            self.image_shape = self.target_size + (num_colors,)
+            
         self.classes = classes
         if class_mode not in {'categorical', 'binary', 'sparse',
                               'input', None}:

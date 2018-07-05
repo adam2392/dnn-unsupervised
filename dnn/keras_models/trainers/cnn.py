@@ -253,7 +253,8 @@ class CNNTrainer(BaseTrainer):
             
             HH = self.model.fit_generator(self.generator.flow_from_directory(directory,
                                                             testname=self.leave_out_name,
-                                                            target_size=target_size, 
+                                                            target_size=target_size,
+                                                            num_colors=self.n_colors, 
                                                             classes=classes, 
                                                             class_mode='binary',
                                                             batch_size=self.batch_size, 

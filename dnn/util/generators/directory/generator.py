@@ -11,7 +11,7 @@ class ImageDirectoryGenerator(ImageDataGenerator):
         self.iterator=None
 
     def flow_from_directory(self, directory, testname=None,
-                            target_size=(64, 64), color_mode='rgb',
+                            target_size=(64, 64), num_colors=4, color_mode='rgb',
                             classes=None, class_mode='categorical',
                             batch_size=32, shuffle=True, seed=None,
                             save_to_dir=None,
@@ -98,6 +98,7 @@ class ImageDirectoryGenerator(ImageDataGenerator):
         return CustomDirectoryIterator(
             directory, self, testname,
             target_size=target_size, color_mode=color_mode,
+            num_colors=num_colors,
             classes=classes, class_mode=class_mode,
             data_format=self.data_format,
             batch_size=batch_size, shuffle=shuffle, seed=seed,
