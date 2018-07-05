@@ -11,7 +11,7 @@ from dnn.keras_models.trainers.base import BaseTrainer
 from dnn.keras_models.trainers.callbacks.testingcallback import MetricsCallback
 from dnn.util.keras.augmentations import Augmentations 
 
-from dnn.util.generators.direcotry.generator import ImageDirectoryGenerator
+from dnn.util.generators.directory.generator import ImageDirectoryGenerator
 
 from keras.metrics import categorical_accuracy
 

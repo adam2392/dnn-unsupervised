@@ -42,7 +42,7 @@ logdatadir="/scratch/users/ali39@jhu.edu/data/dnn/logs/$expname/"
 outputdatadir="/scratch/users/ali39@jhu.edu/data/dnn/output/$expname/"
 
 model_dir="/scratch/users/ali39@jhu.edu/data/dnn/output/exp001/"
-augmentdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/tvbsims_new/"
+augmentdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/augmentdatasets/tvbsim_paramsweep/"
 
 echo "These are the data directories: "
 echo "Temp datadir: $logdatadir "
