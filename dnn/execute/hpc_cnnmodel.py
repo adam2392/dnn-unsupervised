@@ -110,7 +110,7 @@ class MarccHPC(BaseHPC):
                             num_epochs=num_epochs, 
                             batch_size=batch_size,
                             outputdir=outputdir,
-                            train_datadir=train_datadir,
+                            train_directory=train_datadir,
                             leave_out_name=leave_out_name,
                             augment='dir')
         trainer.compose_testdataset(test_dataset)
