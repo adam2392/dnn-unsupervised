@@ -52,10 +52,6 @@ def local_run(args):
     expname = 'test'
 
 def hpc_run(args):
-    from psutil import virtual_memory
-    mem = virtual_memory()
-    print(mem.total)  # total physical memory available
-
     # read in the parsed arguments
     testpat = args.patient_to_loo
     log_data_dir = args.log_data_dir
