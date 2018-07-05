@@ -251,7 +251,7 @@ class CNNTrainer(BaseTrainer):
             target_size = (self.imsize, self.imsize)
             classes=[0, 1]
             
-            HH = self.model.fit_generator(self.generator.flow_from_directory(self, directory,
+            HH = self.model.fit_generator(self.generator.flow_from_directory(directory,
                                                             testname=self.leave_out_name,
                                                             target_size=target_size, 
                                                             classes=classes, 
