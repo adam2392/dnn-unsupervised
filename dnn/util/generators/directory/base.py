@@ -257,8 +257,8 @@ class CustomDirectoryIterator(Iterator):
             fname = self.filenames[j]
             datastruct = np.load(fname)
             # print(datastruct.keys())
-            # x = datastruct['image_tensor']
-            x = datastruct['auxmats']
+            x = datastruct['image_tensor']
+            # x = datastruct['auxmats']
             y = datastruct['ylabels']
 
             # rand sample the dataset
@@ -294,16 +294,16 @@ class CustomDirectoryIterator(Iterator):
             fname = _get_dataset_index(j)
             ind_range = self.datasets_dict[fname]
 
-            print("index range is: ", ind_range)
-            print("j is ", j)
+            # print("index range is: ", ind_range)
+            # print("j is ", j)
             # get actual index within this dataset by subtracting the lower bound
             j = j - ind_range[0]
 
             # load dataset
             datastruct = np.load(fname)
             # print(datastruct.keys())
-            # x = datastruct['image_tensor']
-            x = datastruct['auxmats']
+            x = datastruct['image_tensor']
+            # x = datastruct['auxmats']
             y = datastruct['ylabels']
             # print(x.shape)
             # print(y.shape)
