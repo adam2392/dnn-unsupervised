@@ -268,8 +268,13 @@ class CustomDirectoryIterator(Iterator):
             randsample = np.random.choice(len(y), size=1, replace=False)
             x = x[randsample,...]
             y = y[randsample,...]
+
+            # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
+            invert_y = 1 - y
+            ylabels = np.concatenate((invert_y, y), axis=1)
+            
             X.append(x)
-            Y.append(y)
+            Y.append(ylabels)
 
         return X, Y
 
