@@ -283,7 +283,7 @@ class CustomDirectoryIterator(Iterator):
             (len(index_array),) + self.image_shape,
             dtype=K.floatx())
         batch_y = np.zeros(
-            (len(index_array),),
+            (len(index_array), 2),
             dtype=K.floatx())
         grayscale = self.color_mode == 'grayscale'
 
@@ -326,10 +326,10 @@ class CustomDirectoryIterator(Iterator):
 
             # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
             invert_y = 1 - y
-            print(y.shape)
-            print(x.shape)
-            print(y)
-            print(invert_y.shape)
+            # print(y.shape)
+            # print(x.shape)
+            # print(y)
+            # print(invert_y.shape)
             y = np.concatenate((invert_y, y), axis=1)
             
             batch_x[i] = x
