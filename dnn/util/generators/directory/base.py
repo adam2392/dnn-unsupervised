@@ -309,16 +309,16 @@ class CustomDirectoryIterator(Iterator):
 
             # load dataset
             datastruct = np.load(fname)
-            print(datastruct.keys())
+            # print(datastruct.keys())
             x = datastruct['image_tensor']
             # x = datastruct['auxmats']
             y = datastruct['ylabels']
-            print(x.shape)
-            print(y.shape)
+            # print(x.shape)
+            # print(y.shape)
 
             # get that index
             x = x[j, ...].squeeze().reshape(self.image_shape)
-            y = y[j, ...].squeeze()
+            y = y[j].squeeze()
 
             params = self.image_data_generator.get_random_transform(x.shape)
             x = self.image_data_generator.apply_transform(x, params)
