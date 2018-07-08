@@ -318,7 +318,7 @@ class CustomDirectoryIterator(Iterator):
 
             # get that index
             x = x[j, ...].squeeze().reshape(self.image_shape)
-            y = y[j].squeeze()
+            y = y[j]
 
             params = self.image_data_generator.get_random_transform(x.shape)
             x = self.image_data_generator.apply_transform(x, params)
@@ -328,6 +328,8 @@ class CustomDirectoryIterator(Iterator):
             invert_y = 1 - y
             print(y.shape)
             print(x.shape)
+            print(y)
+            print(invert_y.shape)
             y = np.concatenate((invert_y, y), axis=1)
             
             batch_x[i] = x
