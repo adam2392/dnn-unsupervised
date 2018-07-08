@@ -272,7 +272,7 @@ class CustomDirectoryIterator(Iterator):
             # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
             invert_y = 1 - y
             ylabels = np.concatenate((invert_y, y), axis=1)
-            
+
             X.append(x)
             Y.append(ylabels)
 
@@ -323,6 +323,11 @@ class CustomDirectoryIterator(Iterator):
             params = self.image_data_generator.get_random_transform(x.shape)
             x = self.image_data_generator.apply_transform(x, params)
             x = self.image_data_generator.standardize(x)
+
+            # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
+            invert_y = 1 - y
+            y = np.concatenate((invert_y, y), axis=1)
+            
             batch_x[i] = x
             batch_y[i] = y
 
