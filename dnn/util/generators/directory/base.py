@@ -309,12 +309,12 @@ class CustomDirectoryIterator(Iterator):
 
             # load dataset
             datastruct = np.load(fname)
-            # print(datastruct.keys())
+            print(datastruct.keys())
             x = datastruct['image_tensor']
             # x = datastruct['auxmats']
             y = datastruct['ylabels']
-            # print(x.shape)
-            # print(y.shape)
+            print(x.shape)
+            print(y.shape)
 
             # get that index
             x = x[j, ...].squeeze().reshape(self.image_shape)
