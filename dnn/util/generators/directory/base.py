@@ -318,7 +318,7 @@ class CustomDirectoryIterator(Iterator):
 
             # get that index
             x = x[j, ...].squeeze().reshape(self.image_shape)
-            y = y[j]
+            y = y[j, np.newaxis]
 
             params = self.image_data_generator.get_random_transform(x.shape)
             x = self.image_data_generator.apply_transform(x, params)
