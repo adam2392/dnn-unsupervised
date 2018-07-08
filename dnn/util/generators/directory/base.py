@@ -326,6 +326,8 @@ class CustomDirectoryIterator(Iterator):
 
             # load the ylabeled data 1 in 0th position is 0, 1 in 1st position is 1
             invert_y = 1 - y
+            print(y.shape)
+            print(x.shape)
             y = np.concatenate((invert_y, y), axis=1)
             
             batch_x[i] = x
