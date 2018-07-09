@@ -9,6 +9,8 @@ import dnn.base.constants.model_constants as constants
 from dnn.io.dataloaders.base import BaseLoader
 from sklearn.utils import compute_class_weight
 
+from dnn.io.dataloaders.basedataset import TrainDataset, TestDataset
+
 # preprocessing data
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import scale
@@ -170,11 +172,15 @@ class ReaderImgDataset(BaseLoader):
         self.logger.info("Image tensor shape: {}".format(image_tensors.shape))
 
         if mode == constants.TRAIN:
-            self.train_dataset.X_train = image_tensors
-            self.train_dataset.y_train = ylabels
+            self.train_dataset = TrainDataset(image_tensors, ylabels)
+            # self.train_dataset.X_aux = aux_tensors
+            # self.train_dataset.X = chan_tensors
+            # self.train_dataset.y = ylabels
             self.train_dataset.class_weight = class_weight
         elif mode == constants.TEST:
-            self.test_dataset.X_test = image_tensors
-            self.test_dataset.y_test = ylabels
+            self.test_dataset = TestDataset(image_tensors, ylabels)
+            # self.test_dataset.X_aux = aux_tensors
+            # self.test_dataset.X = chan_tensors
+            # self.test_dataset.y = ylabels
             self.test_dataset.class_weight = class_weight
 

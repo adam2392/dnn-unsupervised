@@ -11,92 +11,7 @@ from sklearn.utils import compute_class_weight
 # preprocessing data
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import scale
-
-class Dataset(object):
-    def __len__(self):
-        return len(self.X)
-
-    @property
-    def imsize(self):
-        if isinstance(self.X, list):
-            return self.X[0].shape[2]
-        return self.X.shape[2]
-
-    @property
-    def length_imsize(self):
-        if isinstance(self.X, list):
-            return self.X[0].shape[1]
-        return self.X.shape[1]
-
-    @property
-    def length_imsize(self):
-        if isinstance(self.X, list):
-            return self.X[0].shape[2]
-        return self.X.shape[2]
-
-    @property
-    def n_colors(self):
-        if isinstance(self.X, list):
-            return self.X[0].shape[3]
-        return self.X.shape[3]
-
-    def empty(self):
-        self.X = None
-        self.y = None
-        self.class_weight = None
-
-class TrainDataset(object):
-    X_aux = None
-    X = None
-    y = None
-    class_weight = None
-
-    @property
-    def width_imsize(self):
-        if isinstance(self.X_aux, list):
-            return self.X_aux[0].shape[2]
-        return self.X_aux.shape[2]
-
-    @property
-    def n_colors(self):
-        if isinstance(self.X_aux, list):
-            return self.X_aux[0].shape[3]
-        return self.X_aux.shape[3]
-
-    @property
-    def length_imsize(self):
-        if isinstance(self.X_aux, list):
-            return self.X_aux[0].shape[1]
-        return self.X_aux.shape[1]
-
-
-class TestDataset(Dataset):
-    X_aux = None
-    X = None
-    y = None
-    class_weight = None
-
-    def __len__(self):
-        return len(self.X_chan)
-
-    @property
-    def width_imsize(self):
-        if isinstance(self.X_aux, list):
-            return self.X_aux[0].shape[2]
-        return self.X_aux.shape[2]
-
-    @property
-    def n_colors(self):
-        if isinstance(self.X_aux, list):
-            return self.X_aux[0].shape[3]
-        return self.X_aux.shape[3]
-
-    @property
-    def length_imsize(self):
-        if isinstance(self.X_aux, list):
-            return self.X_aux[0].shape[1]
-        return self.X_aux.shape[1]
-        
+   
 class BaseAuxLoader(object):
     root_dir = None
     patients = None
@@ -104,8 +19,10 @@ class BaseAuxLoader(object):
     trainfilepaths = None
     filelist = None
 
-    train_dataset = TrainDataset()
-    test_dataset = TestDataset()
+    # train_dataset = TrainDataset()
+    # test_dataset = TestDataset()
+    train_dataset = None
+    test_dataset = None
 
     def __init__(self, config=None):
         self.config = config or Config()

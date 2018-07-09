@@ -5,6 +5,7 @@ import os
 
 import dnn.base.constants.model_constants as constants
 from dnn.io.dataloaders.baseaux import BaseAuxLoader
+from dnn.io.dataloaders.basedataset import TrainDataset, TestDataset
 
 # preprocessing data
 from sklearn.utils import compute_class_weight
@@ -155,13 +156,15 @@ class ReaderEZNetDataset(BaseAuxLoader):
         self.logger.info("Image tensor shape: {}".format(aux_tensors.shape))
 
         if mode == constants.TRAIN:
-            self.train_dataset.X_aux = aux_tensors
-            self.train_dataset.X_chan = chan_tensors
-            self.train_dataset.ylabels = ylabels
+            self.train_dataset = TrainDataset(chan_tensors, ylabels, aux_tensors)
+            # self.train_dataset.X_aux = aux_tensors
+            # self.train_dataset.X = chan_tensors
+            # self.train_dataset.y = ylabels
             self.train_dataset.class_weight = class_weight
         elif mode == constants.TEST:
-            self.test_dataset.X_aux = aux_tensors
-            self.test_dataset.X_chan = chan_tensors
-            self.test_dataset.ylabels = ylabels
+            self.test_dataset = TestDataset(chan_tensors, ylabels, aux_tensors)
+            # self.test_dataset.X_aux = aux_tensors
+            # self.test_dataset.X = chan_tensors
+            # self.test_dataset.y = ylabels
             self.test_dataset.class_weight = class_weight
 

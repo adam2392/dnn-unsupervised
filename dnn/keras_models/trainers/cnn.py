@@ -235,11 +235,11 @@ class CNNTrainer(BaseTrainer):
         # augment data, or not and then trian the model!
         if not self.AUGMENT:
             print('Not using data augmentation. Implement Solution still!')
-            HH = self.model.fit( self.train_dataset.X_train,  self.train_dataset.y_train,
+            HH = self.model.fit( self.train_dataset.X,  self.train_dataset.y,
                               # steps_per_epoch=X_train.shape[0] // self.batch_size,
                               batch_size = self.batch_size,
                               epochs=self.NUM_EPOCHS,
-                              validation_data=(self.test_dataset.X_test, self.test_dataset.y_test),
+                              validation_data=(self.test_dataset.X, self.test_dataset.y),
                               shuffle=True,
                               class_weight= self.train_dataset.class_weight,
                               callbacks=self.callbacks)
@@ -260,18 +260,18 @@ class CNNTrainer(BaseTrainer):
                                                             shuffle=self.shuffle, 
                                                             interpolation='nearest'),
                                         epochs=self.num_epochs,
-                                        validation_data=(self.test_dataset.X_test, self.test_dataset.y_test),
+                                        validation_data=(self.test_dataset.X, self.test_dataset.y),
                                         shuffle=self.shuffle,
                                         # class_weight= self.train_dataset.class_weight,
                                         callbacks=self.callbacks, verbose=2)
         else:
             print('Using real-time data augmentation.')
             # self.generator.fit(X_train)
-            HH = self.model.fit_generator(self.generator.flow(self.train_dataset.X_train, self.train_dataset.y_train, 
+            HH = self.model.fit_generator(self.generator.flow(self.train_dataset.X, self.train_dataset.y, 
                                                                 batch_size=self.batch_size),
                                         steps_per_epoch=self.steps_per_epoch,
                                         epochs=self.num_epochs,
-                                        validation_data=(self.test_dataset.X_test, self.test_dataset.y_test),
+                                        validation_data=(self.test_dataset.X, self.test_dataset.y),
                                         shuffle=True,
                                         class_weight= self.train_dataset.class_weight,
                                         callbacks=self.callbacks, verbose=2)

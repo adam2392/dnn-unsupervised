@@ -7,6 +7,8 @@ import shutil
 sys.path.append(os.path.expanduser('~/Documents/dnn-unsupervised/'))
 from dnn.execute.hpc_eznetmodel import MarccHPC
 
+from dnn.io.dataloaders.basedataset import TrainDataset, TestDataset
+
 from keras.datasets import mnist
 # from dnn.io.dataloaders.baseaux import TrainDataset, TestDataset
 
@@ -28,68 +30,6 @@ parser.add_argument('--model_dir', default='experiments/base_model',
 parser.add_argument('--restore_file', default='best', 
                     help="name of the file in --model_dir \
                      containing weights to load")
-class Dataset(object):
-    def __len__(self):
-        return len(self.X)
-
-    @property
-    def imsize(self):
-        if isinstance(self.X, list):
-            return self.X[0].shape[2]
-        return self.X.shape[2]
-
-    @property
-    def length_imsize(self):
-        if isinstance(self.X, list):
-            return self.X[0].shape[1]
-        return self.X.shape[1]
-
-    @property
-    def width_imsize(self):
-        if isinstance(self.X, list):
-            return self.X[0].shape[2]
-        return self.X.shape[2]
-
-    @property
-    def n_colors(self):
-        if isinstance(self.X, list):
-            return self.X[0].shape[3]
-        return self.X.shape[3]
-
-    def empty(self):
-        self.X = None
-        self.y = None
-        self.class_weight = None
-
-class TrainDataset(Dataset):
-    X = None
-    y = None
-    class_weight = None
-    def __init__(self, X, y):
-        if X.ndim==3:
-            X = X[...,np.newaxis]
-        self.X  = X 
-        self.y = y 
-
-    def empty(self):
-        self.X = None
-        self.y = None
-        self.class_weight = None
-
-class TestDataset(Dataset):
-    X = None
-    y = None
-    class_weight = None
-    def __init__(self, X, y):
-        if X.ndim==3:
-            X = X[...,np.newaxis]
-        self.X  = X 
-        self.y = y 
-
-    def empty(self):
-        self.X = None
-        self.y = None
-        self.class_weight = None
         
 # TODO: pass this list into the models to allow it to know
 # how to select directories for training
@@ -121,6 +61,8 @@ def format_mnist():
 
     # get the datasets
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
+    x_train = x_train[:, -1]
+    x_test = x_test[:, -1]
 
     # hardcode into binary classification 
     y_train_binary = (y_train == 5).astype(np.int)
@@ -164,11 +106,13 @@ def hpc_run(args):
     ########################## 1. LOAD DATA ##########################
     train_dataset, test_dataset = format_mnist()
     # get the image size and n_colors from the datasets
-    length_imsize = 28
-    width_imsize = 28
-    width_imsize = 28*28
-    length_imsize = 1
-    n_colors = 1
+    # length_imsize = 28
+    # width_imsize = 28
+    # width_imsize = 28*28
+    # length_imsize = 1
+    width_imsize = train_dataset.width_imsize
+    length_imsize = train_dataset.length_imsize
+    n_colors = train_dataset.n_colors
             
     print("inputsize is: ", width_imsize, length_imsize, n_colors)
     ########################## 2. CREATE MODEL  ##########################
