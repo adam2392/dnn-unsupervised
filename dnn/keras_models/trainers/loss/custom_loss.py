@@ -16,8 +16,8 @@ def w_categorical_crossentropy(y_true, y_pred, weights):
     final_mask += (weights * y_pred_max_mat[:, :] * y_true[:, :])
     return K.categorical_crossentropy(y_pred, y_true) * final_mask
 
-def weighted_binary_crossentropy(y_true, y_pred):
-    false_positive_weight = self.train_dataset.class_weight[1]        
+def weighted_binary_crossentropy(y_true, y_pred, false_positive_weight, false_negative_weight):
+    # false_positive_weight = self.train_dataset.class_weight[1]        
     # false_negative_weight = self.train_dataset.class_weight[1]
     thresh = 0.5
     y_pred_true = K.greater_equal(thresh,y_pred)

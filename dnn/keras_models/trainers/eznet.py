@@ -128,6 +128,37 @@ class EZNetTrainer(BaseTrainer):
             "Image size is {} with {} colors".format(
                 self.imsize, self.n_colors))
 
+    def weighted_binary_crossentropy(self, y_true, y_pred):
+        false_positive_weight = self.train_dataset.class_weight[1]        
+        false_negative_weight = self.train_dataset.class_weight[0]
+        thresh = 0.5
+        y_pred_true = K.greater_equal(thresh,y_pred)
+        y_not_true = K.less_equal(thresh,y_true)
+        false_positive_tensor = K.equal(y_pred_true,y_not_true)
+
+        #changing from here
+
+        #first let's transform the bool tensor in numbers - maybe you need float64 depending on your configuration
+        false_positive_tensor = K.cast(false_positive_tensor,'float32') 
+
+        #and let's create it's complement (the non false positives)
+        complement = 1 - false_positive_tensor
+
+        #now we're going to separate two groups
+        falsePosGroupTrue = y_true * false_positive_tensor
+        falsePosGroupPred = y_pred * false_positive_tensor
+
+        nonFalseGroupTrue = y_true * complement
+        nonFalseGroupPred = y_pred * complement
+
+        #let's calculate one crossentropy loss for each group
+        #(directly from the keras loss functions imported above)
+        falsePosLoss = binary_crossentropy(falsePosGroupTrue,falsePosGroupPred)
+        nonFalseLoss = binary_crossentropy(nonFalseGroupTrue,nonFalseGroupPred)
+
+        #return them weighted:
+        return (false_positive_weight*falsePosLoss) + (nonFalseLoss)
+
     def configure(self):
         """
         Configuration function that can change:
@@ -141,9 +172,11 @@ class EZNetTrainer(BaseTrainer):
         from dnn.keras_models.trainers.loss.custom_loss import weighted_binary_crossentropy, w_categorical_crossentropy
         # ncce = functools.partial(w_categorical_crossentropy, weights=self.train_dataset.class_weight)
         # ncce = functools.partial(weighted_binary_crossentropy)
+        false_positive_weight = self.train_dataset.class_weight[1]     
+        false_negative_weight = self.train_dataset.class_weight[1]
         model_params = {
-            'loss': 'binary_crossentropy',
-            # 'loss': weighted_binary_crossentropy,
+            # 'loss': 'binary_crossentropy',
+            'loss': weighted_binary_crossentropy,
             'optimizer': Adam(beta_1=0.9,
                          beta_2=0.99,
                          epsilon=1e-08,
