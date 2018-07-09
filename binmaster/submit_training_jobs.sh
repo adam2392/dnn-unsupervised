@@ -34,8 +34,8 @@ testdatadir=$traindatadir
 # traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/pipeline/"
 # testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/pipeline/"
 
-traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/eznet/trainpats/"
-testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/eznet/testpats/"
+# traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/eznet/trainpats/"
+# testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/eznet/testpats/"
 
 # logs for the training logs, and outputdata directory for final summary
 logdatadir="/scratch/users/ali39@jhu.edu/data/dnn/logs/$expname/" 			
