@@ -78,6 +78,8 @@ def format_mnist():
     print(y_train_binary.shape)
     train_dataset = TrainDataset(x_train, y_train_binary)
     test_dataset = TestDataset(x_test, y_test_binary)
+    train_dataset.class_weight = class_weight
+    test_dataset.class_weight = class_weight
 
     return train_dataset, test_dataset
 
