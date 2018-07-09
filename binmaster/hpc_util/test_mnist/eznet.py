@@ -61,8 +61,8 @@ def format_mnist():
 
     # get the datasets
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
-    x_train = x_train[:, -1]
-    x_test = x_test[:, -1]
+    x_train = x_train.reshape((-1, 1, 28*28, 1))
+    x_test = x_test.reshape((-1, 1, 28*28, 1))
 
     # hardcode into binary classification 
     y_train_binary = (y_train == 5).astype(np.int)
