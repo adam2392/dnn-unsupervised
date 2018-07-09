@@ -9,7 +9,8 @@
 
 ################################### 1. READ USER INPUT ###########################################
 patients=(
-'id001_bt id002_sd id003_mg')
+'id001_bt')
+ # id002_sd id003_mg')
 # id004_bj id005_ft
 # id006_mr id007_rd id008_dmc
 # id009_ba id010_cmn 
@@ -27,7 +28,8 @@ ml python/3.6.5
 module list
 
 # expname="exp_win500_step250_largemem"
-expname="eznet_baseline_tcn"
+expname="eznet_mnist"
+
 ## For training and modeling with the simulated data
 traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/mne_methods/win500_step250"
 testdatadir=$traindatadir
@@ -85,12 +87,8 @@ expname=${expname} "
 
 		# build a scavenger job, gpu job, or other job
 		echo "Sbatch should run now"
-		echo ${sbatchcomm} $exvars ./run_train_keras.sbatch
-		# echo $sbatchcomm $exvars ./run_augmentedtrain_keras.sbatch
-		# ${sbatchcomm} $exvars ./run_augmentedtrain_keras.sbatch
-		${sbatchcomm} $exvars ./run_train_keras.sbatch
-
-		# ${sbatchcomm} $exvars ./run_mnist_keras.sbatch
+		echo ${sbatchcomm} $exvars ./run_mnist_keras.sbatch
+		${sbatchcomm} $exvars ./run_mnist_keras.sbatch
 
 		read -p "Continuing in 0.5 Seconds...." -t 0.5
 		echo "Continuing ...."

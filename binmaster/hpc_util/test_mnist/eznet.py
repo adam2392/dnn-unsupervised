@@ -57,6 +57,10 @@ def local_run(args):
 def format_mnist():
     # get the datasets
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
+
+    y_train_binary = (y_train == 5).astype(np.int)
+    y_test_binary = (y_test == 5).astype(np.int)
+    
     traindataset.X_train = x_train
     traindataset.y_train = y_train 
 
@@ -83,7 +87,7 @@ def hpc_run(args):
     data_procedure='loo'
     # training parameters 
     num_epochs = 150
-    batch_size = 8
+    batch_size = 32
     learning_rate = 5e-4  # np.linspace(1e-5, 1e-3, 10)
 
     # for testpat in all÷_patients:
@@ -99,8 +103,11 @@ def hpc_run(args):
     # get the image size and n_colors from the datasets
     length_imsize = 28
     width_imsize = 28
+    width_imsize = 28*28
+    length_imsize = 1
     n_colors = 1
             
+    print("inputsize is: ", width_imsize, length_imsize, n_colors)
     ########################## 2. CREATE MODEL  ##########################
     # create model
     model = hpcrun.createmodel(num_classes, length_imsize, width_imsize, n_colors)

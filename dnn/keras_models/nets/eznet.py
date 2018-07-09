@@ -96,20 +96,20 @@ class EZNet(BaseNet):
                             nb_stacks, activation=activation)
 
         # parameters for VGG TCN
-        numfilters = 24
-        poolsize=(2,)
-        kernel_size=(3,)
-        dilation = (1,)
-        nb_stacks = 1
-        n_layers = [4, 2, 1]
-        tcn = self.build_vggtcn(n_layers,
-                    poolsize,
-                    numfilters,
-                    kernel_size, 
-                    nb_stacks)
-        print("Build the vgg style tcn")
+        # numfilters = 24
+        # poolsize=(2,)
+        # kernel_size=(3,)
+        # dilation = (1,)
+        # nb_stacks = 1
+        # n_layers = [4, 2, 1]
+        # tcn = self.build_vggtcn(n_layers,
+        #             poolsize,
+        #             numfilters,
+        #             kernel_size, 
+        #             nb_stacks)
+        # print("Build the vgg style tcn")
 
-        combinedx = self.combinenets(tcn, vgg)
+        # combinedx = self.combinenets(tcn, vgg)
 
         if output:
             combinedx = self.buildoutput(tcn, self.size_fc)
