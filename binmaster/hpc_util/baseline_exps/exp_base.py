@@ -80,16 +80,16 @@ def hpc_run(args):
     # initialize hpc trainer object
     hpcrun = MarccHPC()
     # get the datasets
-    train_dataset, test_dataset = hpcrun.load_data(train_data_dir, test_data_dir, 
-                                        data_procedure=data_procedure, 
-                                        testpat=testpat, 
-                                        training_pats=training_patients)
-
-    # hard code imsize/n_colors
-    # test_dataset = hpcrun.load_test_data(train_data_dir, test_data_dir, 
+    # train_dataset, test_dataset = hpcrun.load_data(train_data_dir, test_data_dir, 
     #                                     data_procedure=data_procedure, 
     #                                     testpat=testpat, 
     #                                     training_pats=training_patients)
+
+    # hard code imsize/n_colors
+    test_dataset = hpcrun.load_test_data(train_data_dir, test_data_dir, 
+                                        data_procedure=data_procedure, 
+                                        testpat=testpat, 
+                                        training_pats=training_patients)
     imsize = test_dataset.imsize
     n_colors = test_dataset.n_colors
             
@@ -98,19 +98,19 @@ def hpc_run(args):
     # extract the actual model from the object
     model = model.net    
     # train model
-    trainer = hpcrun.trainmodel(model=model, 
-                        num_epochs=num_epochs, batch_size=batch_size, 
-                        train_dataset=train_dataset, 
-                        test_dataset=test_dataset,
-                        outputdir=testpatdir, 
-                        expname=expname)
-    # trainer = hpcrun.trainmodel_withdir(model=model, 
+    # trainer = hpcrun.trainmodel(model=model, 
     #                     num_epochs=num_epochs, batch_size=batch_size, 
+    #                     train_dataset=train_dataset, 
     #                     test_dataset=test_dataset,
-    #                     train_datadir=train_data_dir,
-    #                     leave_out_name=testpat,
     #                     outputdir=testpatdir, 
     #                     expname=expname)
+    trainer = hpcrun.trainmodel_withdir(model=model, 
+                        num_epochs=num_epochs, batch_size=batch_size, 
+                        test_dataset=test_dataset,
+                        train_datadir=train_data_dir,
+                        leave_out_name=testpat,
+                        outputdir=testpatdir, 
+                        expname=expname)
 
     # test and save model
     trainer = hpcrun.testmodel(trainer, modelname)

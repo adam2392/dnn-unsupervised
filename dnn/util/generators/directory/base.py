@@ -332,6 +332,8 @@ class CustomDirectoryIterator(Iterator):
             batch_x[i] = x
             batch_y[i] = y
 
+        print(batch_x.shape)
+        print(batch_y.shape)
         # optionally save augmented images to disk for debugging purposes
         if self.save_to_dir:
             for i, j in enumerate(index_array):

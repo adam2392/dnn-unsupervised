@@ -80,7 +80,7 @@ expname=${expname} "
 		# build a scavenger job, gpu job, or other job
 		# set jobname
 		jobname="train_${patient}_${expname}.log"
-		sbatchcomm=$(cat $gpu_config)
+		sbatchcomm=$(cat $gpu_debug_config)
 		sbatchcomm="$sbatchcomm --job-name=${jobname}"
 
 		# build a scavenger job, gpu job, or other job
