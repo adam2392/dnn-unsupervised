@@ -45,7 +45,7 @@ class Dataset(object):
         return self.X.shape[1]
 
     @property
-    def length_imsize(self):
+    def width_imsize(self):
         if isinstance(self.X, list):
             return self.X[0].shape[2]
         return self.X.shape[2]
