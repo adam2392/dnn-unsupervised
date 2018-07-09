@@ -58,16 +58,16 @@ def format_mnist():
     # get the datasets
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
+    # hardcode into binary classification 
     y_train_binary = (y_train == 5).astype(np.int)
     y_test_binary = (y_test == 5).astype(np.int)
     
     traindataset.X_train = x_train
-    traindataset.y_train = y_train 
+    traindataset.y_train = y_train_binary 
 
     testdataset.X_test = x_test
-    testdataset.y_test = y_test
+    testdataset.y_test = y_test_binary
     return train_dataset, testdataset
-
 
 def hpc_run(args):
     # read in the parsed arguments
