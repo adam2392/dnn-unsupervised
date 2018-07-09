@@ -8,7 +8,7 @@ sys.path.append(os.path.expanduser('~/Documents/dnn-unsupervised/'))
 from dnn.execute.hpc_eznetmodel import MarccHPC
 
 from keras.datasets import mnist
-from dnn.io.dataloaders.baseaux import TrainDataset, TestDataset
+# from dnn.io.dataloaders.baseaux import TrainDataset, TestDataset
 
 parser = argparse.ArgumentParser()
 parser.add_argument('train_data_dir', default='./',
@@ -28,7 +28,59 @@ parser.add_argument('--model_dir', default='experiments/base_model',
 parser.add_argument('--restore_file', default='best', 
                     help="name of the file in --model_dir \
                      containing weights to load")
+class Dataset(object):
+    def __len__(self):
+        return len(self.X)
 
+    @property
+    def imsize(self):
+        if isinstance(self.X, list):
+            return self.X[0].shape[2]
+        return self.X.shape[2]
+
+    @property
+    def length_imsize(self):
+        if isinstance(self.X, list):
+            return self.X[0].shape[1]
+        return self.X.shape[1]
+
+    @property
+    def length_imsize(self):
+        if isinstance(self.X, list):
+            return self.X[0].shape[2]
+        return self.X.shape[2]
+
+    @property
+    def n_colors(self):
+        if isinstance(self.X, list):
+            return self.X[0].shape[3]
+        return self.X.shape[3]
+
+    def empty(self):
+        self.X = None
+        self.y = None
+        self.class_weight = None
+
+class TrainDataset(Dataset):
+    X = None
+    y = None
+    class_weight = None
+
+    def empty(self):
+        self.X_train = None
+        self.y_train = None
+        self.class_weight = None
+
+class TestDataset(Dataset):
+    X = None
+    y = None
+    class_weight = None
+
+    def empty(self):
+        self.X_train = None
+        self.y_train = None
+        self.class_weight = None
+        
 # TODO: pass this list into the models to allow it to know
 # how to select directories for training
 training_patients = [
@@ -56,6 +108,7 @@ def local_run(args):
     expname = 'test'
 
 def format_mnist():
+
     # get the datasets
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
 

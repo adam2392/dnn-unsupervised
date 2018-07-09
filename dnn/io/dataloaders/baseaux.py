@@ -12,14 +12,44 @@ from sklearn.utils import compute_class_weight
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import scale
 
+class Dataset(object):
+    def __len__(self):
+        return len(self.X)
+
+    @property
+    def imsize(self):
+        if isinstance(self.X, list):
+            return self.X[0].shape[2]
+        return self.X.shape[2]
+
+    @property
+    def length_imsize(self):
+        if isinstance(self.X, list):
+            return self.X[0].shape[1]
+        return self.X.shape[1]
+
+    @property
+    def length_imsize(self):
+        if isinstance(self.X, list):
+            return self.X[0].shape[2]
+        return self.X.shape[2]
+
+    @property
+    def n_colors(self):
+        if isinstance(self.X, list):
+            return self.X[0].shape[3]
+        return self.X.shape[3]
+
+    def empty(self):
+        self.X = None
+        self.y = None
+        self.class_weight = None
+
 class TrainDataset(object):
     X_aux = None
-    X_chan = None
-    ylabels = None
+    X = None
+    y = None
     class_weight = None
-
-    def __len__(self):
-        return len(self.X_chan)
 
     @property
     def width_imsize(self):
@@ -40,10 +70,10 @@ class TrainDataset(object):
         return self.X_aux.shape[1]
 
 
-class TestDataset(object):
+class TestDataset(Dataset):
     X_aux = None
-    X_chan = None
-    ylabels = None
+    X = None
+    y = None
     class_weight = None
 
     def __len__(self):
