@@ -58,6 +58,7 @@ def local_run(args):
     expname = 'test'
 
 def format_mnist():
+    from sklearn.utils import compute_class_weight
 
     # get the datasets
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
@@ -67,6 +68,12 @@ def format_mnist():
     # hardcode into binary classification 
     y_train_binary = (y_train == 5).astype(np.int)
     y_test_binary = (y_test == 5).astype(np.int)
+
+    # format the data correctly
+    class_weight = compute_class_weight('balanced',
+                                        np.unique(y_train_binary).astype(int),
+                                        y_train_binary)
+
     print(x_train.shape)
     print(y_train_binary.shape)
     train_dataset = TrainDataset(x_train, y_train_binary)
