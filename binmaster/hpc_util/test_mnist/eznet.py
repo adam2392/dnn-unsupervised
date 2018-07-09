@@ -63,6 +63,9 @@ def format_mnist():
     y_train_binary = (y_train == 5).astype(np.int)
     y_test_binary = (y_test == 5).astype(np.int)
     
+    train_dataset = TrainDataset()
+    test_dataset = TestDataset()
+    
     traindataset.X_train = x_train
     traindataset.y_train = y_train_binary 
 
