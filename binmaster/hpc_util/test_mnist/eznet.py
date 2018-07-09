@@ -8,7 +8,7 @@ sys.path.append(os.path.expanduser('~/Documents/dnn-unsupervised/'))
 from dnn.execute.hpc_eznetmodel import MarccHPC
 
 from keras.datasets import mnist
-from dnn.io.dataloaders.base import TrainDataset, TestDataset
+from dnn.io.dataloaders.baseaux import TrainDataset, TestDataset
 
 parser = argparse.ArgumentParser()
 parser.add_argument('train_data_dir', default='./',
@@ -66,11 +66,11 @@ def format_mnist():
     train_dataset = TrainDataset()
     test_dataset = TestDataset()
 
-    train_dataset.X_train = x_train
-    train_dataset.y_train = y_train_binary 
+    train_dataset.X = x_train
+    train_dataset.y = y_train_binary 
 
-    test_dataset.X_test = x_test
-    test_dataset.y_test = y_test_binary
+    test_dataset.X = x_test
+    test_dataset.y = y_test_binary
     return train_dataset, test_dataset
 
 def hpc_run(args):

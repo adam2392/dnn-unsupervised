@@ -249,8 +249,8 @@ class EZNetTrainer(BaseTrainer):
 
     def train(self):
         self._loadgenerator()
-        print("Training data: ", self.train_dataset.X_aux.shape,  self.train_dataset.ylabels.shape)
-        print("Testing data: ",  self.test_dataset.X_aux.shape,  self.test_dataset.ylabels.shape)
+        # print("Training data: ", self.train_dataset.X_aux.shape,  self.train_dataset.y.shape)
+        # print("Testing data: ",  self.test_dataset.X_aux.shape,  self.test_dataset.y.shape)
         print("Class weights are: ",  self.train_dataset.class_weight)
         test = np.argmax( self.train_dataset.ylabels, axis=1)
         print("class imbalance: ", np.sum(test), len(test))
@@ -263,13 +263,13 @@ class EZNetTrainer(BaseTrainer):
         # augment data, or not and then trian the model!
         if not self.AUGMENT:
             print('Not using data augmentation. Implement Solution still!')
-            HH = self.model.fit(self.train_dataset.X_chan,
+            HH = self.model.fit(self.train_dataset.X,
                 # [self.train_dataset.X_aux, self.train_dataset.X_chan], 
                               self.train_dataset.ylabels,
                               batch_size = self.batch_size,
                               epochs=self.num_epochs,
                               # validation_data=([self.test_dataset.X_aux, self.test_dataset.X_chan], self.test_dataset.ylabels),
-                              validation_data=(self.test_dataset.X_chan, self.test_dataset.ylabels),
+                              validation_data=(self.test_dataset.X, self.test_dataset.ylabels),
                               shuffle=self.shuffle,
                               # class_weight= self.train_dataset.class_weight,
                               callbacks=self.callbacks, verbose=2)
@@ -288,20 +288,25 @@ class EZNetTrainer(BaseTrainer):
                                                             interpolation='nearest'),
                                         steps_per_epoch=self.steps_per_epoch,
                                         epochs=self.num_epochs,
-                                        validation_data=([self.test_dataset.X_aux, self.test_dataset.X_chan], self.test_dataset.ylabels),
+                                        validation_data=([self.test_dataset.X_aux, self.test_dataset.X], self.test_dataset.y),
                                         shuffle=self.shuffle,
                                         class_weight= self.train_dataset.class_weight,
                                         callbacks=self.callbacks, verbose=2)
         else:
             print('Using real-time data augmentation.')
             # self.generator.fit(X_train)
-            HH = self.model.fit_generator(self.generator.flow([self.train_dataset.X_aux, 
-                                                            self.train_dataset.X_chan], 
-                                                            self.train_dataset.ylabels, 
+            HH = self.model.fit_generator(self.generator.flow([
+                                                            # self.train_dataset.X_aux, 
+                                                            self.train_dataset.X
+                                                            ], 
+                                                            self.train_dataset.y, 
                                                             batch_size=self.batch_size),
                                         steps_per_epoch=self.steps_per_epoch,
                                         epochs=self.num_epochs,
-                                        validation_data=([self.test_dataset.X_aux, self.test_dataset.X_chan], self.test_dataset.ylabels),
+                                        validation_data=([
+                                                            # self.test_dataset.X_aux, 
+                                                            self.test_dataset.X
+                                                        ], self.test_dataset.y),
                                         shuffle=self.shuffle,
                                         class_weight= self.train_dataset.class_weight,
                                         callbacks=self.callbacks, verbose=2)

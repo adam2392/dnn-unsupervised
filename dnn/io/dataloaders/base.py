@@ -15,69 +15,54 @@ from sklearn.preprocessing import scale
 class Dataset(object):
     def __len__(self):
         return len(self.X)
+
     @property
     def imsize(self):
         if isinstance(self.X, list):
             return self.X[0].shape[2]
         return self.X.shape[2]
+
+    @property
+    def length_imsize(self):
+        if isinstance(self.X, list):
+            return self.X[0].shape[1]
+        return self.X.shape[1]
+
+    @property
+    def length_imsize(self):
+        if isinstance(self.X, list):
+            return self.X[0].shape[2]
+        return self.X.shape[2]
+
     @property
     def n_colors(self):
         if isinstance(self.X, list):
             return self.X[0].shape[3]
         return self.X.shape[3]
+
     def empty(self):
         self.X = None
         self.y = None
         self.class_weight = None
 
-class TrainDataset(object):
-    X_train = None
-    y_train = None
+class TrainDataset(Dataset):
+    X = None
+    y = None
     class_weight = None
-
-    def __len__(self):
-        return len(self.X_train)
-
-    @property
-    def imsize(self):
-        if isinstance(self.X_train, list):
-            return self.X_train[0].shape[2]
-        return self.X_train.shape[2]
-
-    @property
-    def n_colors(self):
-        if isinstance(self.X_train, list):
-            return self.X_train[0].shape[3]
-        return self.X_train.shape[3]
 
     def empty(self):
         self.X_train = None
         self.y_train = None
         self.class_weight = None
 
-class TestDataset(object):
-    X_test = None
-    y_test = None
+class TestDataset(Dataset):
+    X = None
+    y = None
     class_weight = None
 
-    def __len__(self):
-        return len(self.X_test)
-
-    @property
-    def imsize(self):
-        if isinstance(self.X_test, list):
-            return self.X_test[0].shape[2]
-        return self.X_test.shape[2]
-
-    @property
-    def n_colors(self):
-        if isinstance(self.X_test, list):
-            return self.X_test[0].shape[3]
-        return self.X_test.shape[3]
-
     def empty(self):
-        self.X_test = None
-        self.y_test = None
+        self.X_train = None
+        self.y_train = None
         self.class_weight = None
 
 class BaseLoader(object):
