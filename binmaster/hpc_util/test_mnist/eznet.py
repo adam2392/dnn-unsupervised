@@ -65,20 +65,30 @@ class TrainDataset(Dataset):
     X = None
     y = None
     class_weight = None
+    def __init__(self, X, y):
+        if X.ndim==3:
+            X = X[...,np.newaxis]
+        self.X  = X 
+        self.y = y 
 
     def empty(self):
-        self.X_train = None
-        self.y_train = None
+        self.X = None
+        self.y = None
         self.class_weight = None
 
 class TestDataset(Dataset):
     X = None
     y = None
     class_weight = None
+    def __init__(self, X, y):
+        if X.ndim==3:
+            X = X[...,np.newaxis]
+        self.X  = X 
+        self.y = y 
 
     def empty(self):
-        self.X_train = None
-        self.y_train = None
+        self.X = None
+        self.y = None
         self.class_weight = None
         
 # TODO: pass this list into the models to allow it to know
@@ -115,15 +125,11 @@ def format_mnist():
     # hardcode into binary classification 
     y_train_binary = (y_train == 5).astype(np.int)
     y_test_binary = (y_test == 5).astype(np.int)
-    
-    train_dataset = TrainDataset()
-    test_dataset = TestDataset()
+    print(x_train.shape)
+    print(y_train_binary.shape)
+    train_dataset = TrainDataset(x_train, y_train_binary)
+    test_dataset = TestDataset(x_test, y_test_binary)
 
-    train_dataset.X = x_train
-    train_dataset.y = y_train_binary 
-
-    test_dataset.X = x_test
-    test_dataset.y = y_test_binary
     return train_dataset, test_dataset
 
 def hpc_run(args):
