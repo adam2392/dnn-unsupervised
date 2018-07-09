@@ -157,7 +157,6 @@ class CNNTrainer(BaseTrainer):
         - sets post-prediction-regularizer
         """
         # initialize loss function, SGD optimizer and metrics
-        clipnorm = 1.
         model_params = {
             'loss': 'binary_crossentropy',
             'optimizer': Adam(beta_1=0.9,
@@ -165,7 +164,7 @@ class CNNTrainer(BaseTrainer):
                          epsilon=1e-08,
                          decay=0.0,
                          amsgrad=True,
-                         clipnorm=clipnorm),
+                         clipnorm=self.gradclip_value),
             'metrics': [categorical_accuracy]
         }
         self.modelconfig = self.model.compile(**model_params)
@@ -196,7 +195,7 @@ class CNNTrainer(BaseTrainer):
         self.callbacks = [
                         # checkpoint,
                         reduce_lr,
-                        tboard,
+                        # tboard,
                         metrichistory]
 
     def test(self, modelname):
@@ -278,7 +277,7 @@ class CNNTrainer(BaseTrainer):
                                         callbacks=self.callbacks, verbose=2)
 
         self.HH = HH
-        self.metrichistory = self.callbacks[2] 
+        self.metrichistory = self.callbacks[-1] 
 
     def _loadgenerator_dir(self):
         imagedatagen_args = {
