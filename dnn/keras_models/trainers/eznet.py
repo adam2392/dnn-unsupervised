@@ -169,14 +169,14 @@ class EZNetTrainer(BaseTrainer):
         """
         # initialize loss function, SGD optimizer and metrics
         import functools
-        from dnn.keras_models.trainers.loss.custom_loss import weighted_binary_crossentropy, w_categorical_crossentropy
+        # from dnn.keras_models.trainers.loss.custom_loss import weighted_binary_crossentropy, w_categorical_crossentropy
         # ncce = functools.partial(w_categorical_crossentropy, weights=self.train_dataset.class_weight)
         # ncce = functools.partial(weighted_binary_crossentropy)
         false_positive_weight = self.train_dataset.class_weight[1]     
         false_negative_weight = self.train_dataset.class_weight[1]
         model_params = {
             # 'loss': 'binary_crossentropy',
-            'loss': weighted_binary_crossentropy,
+            'loss': self.weighted_binary_crossentropy,
             'optimizer': Adam(beta_1=0.9,
                          beta_2=0.99,
                          epsilon=1e-08,
