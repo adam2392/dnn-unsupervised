@@ -65,13 +65,13 @@ def format_mnist():
     
     train_dataset = TrainDataset()
     test_dataset = TestDataset()
-    
-    traindataset.X_train = x_train
-    traindataset.y_train = y_train_binary 
 
-    testdataset.X_test = x_test
-    testdataset.y_test = y_test_binary
-    return train_dataset, testdataset
+    train_dataset.X_train = x_train
+    train_dataset.y_train = y_train_binary 
+
+    test_dataset.X_test = x_test
+    test_dataset.y_test = y_test_binary
+    return train_dataset, test_dataset
 
 def hpc_run(args):
     # read in the parsed arguments
