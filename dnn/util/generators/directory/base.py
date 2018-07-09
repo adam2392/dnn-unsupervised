@@ -297,13 +297,12 @@ class CustomDirectoryIterator(Iterator):
                 if index >= ind_range[0] and index < ind_range[1]:
                     return f
 
+        print("getting batch of size: ", len(index_array))
         for i, j in enumerate(index_array):
             # obtain the filepath for this index and the corresponding index range
             fname = _get_dataset_index(j)
             ind_range = self.datasets_dict[fname]
 
-            # print("index range is: ", ind_range)
-            # print("j is ", j)
             # get actual index within this dataset by subtracting the lower bound
             j = j - ind_range[0]
 
@@ -313,8 +312,6 @@ class CustomDirectoryIterator(Iterator):
             x = datastruct['image_tensor']
             # x = datastruct['auxmats']
             y = datastruct['ylabels']
-            # print(x.shape)
-            # print(y.shape)
 
             # get that index
             x = x[j, ...].squeeze().reshape(self.image_shape)
