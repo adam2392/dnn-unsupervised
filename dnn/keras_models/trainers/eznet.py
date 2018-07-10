@@ -129,6 +129,7 @@ class EZNetTrainer(BaseTrainer):
                 self.imsize, self.n_colors))
 
     def weighted_binary_crossentropy(self, y_true, y_pred):
+        from keras.losses import binary_crossentropy
         false_positive_weight = self.train_dataset.class_weight[1]        
         false_negative_weight = self.train_dataset.class_weight[0]
         thresh = 0.5
