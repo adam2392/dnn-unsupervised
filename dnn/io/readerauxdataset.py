@@ -82,7 +82,7 @@ class ReaderEZNetDataset(BaseAuxLoader):
             return result
 
         filerange = enumerate(filelist)
-
+        prevwin = 0
         for idx, datafile in filerange:
             if not datafile.endswith('.npz'):
                 datafile += '.npz'

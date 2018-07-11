@@ -48,22 +48,22 @@ echo $PWD
 echo "Running training model"
 
 # run training here in this
-# singularity exec -B /scratch/ --nv ./tensorflow.simg \
-# python ./hpc_util/eznet/exp_baseline.py \
-# 	${traindatadir} ${testdatadir} \
-# 	--output_data_dir ${outputdatadir} \
-# 	--log_data_dir ${logdatadir} \
-# 	--model_dir ${model_dir} \
-# 	--patient_to_loo ${patient} \
-# 	--expname ${expname}
-
 singularity exec -B /scratch/ --nv ./tensorflow.simg \
-python ./hpc_util/baseline_exps/exp_base.py \
-${traindatadir} ${testdatadir} \
+python ./hpc_util/eznet/exp_baseline.py \
+	${traindatadir} ${testdatadir} \
 	--output_data_dir ${outputdatadir} \
 	--log_data_dir ${logdatadir} \
 	--model_dir ${model_dir} \
 	--patient_to_loo ${patient} \
 	--expname ${expname}
+
+# singularity exec -B /scratch/ --nv ./tensorflow.simg \
+# python ./hpc_util/baseline_exps/exp_base.py \
+# ${traindatadir} ${testdatadir} \
+# 	--output_data_dir ${outputdatadir} \
+# 	--log_data_dir ${logdatadir} \
+# 	--model_dir ${model_dir} \
+# 	--patient_to_loo ${patient} \
+# 	--expname ${expname}
 
 exit
