@@ -37,7 +37,7 @@ class MarccHPC(BaseHPC):
         y = np.concatenate((train_dataset.y, test_dataset.y), axis=0)
         print(X.shape)
         print(y.shape) 
-        X_train, X_test, y_train, y_test = reader.train_test_split(X, y, train_size=0.7)
+        X_train, X_test, y_train, y_test = reader.split_data(X, y, train_size=0.7)
         train_dataset.X = X_train
         train_dataset.y = y_train
         test_dataset.X = X_test
