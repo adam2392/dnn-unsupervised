@@ -9,7 +9,8 @@
 
 ################################### 1. READ USER INPUT ###########################################
 patients=(
-'id001_bt id002_sd id003_mg')
+'id001_bt')
+ # id002_sd id003_mg')
 # id004_bj id005_ft
 # id006_mr id007_rd id008_dmc
 # id009_ba id010_cmn 

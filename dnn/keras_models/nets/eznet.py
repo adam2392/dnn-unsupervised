@@ -68,28 +68,28 @@ class EZNet(BaseNet):
     def buildmodel(self, output=True):
         # weight initialization
         self.w_init = None 
-        self.size_fc = 512
+        self.size_fc = 256
 
         # parameters for AuxNet
-        numfilters = 24
-        poolsize=(1,2)
-        kernel_size=(1,2)
-        dilation = (1,1)
-        nb_stacks = 1
-        n_layers = [4, 2, 1]
+        # numfilters = 24
+        # poolsize=(1,2)
+        # kernel_size=(1,2)
+        # dilation = (1,1)
+        # nb_stacks = 1
+        # n_layers = [4, 2, 1]
 
-        vgg = self.build_vgg(n_layers,
-                    poolsize,
-                    numfilters,
-                    kernel_size, 
-                    nb_stacks)
+        # vgg = self.build_vgg(n_layers,
+        #             poolsize,
+        #             numfilters,
+        #             kernel_size, 
+        #             nb_stacks)
 
         # parameters for TCN
-        dilations = [1,2,4]
-        numfilters = 16
+        dilations = [1,4,16]
+        numfilters = 8
         kernel_size = 5
         nb_stacks=1
-        activation = 'norm_relu'
+        activation = 'relu'
 
         tcn = self.build_dilatedtcn(dilations, 
                             numfilters, kernel_size, 
@@ -141,8 +141,8 @@ class EZNet(BaseNet):
         for s in range(nb_stacks):
             for idx, n_layer in enumerate(n_layers):
                 for ilay in range(n_layer):
-                    # kernel_init = keras.initializers.glorot_uniform()
-                    kernel_init = keras.initializers.he_normal()
+                    kernel_init = keras.initializers.glorot_uniform()
+                    # kernel_init = keras.initializers.he_normal()
                     x = vgg_helper.residual1dblock(x, ilay, idx,
                                             numfilters, 
                                             kernel_size,
@@ -171,7 +171,7 @@ class EZNet(BaseNet):
         self.input_layer = input_layer
 
         x = Conv1D(numfilters, kernel_size, 
-                        kernel_initializer=keras.initializers.he_normal(),
+                        kernel_initializer=keras.initializers.glorot_uniform(),
                         padding='causal', 
                         name='initial_conv')(x)
 
@@ -179,7 +179,7 @@ class EZNet(BaseNet):
         skip_connections = []
         for s in range(nb_stacks):
             for i in dilations:
-                kernel_init = keras.initializers.he_normal()
+                kernel_init = keras.initializers.glorot_uniform()
                 x, skip_out = tcn.TCN.residual_block(x, s, i, activation, 
                                             nb_filters=numfilters, 
                                             kernel_size=kernel_size,

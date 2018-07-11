@@ -133,7 +133,7 @@ class EZNetTrainer(BaseTrainer):
         import functools
         false_positive_weight = self.train_dataset.class_weight[1]        
         false_negative_weight = self.train_dataset.class_weight[0]
-        thresh = 0.5
+        thresh = 0.75
         y_pred_true = K.greater_equal(thresh,y_pred)
         y_not_true = K.less_equal(thresh,y_true)
         false_positive_tensor = K.equal(y_pred_true,y_not_true)
@@ -188,8 +188,10 @@ class EZNetTrainer(BaseTrainer):
         print("false_negative_weight = ", self.train_dataset.class_weight[1])
 
         value_monitor = 'val_categorical_accuracy'
-        tempfilepath = os.path.join(self.explogdir, "weights-improvement-{epoch:02d}-{val_categorical_accuracy:.2f}.hdf5")
-
+        if value_monitor == 'val_categorical_accuracy':
+            tempfilepath = os.path.join(self.explogdir, "weights-improvement-{epoch:02d}-{val_categorical_accuracy:.2f}.hdf5")
+        elif value_monitor == 'val_acc':
+            tempfilepath = os.path.join(self.explogdir, "weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5")
         '''                         CREATE CALLBACKS                        '''
         # callbacks availabble
         checkpoint = ModelCheckpoint(tempfilepath,
