@@ -99,7 +99,7 @@ def hpc_run(args):
     length_imsize = train_dataset.length_imsize
     width_imsize = train_dataset.width_imsize
     n_colors = train_dataset.n_colors
-            
+
     ########################## 2. CREATE MODEL  ##########################
     # create model
     model = hpcrun.createmodel(num_classes, length_imsize, width_imsize, n_colors)

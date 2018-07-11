@@ -130,6 +130,7 @@ class EZNetTrainer(BaseTrainer):
 
     def weighted_binary_crossentropy(self, y_true, y_pred):
         from keras.losses import binary_crossentropy
+        import functools
         false_positive_weight = self.train_dataset.class_weight[1]        
         false_negative_weight = self.train_dataset.class_weight[0]
         thresh = 0.5
@@ -169,12 +170,6 @@ class EZNetTrainer(BaseTrainer):
         - sets post-prediction-regularizer
         """
         # initialize loss function, SGD optimizer and metrics
-        import functools
-        # from dnn.keras_models.trainers.loss.custom_loss import weighted_binary_crossentropy, w_categorical_crossentropy
-        # ncce = functools.partial(w_categorical_crossentropy, weights=self.train_dataset.class_weight)
-        # ncce = functools.partial(weighted_binary_crossentropy)
-        false_positive_weight = self.train_dataset.class_weight[1]     
-        false_negative_weight = self.train_dataset.class_weight[1]
         model_params = {
             # 'loss': 'binary_crossentropy',
             'loss': self.weighted_binary_crossentropy,
@@ -198,10 +193,11 @@ class EZNetTrainer(BaseTrainer):
         # callbacks availabble
         checkpoint = ModelCheckpoint(tempfilepath,
                                      # monitor='val_acc',
-                                     monitor=categorical_accuracy,
+                                     monitor='val_categorical_accuracy',
                                      verbose=1,
                                      save_best_only=True,
                                      mode='max')
+
         reduce_lr = ReduceLROnPlateau(monitor='val_loss', 
                                     factor=0.5,
                                     patience=10, 
@@ -215,11 +211,12 @@ class EZNetTrainer(BaseTrainer):
                                     embeddings_layer_names=None, 
                                     embeddings_metadata=None, 
                                     embeddings_data=None)
+
         metrichistory = MetricsCallback()
         self.callbacks = [
-                        # checkpoint,
-                        # reduce_lr,
-                        # tboard,
+                        checkpoint,
+                        reduce_lr,
+                        tboard,
                         metrichistory
                     ]
 
@@ -236,7 +233,8 @@ class EZNetTrainer(BaseTrainer):
 
         # create a "learning phase" function, to allow prediction with uncertainty
         f = K.Function(self.model.inputs + [K.learning_phase()], self.model.outputs)
-        X = [self.test_dataset.X_aux, self.test_dataset.X_chan]
+        # X = [self.test_dataset.X_aux, self.test_dataset.X]
+        X = self.test_dataset.X
         prediction, uncertainty = predict_with_uncertainty(f, X, n_iter=50)
 
         # determine scoring of these predictions
@@ -253,7 +251,7 @@ class EZNetTrainer(BaseTrainer):
         # print("Training data: ", self.train_dataset.X_aux.shape,  self.train_dataset.y.shape)
         # print("Testing data: ",  self.test_dataset.X_aux.shape,  self.test_dataset.y.shape)
         print("Class weights are: ",  self.train_dataset.class_weight)
-        test = np.argmax( self.train_dataset.ylabels, axis=1)
+        test = np.argmax( self.train_dataset.y, axis=1)
         print("class imbalance: ", np.sum(test), len(test))
 
         # swap the class weights
@@ -266,11 +264,11 @@ class EZNetTrainer(BaseTrainer):
             print('Not using data augmentation. Implement Solution still!')
             HH = self.model.fit(self.train_dataset.X,
                 # [self.train_dataset.X_aux, self.train_dataset.X_chan], 
-                              self.train_dataset.ylabels,
+                              self.train_dataset.y,
                               batch_size = self.batch_size,
                               epochs=self.num_epochs,
                               # validation_data=([self.test_dataset.X_aux, self.test_dataset.X_chan], self.test_dataset.ylabels),
-                              validation_data=(self.test_dataset.X, self.test_dataset.ylabels),
+                              validation_data=(self.test_dataset.X, self.test_dataset.y),
                               shuffle=self.shuffle,
                               # class_weight= self.train_dataset.class_weight,
                               callbacks=self.callbacks, verbose=2)
@@ -313,7 +311,7 @@ class EZNetTrainer(BaseTrainer):
                                         callbacks=self.callbacks, verbose=2)
 
         self.HH = HH
-        self.metrichistory = self.callbacks[0] 
+        self.metrichistory = self.callbacks[-1] 
 
     def _loadgenerator(self):
         imagedatagen_args = {

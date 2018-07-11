@@ -157,14 +157,8 @@ class ReaderEZNetDataset(BaseAuxLoader):
 
         if mode == constants.TRAIN:
             self.train_dataset = TrainDataset(chan_tensors, ylabels, aux_tensors)
-            # self.train_dataset.X_aux = aux_tensors
-            # self.train_dataset.X = chan_tensors
-            # self.train_dataset.y = ylabels
             self.train_dataset.class_weight = class_weight
         elif mode == constants.TEST:
             self.test_dataset = TestDataset(chan_tensors, ylabels, aux_tensors)
-            # self.test_dataset.X_aux = aux_tensors
-            # self.test_dataset.X = chan_tensors
-            # self.test_dataset.y = ylabels
             self.test_dataset.class_weight = class_weight
 

@@ -32,6 +32,11 @@ class BaseLoader(object):
 
     def __len__(self):
         return len(self.filelist)
+    
+    def split_data(self, X, y, train_size=.7):
+        X_train, X_test, y_train, y_test = train_test_split(X, y,  
+                                            test_size=1.-train_size)
+        return X_train, X_test, y_train, y_test
 
     def loadbydir(self, traindir, testdir, procedure='loo', testname=None):
         raise NotImplementedError("Need to implement function to load filepaths\

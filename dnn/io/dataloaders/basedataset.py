@@ -1,9 +1,15 @@
 import numpy as np 
+from sklearn.model_selection import train_test_split
 
 class Dataset(object):
     def __len__(self):
         return len(self.X)
 
+    def split_data(self, train_size=.7):
+        X_train, X_test, y_train, y_test = train_test_split(self.X, self.y, 
+                                            test_size=1.-train_size)
+        return X_train, X_test, y_train, y_test
+        
     @property
     def imsize(self):
         if isinstance(self.X, list):

@@ -27,15 +27,15 @@ ml python/3.6.5
 module list
 
 # expname="exp_win500_step250_largemem"
-expname="eznet_baseline_tcn"
+expname="eznet_naivebaseline_tcn"
 ## For training and modeling with the simulated data
 traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/mne_methods/win500_step250"
 testdatadir=$traindatadir
 # traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/pipeline/"
 # testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/traindata_fft/realtng/pipeline/"
 
-# traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/eznet/trainpats/"
-# testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/eznet/testpats/"
+traindatadir="/scratch/users/ali39@jhu.edu/data/dnn/eznet/trainpats/"
+testdatadir="/scratch/users/ali39@jhu.edu/data/dnn/eznet/trainpats/"
 
 # logs for the training logs, and outputdata directory for final summary
 logdatadir="/scratch/users/ali39@jhu.edu/data/dnn/logs/$expname/" 			
