@@ -187,13 +187,13 @@ class EZNetTrainer(BaseTrainer):
         print("false_positive_weight = ", self.train_dataset.class_weight[0])        
         print("false_negative_weight = ", self.train_dataset.class_weight[1])
 
-        tempfilepath = os.path.join(self.explogdir, "weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5")
+        value_monitor = 'val_categorical_accuracy'
+        tempfilepath = os.path.join(self.explogdir, "weights-improvement-{epoch:02d}-{val_categorical_accuracy:.2f}.hdf5")
 
         '''                         CREATE CALLBACKS                        '''
         # callbacks availabble
         checkpoint = ModelCheckpoint(tempfilepath,
-                                     # monitor='val_acc',
-                                     monitor='val_categorical_accuracy',
+                                     monitor=value_monitor,
                                      verbose=1,
                                      save_best_only=True,
                                      mode='max')
