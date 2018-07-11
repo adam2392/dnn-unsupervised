@@ -36,7 +36,6 @@ class ReaderEZNetDataset(BaseAuxLoader):
                  # \
                     # and testname not in file:
                     self.testfilepaths.append(os.path.join(root, file))
-
         
         ''' Get list of file paths '''
         self.trainfilepaths = []

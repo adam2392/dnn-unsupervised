@@ -60,7 +60,7 @@ class TrainDataset(Dataset):
     y = None
     class_weight = None
     def __init__(self, X, y, X_aux=None):
-        if X.ndim==3:
+        if X.ndim==2:
             X = X[...,np.newaxis]
         self.X  = X 
         self.y = y 
@@ -77,7 +77,7 @@ class TestDataset(Dataset):
     y = None
     class_weight = None
     def __init__(self, X, y, X_aux=None):
-        if X.ndim==3:
+        if X.ndim==2:
             X = X[...,np.newaxis]
         self.X  = X 
         self.y = y 
